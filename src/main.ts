@@ -1,11 +1,11 @@
 import * as  bodyParser from 'body-parser';
-import * as express from 'express';
+import express, {Request, Response} from 'express';
 
 import {Block, generateNextBlock, getBlockChain} from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
 
-const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
-const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
+const httpPort: number = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT): 3001;
+const p2pPort: number = process.env.P2P_PORT ? parseInt(process.env.P2P_PORT) : 6001;
 
 
 /*
@@ -29,12 +29,12 @@ const initHTTPServer = (myHTTPPort: number) =>{
     app.use(bodyParser.json());
 
     //GET /blocks: returns the current state of the entire block chain as JSON
-    app.get('/blocks', (req, res) =>{
+    app.get('/blocks', (req: Request, res: Response) =>{
         res.send(getBlockChain());
     });
 
     //POST/minceBlock: mines a new block using the data sent in the requets of req.body.data
-    app.post('/mineBlock', (req, res) =>{
+    app.post('/mineBlock', (req: Request, res: Response) =>{
         const newBlock: Block = generateNextBlock(req.body.data);
         res.send(newBlock);
     });
@@ -42,11 +42,11 @@ const initHTTPServer = (myHTTPPort: number) =>{
     //GET /peers: returns a list of peer connections
     //getSockets() retrieves all active WebSocket connctions
     //Then, each peer's IP and port are returned
-    app.get('/peers', (req, res) => {
+    app.get('/peers', (req: Request, res: Response) => {
         res.send(getSockets().map(( s: any ) => s._socket.remoteAddress + ':' + s._socket.remotePort));
     });
 
-    app.post('/addPeer', (req, res) => {
+    app.post('/addPeer', (req: Request, res: Response) => {
         connectToPeers(req.body.peer);
         res.send();
     });
