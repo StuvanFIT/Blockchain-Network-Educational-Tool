@@ -1,4 +1,4 @@
-import * as WebSocket from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import {Server} from 'ws';
 import {addBlockToChain, Block, getBlockChain, getLatestBlock, isValidBlockStructure, replaceChain} from './blockchain';
 
@@ -16,7 +16,7 @@ class Message {
 }
 
 const initP2PServer = (p2pPort: number) => {
-    const server: Server = new WebSocket.Server({port: p2pPort});
+    const server: Server = new WebSocketServer({port: p2pPort});
     server.on('connection', (ws: WebSocket) => {
         initConnection(ws);
     });
