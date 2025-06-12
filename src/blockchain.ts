@@ -1,5 +1,6 @@
 import * as CryptoJs from 'crypto-js';
 import {broadcastLatest} from './p2p';
+import {hexToBinary} from './utils';
 //Code for simple block structure
 class Block {
 
@@ -8,20 +9,24 @@ class Block {
     public previousHash: string;
     public timestamp: number;
     public data: string;
+    public difficulty: number;
+    public nonce: number; //nonce is the current value that when combined with other block data and hashed, results in a hash that meets the network's difficulty target. 
 
 
-    constructor(index: number, hash: string, previousHash: string, timestamp: number, data: string){
+    constructor(index: number, hash: string, previousHash: string, timestamp: number, data: string, difficulty:number, nonce: number){
         this.index = index;
         this.hash = hash;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.data = data;
+        this.difficulty = difficulty;
+        this.nonce = nonce;
     }
 }
 
 //Genesis block: the first block of the blockchain. THis block has no previousHash (root).
 const genesisBlock: Block = new Block (
-    0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7', ' ', 1465154705, 'my genesis block!!');
+    0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7', ' ', 1465154705, 'my genesis block!!', 0,0);
 
 
 //Storing the Block chain:
@@ -38,6 +43,17 @@ const calculateHash = (index: number, previousHash: string, timestamp: number, d
 
 const calculateHashForBlock = (newBlock: Block): string =>
     calculateHash(newBlock.index, newBlock.previousHash, newBlock.timestamp, newBlock.data);
+
+
+
+const hashMatchesDifficulty = (hash:string, difficulty: number): boolean  =>{
+    const binaryHash:string = hexToBinary(hash);
+    const requiredPrefix: string = '0'.repeat(difficulty);
+    return binaryHash.startsWith(requiredPrefix);   
+}
+
+
+
 
 
 /*
@@ -66,11 +82,28 @@ const generateNextBlock = (blockData: string) => {
     const nextIndex: number = previousBlock.index + 1;
     const nextTimeStamp: number = new Date().getTime() /1000;
     const nextHash: string = calculateHash(nextIndex, previousBlock.hash, nextTimeStamp, blockData);
-    const newBlock: Block = new Block(nextIndex, nextHash, previousBlock.hash, nextTimeStamp, blockData);
+    const newBlock: Block = new Block(nextIndex, nextHash, previousBlock.hash, nextTimeStamp, blockData,0,0);
     addBlock(newBlock);
     broadcastLatest();
     return newBlock;
 };
+
+//Finding a block: to find a valid block hash we must increase the nonce as until we get a valid hash
+//When the block is found, it is broadcasted to the network
+const findBlock = (index:number, previousHash:string, timestamp:number, data:string, difficulty:number):Block =>{
+
+    let nonce = 0;
+
+    while (true) {
+        const currHash: string = calculateHash(index, previousHash, timestamp, data);
+
+        if (hashMatchesDifficulty(currHash, difficulty)){
+            return new Block(index, currHash, previousHash, timestamp, data, difficulty, nonce);
+        }
+
+        nonce++;
+    }
+}
 
 
 
