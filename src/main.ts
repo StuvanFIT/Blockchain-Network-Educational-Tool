@@ -136,6 +136,6 @@ const initHttpServer = (myHttpPort: number) => {
     });
 };
 
+initWallet();
 initHttpServer(httpPort);
 initP2PServer(p2pPort);
-initWallet();

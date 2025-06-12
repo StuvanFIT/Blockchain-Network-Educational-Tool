@@ -24,11 +24,8 @@ const generatePrivateKey = (): string => {
 };
 
 const initWallet = () => {
-    // let's not override existing private keys
-    if (existsSync(privateKeyLocation)) {
-        return;
-    }
     const newPrivateKey = generatePrivateKey();
+    console.log(newPrivateKey)
 
     writeFileSync(privateKeyLocation, newPrivateKey);
     console.log('new wallet with private key created to : %s', privateKeyLocation);
