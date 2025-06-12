@@ -33,9 +33,64 @@ const genesisBlock: Block = new Block (
 //For now, we will be using a JS array to store the block chain
 let blockchain: Block[] = [genesisBlock];
 
+
 const getBlockChain = (): Block[] => blockchain;
 
 const getLatestBlock = (): Block => blockchain[blockchain.length -1];
+
+/*
+Consensus on the difficulty
+We have now the means to find and verify the hash for a given difficulty, but how is the difficulty determined?
+
+block generation interval: how often a new block should be found
+difficulty adjustmnet interval: how often the difficulty should adjust to the increasing/decreasing network hash rate
+
+Based on BITCOIN:
+const BLOCK_GENERATION_INTERVAL: number = 10; // in seconds
+const DIFFICULTY_ADJUSTMNET_INTERVAL:number = 2016; // in blocks
+
+In the below example:
+For every 10 blocks generated, we check if the time that took to generate those blocks are larger or smaller than the expected time
+
+*/
+const BLOCK_GENERATION_INTERVAL: number = 10; // in seconds
+const DIFFICULTY_ADJUSTMNET_INTERVAL:number = 10; // in blocks
+
+const getDifficulty = (blockChain: Block[]): number =>{
+
+    const latestBlock: Block = blockChain[blockChain.length - 1];
+
+    if (latestBlock.index % DIFFICULTY_ADJUSTMNET_INTERVAL ===0 && latestBlock.index !== 0){
+        return getAdjustedDifficulty(latestBlock, blockChain);
+    }
+
+    return latestBlock.difficulty;
+
+}
+
+const getAdjustedDifficulty = (latestBlock: Block, blockChain: Block[]): number => {
+
+    //Expected time to generate 10 blocks = 100 seconds
+    const expectedTime: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMNET_INTERVAL;
+    const previousAdjustmentBlock: Block = blockchain[blockChain.length - DIFFICULTY_ADJUSTMNET_INTERVAL];
+    const timeTaken: number = latestBlock.timestamp - previousAdjustmentBlock.timestamp;
+
+    /*
+    If blocks were generated too quickly (less than half the expected time)  --> increase difficulty
+    If blocks were generated too slowly (more than double the expected time) --> decrease difficulty
+    Else, keep the difficulty the same
+    */
+    if (timeTaken < expectedTime/2){
+        return previousAdjustmentBlock.difficulty + 1;
+    } else if (timeTaken > expectedTime * 2){
+        return previousAdjustmentBlock.difficulty - 1;
+    } else {
+        return previousAdjustmentBlock.difficulty;
+    };
+}
+
+
+
 
 //Computing the hash of the block. The hash is calculated over all data of the block
 const calculateHash = (index: number, previousHash: string, timestamp: number, data: string): string =>
@@ -50,7 +105,7 @@ const hashMatchesDifficulty = (hash:string, difficulty: number): boolean  =>{
     const binaryHash:string = hexToBinary(hash);
     const requiredPrefix: string = '0'.repeat(difficulty);
     return binaryHash.startsWith(requiredPrefix);   
-}
+};
 
 
 
