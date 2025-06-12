@@ -1,6 +1,7 @@
 import * as  bodyParser from 'body-parser';
 import express from 'express';
 import * as _ from 'lodash';
+import cors from 'cors';
 import {
     Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
     getBlockchain, getMyUnspentTransactionOutputs, getUnspentTxOuts, sendTransaction
@@ -17,15 +18,20 @@ const initHttpServer = (myHttpPort: number) => {
     const app = express();
     app.use(bodyParser.json());
 
+    app.use(cors());
+
     app.use((err, req, res, next) => {
         if (err) {
             res.status(400).send(err.message);
         }
     });
 
+
     app.get('/blocks', (req, res) => {
         res.send(getBlockchain());
     });
+
+
 
     app.get('/block/:hash', (req, res) => {
         const block = _.find(getBlockchain(), {'hash' : req.params.hash});
