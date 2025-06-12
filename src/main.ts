@@ -1,64 +1,147 @@
-import * as  bodyParser from 'body-parser';
-import express, {Request, Response} from 'express';
-
-import {Block, generateNextBlock, getBlockChain} from './blockchain';
+import bodyParser from 'body-parser';
+import express from 'express';
+import _ from 'lodash';
+import cors from 'cors';
+import {
+    Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
+    getBlockchain, getMyUnspentTransactionOutputs, getUnspentTxOuts, sendTransaction
+} from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
+import {UnspentTxOut} from './transaction';
+import {getTransactionPool} from './transactionPool';
+import {getPublicFromWallet, initWallet} from './wallet';
 
-const httpPort: number = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT): 3001;
-const p2pPort: number = process.env.P2P_PORT ? parseInt(process.env.P2P_PORT) : 6001;
+const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
+const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
 
-
-/*
-An essential part of a node is to share and sync the blockchain with other nodes. The following rules are used to keep the network in sync.
-
-When a node generates a new block, it broadcasts it to the network
-When a node connects to a new peer it querys for the latest block
-When a node encounters a block that has an index larger than the current known block, it either adds the block the its current chain or querys for the full blockchain.
-
-We will be using websockets for Peer to peer communication
-
-The user must be able to control the node in some way. This is done by setting up a HTTP server.
--the http server provides a REST API interface for users to control the blockchain node
-*/
-
-//We listen on myHTTPPort: Sets up API routes to interact with the blockchain node (e.g., getting the blockchain, mining new blocks, managing peers).
-const initHTTPServer = (myHTTPPort: number) =>{
-
-    //Adds middleware to parse incoming JSON request bodies. Particularly used for POST requests that send data.
+const initHttpServer = (myHttpPort: number) => {
     const app = express();
     app.use(bodyParser.json());
 
-    //GET /blocks: returns the current state of the entire block chain as JSON
-    app.get('/blocks', (req: Request, res: Response) =>{
-        res.send(getBlockChain());
+    app.use(cors());
+
+    app.use((err, req, res, next) => {
+        if (err) {
+            res.status(400).send(err.message);
+        }
     });
 
-    //POST/minceBlock: mines a new block using the data sent in the requets of req.body.data
-    app.post('/mineBlock', (req: Request, res: Response) =>{
-        const newBlock: Block = generateNextBlock(req.body.data);
-        res.send(newBlock);
+
+    app.get('/blocks', (req, res) => {
+        res.send(getBlockchain());
     });
 
-    //GET /peers: returns a list of peer connections
-    //getSockets() retrieves all active WebSocket connctions
-    //Then, each peer's IP and port are returned
-    app.get('/peers', (req: Request, res: Response) => {
-        res.send(getSockets().map(( s: any ) => s._socket.remoteAddress + ':' + s._socket.remotePort));
+
+
+    app.get('/block/:hash', (req, res) => {
+        const block = _.find(getBlockchain(), {'hash' : req.params.hash});
+        res.send(block);
     });
 
-    app.post('/addPeer', (req: Request, res: Response) => {
+    app.get('/transaction/:id', (req, res) => {
+        const tx = _(getBlockchain())
+            .map((blocks) => blocks.data)
+            .flatten()
+            .find({'id': req.params.id});
+        res.send(tx);
+    });
+
+    app.get('/address/:address', (req, res) => {
+        const unspentTxOuts: UnspentTxOut[] =
+            _.filter(getUnspentTxOuts(), (uTxO) => uTxO.address === req.params.address);
+        res.send({'unspentTxOuts': unspentTxOuts});
+    });
+
+    app.get('/unspentTransactionOutputs', (req, res) => {
+        res.send(getUnspentTxOuts());
+    });
+
+    app.get('/myUnspentTransactionOutputs', (req, res) => {
+        res.send(getMyUnspentTransactionOutputs());
+    });
+
+    app.post('/mineRawBlock', (req, res) => {
+        if (req.body.data == null) {
+            res.send('data parameter is missing');
+            return;
+        }
+        const newBlock: Block = generateRawNextBlock(req.body.data);
+        if (newBlock === null) {
+            res.status(400).send('could not generate block');
+        } else {
+            res.send(newBlock);
+        }
+    });
+
+    app.post('/mineBlock', (req, res) => {
+        const newBlock: Block = generateNextBlock();
+        if (newBlock === null) {
+            res.status(400).send('could not generate block');
+        } else {
+            res.send(newBlock);
+        }
+    });
+
+    app.get('/balance', (req, res) => {
+        const balance: number = getAccountBalance();
+        res.send({'balance': balance});
+    });
+
+    app.get('/address', (req, res) => {
+        const address: string = getPublicFromWallet();
+        res.send({'address': address});
+    });
+
+    app.post('/mineTransaction', (req, res) => {
+        const address = req.body.address;
+        const amount = req.body.amount;
+        try {
+            const resp = generatenextBlockWithTransaction(address, amount);
+            res.send(resp);
+        } catch (e) {
+            console.log(e.message);
+            res.status(400).send(e.message);
+        }
+    });
+
+    app.post('/sendTransaction', (req, res) => {
+        try {
+            const address = req.body.address;
+            const amount = req.body.amount;
+
+            if (address === undefined || amount === undefined) {
+                throw Error('invalid address or amount');
+            }
+            const resp = sendTransaction(address, amount);
+            res.send(resp);
+        } catch (e) {
+            console.log(e.message);
+            res.status(400).send(e.message);
+        }
+    });
+
+    app.get('/transactionPool', (req, res) => {
+        res.send(getTransactionPool());
+    });
+
+    app.get('/peers', (req, res) => {
+        res.send(getSockets().map((s: any) => s._socket.remoteAddress + ':' + s._socket.remotePort));
+    });
+    app.post('/addPeer', (req, res) => {
         connectToPeers(req.body.peer);
         res.send();
     });
 
-    app.listen(myHTTPPort, () => {
-        console.log('Listening http on port: ' + myHTTPPort);
+    app.post('/stop', (req, res) => {
+        res.send({'msg' : 'stopping server'});
+        process.exit();
     });
-}
 
-initHTTPServer(httpPort);
+    app.listen(myHttpPort, () => {
+        console.log('Listening http on port: ' + myHttpPort);
+    });
+};
+
+initWallet();
+initHttpServer(httpPort);
 initP2PServer(p2pPort);
-
-
-
-

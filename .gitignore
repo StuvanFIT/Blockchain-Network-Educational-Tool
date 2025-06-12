@@ -1,0 +1,7 @@
+private_key
+node_modules
+npm-debug.log
+.idea
+src/*.js
+src/*.map
+node/wallet/private_key
