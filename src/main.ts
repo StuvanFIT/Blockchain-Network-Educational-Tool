@@ -1,5 +1,5 @@
 import * as  bodyParser from 'body-parser';
-import * as express from 'express';
+import express from 'express';
 import * as _ from 'lodash';
 import {
     Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
