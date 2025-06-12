@@ -1,6 +1,6 @@
-import * as  bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 import express from 'express';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import cors from 'cors';
 import {
     Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,

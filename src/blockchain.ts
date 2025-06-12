@@ -1,5 +1,5 @@
-import * as CryptoJS from 'crypto-js';
-import * as _ from 'lodash';
+import CryptoJS from 'crypto-js';
+import _ from 'lodash';
 import {broadcastLatest, broadCastTransactionPool} from './p2p';
 import {
     getCoinbaseTransaction, isValidAddress, processTransactions, Transaction, UnspentTxOut

@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {Transaction, TxIn, UnspentTxOut, validateTransaction} from './transaction';
 
 let transactionPool: Transaction[] = [];

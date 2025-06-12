@@ -15,6 +15,7 @@ type Block = {
 
 
 
+
 const BlockExplorer = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
@@ -37,17 +38,21 @@ const BlockExplorer = () => {
       {/* Sidebar */}
       <div className="w-80 bg-white shadow-xl border-r border-slate-200">
         <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-              <Hash className="w-6 h-6" />
+            <div className='flex flex-col'>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <Hash className="w-6 h-6" />
+                    </div>
+                    <div>
+                    <h2 className="text-xl font-bold">Blockchain Explorer</h2>
+                    <p className="text-blue-100 text-sm">{blocks.length} blocks</p>
+                    </div>
+                </div>
+                <span className='mt-6 text-blue-100 text-sm'>Each card represents a block on the chain. Feel free to click on the block to see the transactions inside of it!  </span>
             </div>
-            <div>
-              <h2 className="text-xl font-bold">Blockchain Explorer</h2>
-              <p className="text-blue-100 text-sm">{blocks.length} blocks</p>
-            </div>
-          </div>
         </div>
         
+        {/*Block chain elements on left side */}
         <div className="overflow-y-auto h-full pb-6">
           {blocks.map((block, index) => (
             <div
@@ -163,7 +168,7 @@ const BlockExplorer = () => {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-slate-600">Transaction ID</p>
-                          <p className="font-mono text-sm text-slate-800">{formatHash(tx.id, 16)}</p>
+                          <p className="font-mono text-sm text-slate-800">{tx.id}</p>
                         </div>
                       </div>
                     </div>
@@ -211,10 +216,10 @@ const BlockExplorer = () => {
                                 <Coins className="w-4 h-4 text-green-600" />
                                 <div className="flex-1">
                                   <p className="font-mono text-sm text-slate-700">
-                                    {formatAddress(output.address)}
+                                    Address: {formatAddress(output.address)}
                                   </p>
                                   <p className="text-sm font-semibold text-green-700 mt-1">
-                                    {output.amount} coins
+                                    Total Amount: {output.amount} coins
                                   </p>
                                 </div>
                               </div>

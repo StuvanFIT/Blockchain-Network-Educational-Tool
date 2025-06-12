@@ -1,5 +1,5 @@
-import * as CryptoJS from 'crypto-js';
-import * as ecdsa from 'elliptic';
+import CryptoJS from 'crypto-js';
+import ecdsa from 'elliptic';
 import _ from 'lodash';
 
 
