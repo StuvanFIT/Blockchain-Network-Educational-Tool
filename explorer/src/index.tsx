@@ -1,16 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import BlockExplorer from './components/BlockExplorer';
+import App from './App';
 import './styles/tailwind.css';
 
+import { BrowserRouter } from 'react-router-dom';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Root element not found');
+}
+
+ReactDOM.createRoot(container).render (
   <React.StrictMode>
-    <BlockExplorer />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>
 );
+
 
 
