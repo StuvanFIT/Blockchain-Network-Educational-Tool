@@ -24,8 +24,8 @@ function App() {
                 <Route path="createTransactions" element={<Transactions/>}/>
                 <Route path="hash" element={<HashDemo/>}/>
 
-                    {/*Not found page */}
-                    <Route path="*" element={<NotFound />} />
+                {/*Not found page */}
+                <Route path="*" element={<NotFound />} />
             </Route>
         </Routes>
 
