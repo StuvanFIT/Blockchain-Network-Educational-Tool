@@ -21,7 +21,7 @@
     "jsx": "react-jsx",
   },
   "include": [
-    "imports/blockchain/main.ts",
+    "src/blockchain/main.ts",
     "src"
 , "main"  ]
 }

@@ -131,8 +131,12 @@ const generatenextBlockWithTransaction = (receiverAddress: string, amount: numbe
 
 const findBlock = (index: number, previousHash: string, timestamp: number, data: Transaction[], difficulty: number): Block => {
     let nonce = 0;
+    let attempts = 0;
+
     while (true) {
         const hash: string = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
+        attempts++;
+        
         if (hashMatchesDifficulty(hash, difficulty)) {
             return new Block(index, hash, previousHash, timestamp, data, difficulty, nonce);
         }
@@ -295,5 +299,5 @@ export {
     Block, getBlockchain, getUnspentTxOuts, getLatestBlock, sendTransaction,
     generateRawNextBlock, generateNextBlock, generatenextBlockWithTransaction,
     handleReceivedTransaction, getMyUnspentTransactionOutputs,
-    getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain
+    getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain, findBlock
 };

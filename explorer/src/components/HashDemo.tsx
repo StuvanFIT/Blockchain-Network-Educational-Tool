@@ -1,6 +1,8 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useState, useRef }  from 'react';
 import { BarChart3 } from "lucide-react";
 import CryptoJS from 'crypto-js';
+
+import { hexToBinary } from '../blockchain/utils';
 
 // Analytics Page
 export const HashDemo = () => {
@@ -8,13 +10,19 @@ export const HashDemo = () => {
   const getCurrentTimestamp = (): number => Math.round(new Date().getTime() / 1000);
 
   const [hash, setHash] = useState('');
+  const [hashBinary, setHashBinary] = useState('');
 
   const [data, setData] = useState('');
   const [index, setIndex] = useState(0);
   const [previousHash, setPreviousHash] = useState('');
   const [timestamp, setTimeStamp] = useState(getCurrentTimestamp());
   const [difficulty, setDifficulty] = useState('');
-  const [nonce, setNonce] = useState('');
+  const [nonce, setNonce] = useState(0);
+
+  //Mining Status
+  const [isMining, setIsMining] = useState(false);
+  const isMiningRef = useRef(false);
+  const [miningStatus, setMiningStatus] = useState({attempts: 0, timeStarted: 0, timeFinished: "Pending..."});
   
 
   const handleChange = (setter: Function) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -23,8 +31,6 @@ export const HashDemo = () => {
 
   const calcHashDemo = (index:number, previousHash:string, timestamp:number, data:string, difficulty:number, nonce: number):string =>
     CryptoJS.SHA256(`${index ?? ''}${previousHash ?? ''}${timestamp ?? ''}${data ?? ''}${difficulty ?? ''}${nonce ?? ''}`).toString();
-
-
 
   useEffect(() => {
     const allEmpty = [data, index, previousHash, timestamp, difficulty, nonce].every(f => !f);
@@ -35,6 +41,67 @@ export const HashDemo = () => {
     }
   }, [data, index, previousHash, timestamp, difficulty, nonce]);
     
+  const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
+      const hashInBinary: string = hexToBinary(hash);
+      const requiredPrefix: string = '0'.repeat(difficulty);
+      return hashInBinary.startsWith(requiredPrefix);
+  };
+
+  const mineBlock = async () =>{
+    if (isMiningRef.current){
+      return;
+    };
+    //We are mining now
+    setIsMining(true);
+    isMiningRef.current = true;
+    setMiningStatus({attempts:0, timeStarted: Date.now(), timeFinished: "Pending..."});
+
+    //Find the matching block
+    let attempts = 0;
+    let currNonce = 0;
+
+    while (true) {
+      
+
+      const currHash =  calcHashDemo(Number(index), previousHash, Number(timestamp), data, Number(difficulty), currNonce);
+    
+      attempts++;
+
+      //Every 1000 attempts, update the UI
+      if (attempts % 1000 ===0 ){
+        setMiningStatus({attempts: attempts, timeStarted: miningStatus.timeStarted, timeFinished: miningStatus.timeFinished});
+        setNonce(currNonce);
+        setHash(currHash);
+        setHashBinary(hexToBinary(currHash))
+        //ALlow the UI to update
+        await new Promise(resolve => setTimeout(resolve, 1));
+      };
+
+      //Check if we have a matching block --> zeroes match the difficulty level given
+      if (hashMatchesDifficulty(currHash, Number(difficulty))) {
+        setNonce(currNonce);
+        setHash(currHash);
+        setHashBinary(hexToBinary(currHash))
+        setMiningStatus({attempts: attempts, timeStarted: miningStatus.timeStarted, timeFinished: Date.now().toString()});
+        setIsMining(false);
+        isMiningRef.current = false;
+        return;
+      };
+
+      currNonce++;
+
+      //Limit break
+      if (attempts > 1000000){
+        setIsMining(false);
+        isMiningRef.current = false;
+        setMiningStatus({attempts:attempts,  timeStarted: miningStatus.timeStarted, timeFinished: miningStatus.timeFinished});
+        alert('Mining has halted after 1,000,000 attempts. Maybe try reducing the difficulty.');
+        return;
+      };
+
+    };
+
+  }
 
 
 
@@ -58,8 +125,25 @@ export const HashDemo = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
             <label htmlFor="hash-output" className="block mb-2 text-sm font-medium text-gray-900">Hash Output</label>
             <textarea id="hash-output" className='w-full h-24 p-4 border border-gray-500 rounded-md bg-orange-100 resize-none' value={hash} spellCheck={false}></textarea>
+            <label htmlFor="hash-binary" className="block mb-2 text-sm font-medium text-gray-900">Hash Binary</label>
+            <textarea id="hash-binary" className='w-full h-24 p-4 border border-gray-500 rounded-md bg-orange-100 resize-none' value={hashBinary} spellCheck={false}></textarea>
          </div>
+        
+        <div className='bg-white rounded-2xl shadow-lg p-8 border border-slate-200 mt-8 mb-8'>
+          <button 
+          onClick={mineBlock}
+          disabled={isMining}
+          className='px-6 py-6 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium'>Mine Block</button>
 
+          {isMining && (
+            <div> 
+              <div>Attempts: {miningStatus.attempts} </div>
+              <div>Time Started: {miningStatus.timeStarted} </div>
+              <div>Time Completed: {miningStatus.timeFinished} </div>
+            </div>
+
+          )}
+        </div>
 
         <div className="bg-white rounded-2xl mt-6 shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
