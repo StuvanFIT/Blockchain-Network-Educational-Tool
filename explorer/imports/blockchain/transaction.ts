@@ -25,6 +25,12 @@ class TxIn {
     public txOutId: string;
     public txOutIndex: number;
     public signature: string;
+
+    constructor (txOutId: string, txOutIndex: number, signature: string) {
+        this.txOutId = txOutId;
+        this.txOutIndex = txOutIndex;
+        this.signature = signature;
+    } 
 }
 
 class TxOut {
@@ -40,9 +46,14 @@ class TxOut {
 class Transaction {
 
     public id: string;
-
     public txIns: TxIn[];
     public txOuts: TxOut[];
+
+    constructor (id: string, txIns: TxIn[], txOuts: TxOut[]){
+        this.id = id;
+        this.txIns = txIns;
+        this.txOuts = txOuts;
+    }
 }
 
 const getTransactionId = (transaction: Transaction): string => {
@@ -141,7 +152,7 @@ const validateCoinbaseTx = (transaction: Transaction, blockIndex: number): boole
     }
     if (transaction.txIns.length !== 1) {
         console.log('one txIn must be specified in the coinbase transaction');
-        return;
+        return false;
     }
     if (transaction.txIns[0].txOutIndex !== blockIndex) {
         console.log('the txIn signature in coinbase tx must be the block height');
@@ -159,9 +170,9 @@ const validateCoinbaseTx = (transaction: Transaction, blockIndex: number): boole
 };
 
 const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
-    const referencedUTxOut: UnspentTxOut =
+    const referencedUTxOut: UnspentTxOut | undefined =
         aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex);
-    if (referencedUTxOut == null) {
+    if (!referencedUTxOut) {
         console.log('referenced txOut not found: ' + JSON.stringify(txIn));
         return false;
     }
@@ -177,16 +188,21 @@ const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: Unsp
 };
 
 const getTxInAmount = (txIn: TxIn, aUnspentTxOuts: UnspentTxOut[]): number => {
-    return findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts).amount;
+    const utxo = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
+    if (!utxo) {
+        console.log("UTXO not found for TxIn:", JSON.stringify(txIn));
+        return 0; 
+    }
+    return utxo.amount;
 };
 
-const findUnspentTxOut = (transactionId: string, index: number, aUnspentTxOuts: UnspentTxOut[]): UnspentTxOut => {
-    return aUnspentTxOuts.find((uTxO) => uTxO.txOutId === transactionId && uTxO.txOutIndex === index);
+const findUnspentTxOut = (transactionId: string, index: number, aUnspentTxOuts: UnspentTxOut[]): UnspentTxOut | null => {
+    return aUnspentTxOuts.find((uTxO) => uTxO.txOutId === transactionId && uTxO.txOutIndex === index) ?? null;
 };
 
 const getCoinbaseTransaction = (address: string, blockIndex: number): Transaction => {
-    const t = new Transaction();
-    const txIn: TxIn = new TxIn();
+    const t = new Transaction("null", [],[]);
+    const txIn: TxIn = new TxIn('',blockIndex, '');
     txIn.signature = '';
     txIn.txOutId = '';
     txIn.txOutIndex = blockIndex;
@@ -202,7 +218,7 @@ const signTxIn = (transaction: Transaction, txInIndex: number,
     const txIn: TxIn = transaction.txIns[txInIndex];
 
     const dataToSign = transaction.id;
-    const referencedUnspentTxOut: UnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
+    const referencedUnspentTxOut: UnspentTxOut | null = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
     if (referencedUnspentTxOut == null) {
         console.log('could not find referenced txOut');
         throw Error();
@@ -248,14 +264,14 @@ const processTransactions = (aTransactions: Transaction[], aUnspentTxOuts: Unspe
     return updateUnspentTxOuts(aTransactions, aUnspentTxOuts);
 };
 
-const toHexString = (byteArray): string => {
+const toHexString = (byteArray:any): string => {
     return Array.from(byteArray, (byte: any) => {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('');
 };
 
 const getPublicKey = (aPrivateKey: string): string => {
-    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex');
+    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex', false);
 };
 
 const isValidTxInStructure = (txIn: TxIn): boolean => {

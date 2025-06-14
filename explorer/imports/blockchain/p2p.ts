@@ -20,6 +20,11 @@ enum MessageType {
 class Message {
     public type: MessageType;
     public data: any;
+
+    constructor (type: MessageType, data: any) {
+        this.type = type;
+        this.data = data;
+    }
 }
 
 const initP2PServer = (p2pPort: number) => {
@@ -44,7 +49,7 @@ const initConnection = (ws: WebSocket) => {
     }, 500);
 };
 
-const JSONToObject = <T>(data: string): T => {
+const JSONToObject = <T>(data: string): T | null => {
     try {
         return JSON.parse(data);
     } catch (e) {
@@ -57,7 +62,7 @@ const initMessageHandler = (ws: WebSocket) => {
     ws.on('message', (data: string) => {
 
         try {
-            const message: Message = JSONToObject<Message>(data);
+            const message: Message | null = JSONToObject<Message>(data);
             if (message === null) {
                 console.log('could not parse received JSON message: ' + data);
                 return;
@@ -71,7 +76,7 @@ const initMessageHandler = (ws: WebSocket) => {
                     write(ws, responseChainMsg());
                     break;
                 case MessageType.RESPONSE_BLOCKCHAIN:
-                    const receivedBlocks: Block[] = JSONToObject<Block[]>(message.data);
+                    const receivedBlocks: Block[] | null = JSONToObject<Block[]>(message.data);
                     if (receivedBlocks === null) {
                         console.log('invalid blocks received: %s', JSON.stringify(message.data));
                         break;
@@ -82,7 +87,7 @@ const initMessageHandler = (ws: WebSocket) => {
                     write(ws, responseTransactionPoolMsg());
                     break;
                 case MessageType.RESPONSE_TRANSACTION_POOL:
-                    const receivedTransactions: Transaction[] = JSONToObject<Transaction[]>(message.data);
+                    const receivedTransactions: Transaction[] | null = JSONToObject<Transaction[]>(message.data);
                     if (receivedTransactions === null) {
                         console.log('invalid transaction received: %s', JSON.stringify(message.data));
                         break;
@@ -93,7 +98,7 @@ const initMessageHandler = (ws: WebSocket) => {
                             // if no error is thrown, transaction was indeed added to the pool
                             // let's broadcast transaction pool
                             broadCastTransactionPool();
-                        } catch (e) {
+                        } catch (e:any) {
                             console.log(e.message);
                         }
                     });

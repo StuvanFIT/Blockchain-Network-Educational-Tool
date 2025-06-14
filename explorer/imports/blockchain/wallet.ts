@@ -14,7 +14,7 @@ const getPrivateFromWallet = (): string => {
 const getPublicFromWallet = (): string => {
     const privateKey = getPrivateFromWallet();
     const key = EC.keyFromPrivate(privateKey, 'hex');
-    return key.getPublic().encode('hex');
+    return key.getPublic().encode('hex', false);
 };
 
 const generatePrivateKey = (): string => {
@@ -64,7 +64,7 @@ const findTxOutsForAmount = (amount: number, myUnspentTxOuts: UnspentTxOut[]) =>
     throw Error(eMsg);
 };
 
-const createTxOuts = (receiverAddress: string, myAddress: string, amount, leftOverAmount: number) => {
+const createTxOuts = (receiverAddress: string, myAddress: string, amount:number, leftOverAmount: number) => {
     const txOut1: TxOut = new TxOut(receiverAddress, amount);
     if (leftOverAmount === 0) {
         return [txOut1];
@@ -108,7 +108,7 @@ const createTransaction = (receiverAddress: string, amount: number, privateKey: 
     const {includedUnspentTxOuts, leftOverAmount} = findTxOutsForAmount(amount, myUnspentTxOuts);
 
     const toUnsignedTxIn = (unspentTxOut: UnspentTxOut) => {
-        const txIn: TxIn = new TxIn();
+        const txIn: TxIn = new TxIn('', 1, '');
         txIn.txOutId = unspentTxOut.txOutId;
         txIn.txOutIndex = unspentTxOut.txOutIndex;
         return txIn;
@@ -116,7 +116,7 @@ const createTransaction = (receiverAddress: string, amount: number, privateKey: 
 
     const unsignedTxIns: TxIn[] = includedUnspentTxOuts.map(toUnsignedTxIn);
 
-    const tx: Transaction = new Transaction();
+    const tx: Transaction = new Transaction('', [],[]);
     tx.txIns = unsignedTxIns;
     tx.txOuts = createTxOuts(receiverAddress, myAddress, amount, leftOverAmount);
     tx.id = getTransactionId(tx);

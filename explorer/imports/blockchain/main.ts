@@ -11,8 +11,8 @@ import {UnspentTxOut} from './transaction';
 import {getTransactionPool} from './transactionPool';
 import {getPublicFromWallet, initWallet} from './wallet';
 
-const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
-const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
+const httpPort: number = parseInt(process.env.HTTP_PORT ?? '3001') || 3001;
+const p2pPort: number = parseInt(process.env.P2P_PORT ?? '6001') || 6001;
 
 const initHttpServer = (myHttpPort: number) => {
     const app = express();
@@ -20,7 +20,7 @@ const initHttpServer = (myHttpPort: number) => {
 
     app.use(cors());
 
-    app.use((err, req, res, next) => {
+    app.use((err:Error, req:any, res:any, next:any) => {
         if (err) {
             res.status(400).send(err.message);
         }
@@ -65,7 +65,7 @@ const initHttpServer = (myHttpPort: number) => {
             res.send('data parameter is missing');
             return;
         }
-        const newBlock: Block = generateRawNextBlock(req.body.data);
+        const newBlock: Block | null = generateRawNextBlock(req.body.data);
         if (newBlock === null) {
             res.status(400).send('could not generate block');
         } else {
@@ -74,7 +74,7 @@ const initHttpServer = (myHttpPort: number) => {
     });
 
     app.post('/mineBlock', (req, res) => {
-        const newBlock: Block = generateNextBlock();
+        const newBlock: Block | null = generateNextBlock();
         if (newBlock === null) {
             res.status(400).send('could not generate block');
         } else {
@@ -98,7 +98,7 @@ const initHttpServer = (myHttpPort: number) => {
         try {
             const resp = generatenextBlockWithTransaction(address, amount);
             res.send(resp);
-        } catch (e) {
+        } catch (e:any) {
             console.log(e.message);
             res.status(400).send(e.message);
         }
@@ -114,7 +114,7 @@ const initHttpServer = (myHttpPort: number) => {
             }
             const resp = sendTransaction(address, amount);
             res.send(resp);
-        } catch (e) {
+        } catch (e:any) {
             console.log(e.message);
             res.status(400).send(e.message);
         }
