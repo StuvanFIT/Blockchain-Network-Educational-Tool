@@ -4,4 +4,6 @@ npm-debug.log
 .idea
 src/*.js
 src/*.map
+node/wallet/
 node/wallet/private_key
+
