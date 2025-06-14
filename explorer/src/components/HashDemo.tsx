@@ -16,7 +16,7 @@ export const HashDemo = () => {
   useEffect(() =>{
 
     if (!data){
-      setHash('');
+      setHash(CryptoJS.SHA256('').toString());
     }
 
     if (data){
@@ -44,14 +44,29 @@ export const HashDemo = () => {
       </div>
       <div className="mt-6 max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+            <label htmlFor="hash-output" className="block mb-2 text-sm font-medium text-gray-900">Hash Output</label>
+            <textarea id="hash-output" className='w-full h-24 p-4 border border-gray-500 rounded-md bg-orange-100 resize-none' value={hash} spellCheck={false}></textarea>
+         </div>
+
+
+        <div className="bg-white rounded-2xl mt-6 shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
 
-            <div className='flex flex-col gap-6 w-full'>
-              <label htmlFor="data-message" className="block mb-2 text-sm font-medium text-gray-900">Input Data</label>
-              <textarea id="data-message" className='w-full h-40 p-8 border border-gray-500 rounded-md' onChange={handleData} spellCheck={false} placeholder='Enter something here...'  ></textarea>
+            <div className='grid grid-cols-2 gap-6 w-full'>
+              <label htmlFor="data-message" className="block mb-2 text-base font-medium text-gray-900">Input Data</label>
+              <label htmlFor="index" className="block mb-2 text-base font-medium text-gray-900">Index</label>
+              <textarea id="data-message" className='w-full h-24 p-4 text-left border border-gray-500 rounded-md resize-none' onChange={handleData} spellCheck={false} placeholder='Enter input block data...'  ></textarea>
+              <textarea id="index" className='w-full h-24 p-4 border border-gray-500 rounded-md resize-none' onChange={handleData} spellCheck={false} placeholder='Enter index...'  ></textarea>
 
-              <label htmlFor="hash-output" className="block mb-2 text-sm font-medium text-gray-900">Hash Output</label>
-              <textarea id="hash-output" className='w-full h-40 p-8 border border-gray-500 rounded-md' value={hash} spellCheck={false}></textarea>
+              <label htmlFor="previous-hash" className="block mb-2 text-base font-medium text-gray-900">Previous Hash</label>
+              <label htmlFor="timestamp" className="block mb-2 text-base font-medium text-gray-900">Timestamp</label>
+              <textarea id="previous-hash" className='w-full h-24 p-4 border border-gray-500 rounded-md resize-none' onChange={handleData} spellCheck={false} placeholder='Enter Previous Hash...'  ></textarea>
+              <textarea id="timestamp" className='w-full h-24 p-4 border border-gray-500 rounded-md resize-none' onChange={handleData} spellCheck={false} placeholder='Timestamp...'  ></textarea>
+
+              <label htmlFor="difficulty" className="block mb-2 text-base font-medium text-gray-900">Difficulty</label>
+              <label htmlFor="nonce" className="block mb-2 text-base font-medium text-gray-900">Nonce</label>
+              <textarea id="difficulty" className='w-full h-24 p-4 border border-gray-500 rounded-md resize-none' onChange={handleData} spellCheck={false} placeholder='Enter difficulty level...'  ></textarea>
+              <textarea id="nonce" className='w-full h-24 p-4 border border-gray-500 rounded-md resize-none' onChange={handleData} spellCheck={false} placeholder='Enter nonce...'  ></textarea>
             </div>
           </div>
         </div>
