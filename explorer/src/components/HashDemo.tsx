@@ -1,6 +1,8 @@
-import React, { useEffect, useState }  from 'react';
-import { BarChart3 } from "lucide-react";
+import React, { useEffect, useState, useRef }  from 'react';
+import { BarChart3, Loader2, Pickaxe, Square, Wrench,ChartColumnIncreasing, Target, Hourglass, ChartNoAxesCombined, Trophy, Ban } from "lucide-react";
 import CryptoJS from 'crypto-js';
+
+import { hexToBinary } from '../blockchain/utils';
 
 // Analytics Page
 export const HashDemo = () => {
@@ -8,23 +10,19 @@ export const HashDemo = () => {
   const getCurrentTimestamp = (): number => Math.round(new Date().getTime() / 1000);
 
   const [hash, setHash] = useState('');
-
+  const [hashBinary, setHashBinary] = useState('');
   const [data, setData] = useState('');
   const [index, setIndex] = useState(0);
   const [previousHash, setPreviousHash] = useState('');
   const [timestamp, setTimeStamp] = useState(getCurrentTimestamp());
-  const [difficulty, setDifficulty] = useState('');
-  const [nonce, setNonce] = useState('');
-  
+  const [difficulty, setDifficulty] = useState(5);
+  const [nonce, setNonce] = useState(0);
 
-  const handleChange = (setter: Function) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setter(e.target.value)
-  };
-
-  const calcHashDemo = (index:number, previousHash:string, timestamp:number, data:string, difficulty:number, nonce: number):string =>
-    CryptoJS.SHA256(`${index ?? ''}${previousHash ?? ''}${timestamp ?? ''}${data ?? ''}${difficulty ?? ''}${nonce ?? ''}`).toString();
-
-
+  //Mining Status
+  const isMiningRef = useRef(false);
+  const [miningStatus, setMiningStatus] = useState({attempts: 0, timeStarted: 0});
+  const [miningSuccess, setMiningSuccess] = useState(false);
+  const [estimatedTime , setEstimatedTime] = useState(0);
 
   useEffect(() => {
     const allEmpty = [data, index, previousHash, timestamp, difficulty, nonce].every(f => !f);
@@ -34,12 +32,133 @@ export const HashDemo = () => {
       setHash(calcHashDemo(Number(index), previousHash, Number(timestamp), data, Number(difficulty), Number(nonce)));
     }
   }, [data, index, previousHash, timestamp, difficulty, nonce]);
+  
+  //Handling user input data changes:
+  const handleChange = (setter: Function) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log(e.target);
+    if (e.target.id === "difficulty"){
+      const value = e.target.value;
+      
+      if (Number(value) > 100) {
+        alert("Max difficulty: 100. Please try a lower difficulty level.");
+        return;
+      }
+    }
+    setter(e.target.value)
+  };
+
+  //Calculating the hash
+  const calcHashDemo = (index:number, previousHash:string, timestamp:number, data:string, difficulty:number, nonce: number):string =>
+    CryptoJS.SHA256(`${index ?? ''}${previousHash ?? ''}${timestamp ?? ''}${data ?? ''}${difficulty ?? ''}${nonce ?? ''}`).toString();
+
+
+  //Checking if the hash (binary form) matches the difficulty level
+  const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
+      const hashInBinary: string = hexToBinary(hash);
+      const requiredPrefix: string = '0'.repeat(difficulty);
+      return hashInBinary.startsWith(requiredPrefix);
+  };
+
+  //Stop mining
+  const stopMining = () => {
+    isMiningRef.current = false;
+  }
+
+  //Start mining
+  const startMining = () => {
+    isMiningRef.current = true;
+  }
+  
+
+  const mineBlock = async () =>{
     
+    if (isMiningRef.current){
+      return;
+    };
+
+    //Reset mining success state
+    setMiningSuccess(false);
+
+
+    //We are mining now
+    startMining();
+    const startTime = Date.now();
+    setMiningStatus({attempts:0, timeStarted: startTime});
+
+    //Calculate the estimated time based on the input difficulty
+    const estimatedAttempts = Math.pow(2, Number(difficulty));
+    setEstimatedTime(estimatedAttempts /10000) //rough estimate in seconds
+
+    //Find the matching block
+    let attempts = 0;
+    let currNonce = 0;
+
+    while (isMiningRef.current) {
+      const currHash =  calcHashDemo(Number(index), previousHash, Number(timestamp), data, Number(difficulty), currNonce);
+      attempts++;
+
+      //Every 1000 attempts, update the UI
+      if (attempts % 1000 ===0 ){
+        setMiningStatus({attempts: attempts, timeStarted: startTime});
+        setNonce(currNonce);
+        setHash(currHash);
+        setHashBinary(hexToBinary(currHash))
+
+        //ALlow the UI to update
+        await new Promise(resolve => setTimeout(resolve, 1));
+      };
+
+      //Check if we have a matching block --> zeroes match the difficulty level given
+      if (hashMatchesDifficulty(currHash, Number(difficulty))) {
+        setNonce(currNonce);
+        setHash(currHash);
+        setHashBinary(hexToBinary(currHash))
+        setMiningStatus({attempts: attempts, timeStarted: startTime});
+        setMiningSuccess(true);
+
+        stopMining();
+        return;
+      };
+
+      currNonce++;
+
+      //Limit break
+      if (attempts > 1000000){
+        stopMining();
+        setMiningStatus({attempts:attempts,  timeStarted: startTime});
+        return;
+      };
+
+    };
+
+  };
+
+  //Total Mining Time
+  const miningTime = miningStatus.timeStarted ? ((Date.now() - miningStatus.timeStarted)/1000): 0;
+  //Mining Time Hash Rate
+  const miningHashRate = miningTime > 0 ? (Math.round(miningStatus.attempts / miningTime)): 0;
+  const progress = estimatedTime > 0 ? Math.min((miningTime / estimatedTime) * 100, 100) : 0;
+
+  const formatTime = (seconds: number): string =>{
+    if (seconds < 60){
+      return `${seconds.toFixed(1)}s`
+    };
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds.toFixed(0)}s`
+  };
+  
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toLocaleString();
+  };
 
 
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
@@ -47,19 +166,220 @@ export const HashDemo = () => {
               <BarChart3 className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">SHA256 Hash</h1>
-              <p className="text-slate-500 mt-1">SHA-256 plays a critical role in blockchain technology, ensuring security and integrity in digital transactions. One of its primary uses is in mining, the process of validating and adding new transactions to a blockchain.</p>
+              <h1 className="text-3xl font-bold text-slate-800">Block Mining Simulator</h1>
+              <p className="text-slate-500 mt-1">Experience proof-of-work mining and see how computational difficulty affects blockchain security</p>
             </div>
           </div>
-          <p className="text-slate-600">Experiment with the SHA256 Hash...</p>
         </div>
       </div>
+
       <div className="mt-6 max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-            <label htmlFor="hash-output" className="block mb-2 text-sm font-medium text-gray-900">Hash Output</label>
-            <textarea id="hash-output" className='w-full h-24 p-4 border border-gray-500 rounded-md bg-orange-100 resize-none' value={hash} spellCheck={false}></textarea>
-         </div>
 
+          {/* Header Section */}
+          <div className="flex items-center justify-between mb-6">
+            <label htmlFor="hash-output" className="text-sm font-semibold text-slate-900">
+              Hash Output (Hexadecimal)
+            </label>
+            <div className="flex items-center gap-3">
+              {miningSuccess && (
+                <div className="flex items-center text-emerald-600 gap-2">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-sm font-medium">Valid Block!</span>
+                </div>
+              )}
+              <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                miningSuccess 
+                  ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200' 
+                  : 'bg-red-100 text-red-700 ring-1 ring-red-200'
+              }`}>
+                {miningSuccess ? 'Valid' : 'Invalid'}
+              </span>
+            </div>
+          </div>
+          {/* Hash Output */}
+          <textarea 
+            id="hash-output" 
+            className={`w-full h-24 p-4 border rounded-xl resize-none font-mono text-sm transition-colors ${
+              miningSuccess 
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
+                : 'bg-amber-50 border-amber-200 text-amber-900'
+            }`} 
+            value={hash} 
+            spellCheck={false} 
+            readOnly 
+          />
+
+          {/* Binary Section */}
+          <label htmlFor="hash-binary" className="block mt-6 mb-3 text-sm font-semibold text-slate-900">
+            Hash Binary (Binary)
+          </label>
+          <textarea 
+            id="hash-binary" 
+            className={`w-full h-24 p-4 border rounded-xl resize-none font-mono text-sm transition-colors ${
+              miningSuccess 
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
+                : 'bg-amber-50 border-amber-200 text-amber-900'
+            }`} 
+            value={hashBinary} 
+            spellCheck={false} 
+            readOnly 
+          />
+
+          {/* Target Info */}
+          <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <div className="text-sm text-slate-700">
+              <span className="font-semibold text-slate-900">Target:</span> Hash must start with{' '}
+              <span className="font-mono font-semibold text-slate-900">{difficulty}</span> zeros in binary →{' '}
+              <span className="font-mono text-slate-600">{Number(difficulty) >150 ? "0".repeat(150) : "0".repeat(Number(difficulty))}...</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className='flex-1 bg-white rounded-2xl shadow-lg p-8 border border-slate-200 mt-8 mb-8'>
+          <div className='flex flex-col lg:flex-row gap-8'>
+            <div className='flex-1'>
+              <h3 className='text-lg font-semibold text-gray-800 mb-5 flex items-center gap-2'>
+                < Wrench className='w-4 h-4' />
+                Mining Controls
+              </h3>
+
+              <div className='flex gap-4'>
+                <button 
+                onClick={mineBlock}
+                disabled={isMiningRef.current}
+                className={`flex items-center gap-2 px-6 py-6 rounded-lg font-medium ${
+                  isMiningRef.current
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'}`}>
+
+                    {isMiningRef.current ? (
+                      <>
+                        <Loader2 className='w-4 h-4 animate-spin' />
+                        Mining...
+                      </>
+                    ): (
+                      <>
+                        <Pickaxe className='w-4 h-4' />
+                        Mine Block
+                      </>
+
+
+                    )}
+                </button>
+
+                {isMiningRef.current && (
+                  <button
+                  onClick={stopMining}
+                  className='flex items-center gap-2 px-6 py-6 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
+
+                    <Square className='w-4 h-4'/>
+                    Stop
+
+                  </button>
+                )}
+            </div>
+        </div>
+
+        {/*Mining Statistics */}
+        {(isMiningRef.current || miningStatus.attempts >0) && (
+          <div className='flex-1'> 
+            <h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
+              <ChartColumnIncreasing className='w-4 h-4'/>
+              Mining Statistics
+            </h3>
+
+            <div className='grid grid-cols-2 gap-4'>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 text-blue-700 mb-1">
+                    <Target className="w-4 h-4" />
+                    <span className="text-sm font-medium">Attempts</span>
+                  </div>
+                  <div className="text-2xl font-bold text-blue-800">
+                    {formatNumber(miningStatus.attempts)}
+                  </div>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-700 mb-1">
+                    <Hourglass className="w-4 h-4" />
+                    <span className="text-sm font-medium">Time Elapsed</span>
+                  </div>
+                  <div className="text-2xl font-bold text-green-800">
+                    {formatTime(miningTime)}
+                  </div>
+                </div>
+                <div className="bg-pink-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 text-pink-700 mb-1">
+                    <ChartNoAxesCombined className="w-4 h-4" />
+                    <span className="text-sm font-medium">Hash Rate</span>
+                  </div>
+                  <div className="text-2xl font-bold text-pink-800">
+                    {formatNumber(miningHashRate)} H/s
+                  </div>
+                </div>
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 text-orange-700 mb-1">
+                    <ChartNoAxesCombined className="w-4 h-4" />
+                    <span className="text-sm font-medium">Nonces</span>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-800">
+                    {formatNumber(nonce)}
+                  </div>
+                </div>
+                {/* Progress Bar */}
+                {isMiningRef.current && estimatedTime > 0 && (
+                  <div className="mt-4">
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>Estimated Progress</span>
+                      <span>{progress.toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Est. total time: {formatTime(estimatedTime)} (based on difficulty {difficulty})
+                    </div>
+                  </div>
+                )}
+            </div>
+            {/*Success Message: valid block */}
+            {miningSuccess && (
+
+              <div className='mt-4 p-4 border border-green-300 rounded-lg bg-emerald-50'>
+                <div className='flex items-center gap-2 font-medium'>
+                  <Trophy className='w-8 h-8 text-yellow-500'/>
+                  <span className='text-green-700'>Block Mined Successfully!</span> 
+                </div>
+
+                <div className='text-sm text-green-700 font-medium'>
+                  Found valid hash in {formatNumber(miningStatus.attempts)} attempts and  {formatTime(miningTime)}
+                </div>
+              
+              </div>
+            )}
+
+            {/*Unsuccessful Message: Too many attempts */}
+            {(!miningSuccess && miningStatus.attempts >1000000)&&(
+
+              <div className='mt-4 p-4 border border-red-300 rounded-lg bg-red-100'>
+                <div className='flex items-center gap-2 font-medium'>
+                  <Trophy className='w-8 h-8 text-yellow-500'/>
+                  <span className='text-red-700'>Block Mined Unsuccessfully..</span> 
+                </div>
+
+                <div className='text-sm text-red-700 font-medium'>
+                  Mining has halted after 1,000,000 attempts. Maybe try reducing the difficulty.
+                </div>
+              
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
 
         <div className="bg-white rounded-2xl mt-6 shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
