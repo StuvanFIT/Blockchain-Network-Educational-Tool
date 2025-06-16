@@ -23,6 +23,8 @@ export const HashDemo = () => {
 
   //Mining Status
   const isMiningRef = useRef(false);
+  const [isMining, setIsMining] = useState(false);
+
   const [miningStatus, setMiningStatus] = useState({attempts: 0, timeStarted: 0});
   const [miningSuccess, setMiningSuccess] = useState(false);
   const [estimatedTime , setEstimatedTime] = useState(0);
@@ -68,11 +70,13 @@ export const HashDemo = () => {
   //Stop mining
   const stopMining = () => {
     isMiningRef.current = false;
+    setIsMining(false);
   }
 
   //Start mining
   const startMining = () => {
     isMiningRef.current = true;
+    setIsMining(true);
   }
   
 
@@ -259,7 +263,7 @@ export const HashDemo = () => {
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'}`}>
 
-                    {isMiningRef.current ? (
+                    {(isMiningRef.current || isMining) ? (
                       <>
                         <Loader2 className='w-4 h-4 animate-spin' />
                         Mining...
@@ -274,7 +278,7 @@ export const HashDemo = () => {
                     )}
                 </button>
 
-                {isMiningRef.current && (
+                {(isMiningRef.current || isMining) && (
                   <button
                   onClick={stopMining}
                   className='flex items-center gap-2 px-6 py-6 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>

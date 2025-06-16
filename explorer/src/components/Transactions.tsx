@@ -1,9 +1,11 @@
 
-import React from 'react';
-import {FileText, Wallet, Copy, RefreshCw} from 'lucide-react';
+import React, {useState} from 'react';
+import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe} from 'lucide-react';
 
 // Transactions Page
 export const Transactions = () => {
+
+  const [activeTab, setActiveTab] = useState(''); //send or mine
 
 
 
@@ -41,6 +43,8 @@ export const Transactions = () => {
           </div>
 
           <div className='p-6 border-b bg-gray-100'>
+
+            {/*Wallet information */}
             <div className='flex flex-col gap-4'>
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
@@ -70,13 +74,73 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool</label>
                 <div className='flex items-center gap-2'>
-                  <span className='text-2xl font-bold text-orange-600'>0</span>
-                  <span className='text-sm text-gray-500'>pending transactions</span>
+                  <span className='text-2xl font-bold text-purple-600'>0</span>
+                  <span className='text-sm text-gray-500'>pending transactions...</span>
                 </div>
               </div>
+            </div>
 
+            {/*Navigation tab bar: send money and mine block */}
+            <div className='mt-8 border border-gray-300'>
+              <nav className='flex'>
+                <button
+                  onClick={() => setActiveTab('send')}
+                  className={`flex-1 py-4 px-6 text-center font-semibold transition-colors ${
+                    activeTab === 'send'
+                    ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    <Send className='w-4 h-4 inline mr-2'/>
+                    <span>Send Money</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('mine')}
+                  className={`flex-1 py-4 px-6 text-center font-semibold transition-colors ${
+                    activeTab === 'mine'
+                    ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    <Pickaxe className='w-4 h-4 inline mr-2'/>
+                    <span>Mine Blocks</span>
+                  </div>
+                </button>
+              </nav>
+            </div>
+            
+            {/*Tab Content */}
+            <div className='p-6'>
+              {activeTab === 'send' && (
+                <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
+                  <Send className='w-4 h-4 inline mr-2'/>
+                  <span>Send Money</span>
+                </h2>
+
+                
+
+
+
+              )}
+
+              {activeTab === 'mine' && (
+                <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
+                  <Pickaxe className='w-4 h-4 inline mr-2'/>
+                  <span>Mine Blocks</span>
+                </h2>
+              )}
 
             </div>
+
+
+
+
+
           </div>
         </div>
       </div>
