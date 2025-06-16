@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useRef }  from 'react';
-import { BarChart3, Loader2, Pickaxe, Square, Wrench,ChartColumnIncreasing, Target, Hourglass, ChartNoAxesCombined, Trophy, Ban } from "lucide-react";
+import { BarChart3, Loader2, Pickaxe, Square, Wrench,ChartColumnIncreasing,
+  Target, Hourglass, ChartNoAxesCombined, Trophy, Ban, Info } from "lucide-react";
 import CryptoJS from 'crypto-js';
 
 import { hexToBinary } from '../blockchain/utils';
+import { InfoTooltip, tooltipContent } from './Tooltip';
 
 // Analytics Page
 export const HashDemo = () => {
 
   const getCurrentTimestamp = (): number => Math.round(new Date().getTime() / 1000);
-
+  
+  //Input fields
   const [hash, setHash] = useState('');
   const [hashBinary, setHashBinary] = useState('');
   const [data, setData] = useState('');
@@ -24,18 +27,11 @@ export const HashDemo = () => {
   const [miningSuccess, setMiningSuccess] = useState(false);
   const [estimatedTime , setEstimatedTime] = useState(0);
 
-  useEffect(() => {
-    const allEmpty = [data, index, previousHash, timestamp, difficulty, nonce].every(f => !f);
-    if (allEmpty) {
-      setHash(CryptoJS.SHA256('').toString());
-    } else {
-      setHash(calcHashDemo(Number(index), previousHash, Number(timestamp), data, Number(difficulty), Number(nonce)));
-    }
-  }, [data, index, previousHash, timestamp, difficulty, nonce]);
-  
+
+ 
   //Handling user input data changes:
   const handleChange = (setter: Function) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log(e.target);
+    
     if (e.target.id === "difficulty"){
       const value = e.target.value;
       
@@ -50,6 +46,16 @@ export const HashDemo = () => {
   //Calculating the hash
   const calcHashDemo = (index:number, previousHash:string, timestamp:number, data:string, difficulty:number, nonce: number):string =>
     CryptoJS.SHA256(`${index ?? ''}${previousHash ?? ''}${timestamp ?? ''}${data ?? ''}${difficulty ?? ''}${nonce ?? ''}`).toString();
+
+  useEffect(() => {
+    const allEmpty = [data, index, previousHash, timestamp, difficulty, nonce].every(f => !f);
+    if (allEmpty) {
+      setHash(CryptoJS.SHA256('').toString());
+    } else {
+      setHash(calcHashDemo(Number(index), previousHash, Number(timestamp), data, Number(difficulty), Number(nonce)));
+    }
+  }, [data, index, previousHash, timestamp, difficulty, nonce]);
+
 
 
   //Checking if the hash (binary form) matches the difficulty level
@@ -386,7 +392,17 @@ export const HashDemo = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6 w-full'>
 
               <div className='flex flex-col'>
-                <label htmlFor="data-message" className="mb-2 text-base font-medium text-gray-900">Input Data</label>
+
+                <div className="flex items-center gap-2">
+                  <label htmlFor="data-message" className="mb-2 text-base font-semibold text-slate-900">
+                    Input Data
+                  </label>
+                  <InfoTooltip 
+                    content={tooltipContent['data-tool-tip']} 
+                    id="data-tool-tip" 
+                  />
+                </div>
+
                 <textarea
                   id="data-message"
                   className="w-full h-24 p-4 text-left border border-gray-500 rounded-md resize-none"
@@ -398,7 +414,15 @@ export const HashDemo = () => {
               </div>
 
               <div className="flex flex-col">
-                <label htmlFor="index" className="mb-2 text-base font-medium text-gray-900">Index</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="index" className="mb-2 text-base font-semibold text-slate-900">
+                    Index
+                  </label>
+                  <InfoTooltip 
+                    content={tooltipContent['index-tool-tip']} 
+                    id="index-tool-tip" 
+                  />
+                </div>
                 <textarea
                   id="index"
                   className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
@@ -410,7 +434,15 @@ export const HashDemo = () => {
               </div>
 
               <div className="flex flex-col">
-                <label htmlFor="previous-hash" className="mb-2 text-base font-medium text-gray-900">Previous Hash</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="previous-hash" className="mb-2 text-base font-semibold text-slate-900">
+                    Previous Hash
+                  </label>
+                  <InfoTooltip 
+                    content={tooltipContent['prev-hash-tool-tip']} 
+                    id="prev-hash-tool-tip" 
+                  />
+                </div>
                 <textarea
                   id="previous-hash"
                   className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
@@ -422,7 +454,15 @@ export const HashDemo = () => {
               </div>
 
               <div className="flex flex-col">
-                <label htmlFor="timestamp" className="mb-2 text-base font-medium text-gray-900">Timestamp</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="timestamp" className="mb-2 text-base font-semibold text-slate-900">
+                    Timestamp
+                  </label>
+                  <InfoTooltip 
+                    content={tooltipContent['timestamp-tool-tip']} 
+                    id="timestamp-tool-tip" 
+                  />
+                </div>
                 <textarea
                   id="timestamp"
                   className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
@@ -434,7 +474,15 @@ export const HashDemo = () => {
               </div>
 
               <div className="flex flex-col">
-                <label htmlFor="difficulty" className="mb-2 text-base font-medium text-gray-900">Difficulty</label>
+              <div className="flex items-center gap-2">
+                <label htmlFor="difficulty" className="mb-2 text-base font-semibold text-slate-900">
+                  Difficulty
+                </label>
+                <InfoTooltip 
+                  content={tooltipContent['difficulty-tool-tip']} 
+                  id="difficulty-tool-tip" 
+                />
+              </div>
                 <textarea
                   id="difficulty"
                   className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
@@ -446,7 +494,15 @@ export const HashDemo = () => {
               </div>
 
               <div className="flex flex-col">
-                <label htmlFor="nonce" className="mb-2 text-base font-medium text-gray-900">Nonce</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="nonce" className="mb-2 text-base font-semibold text-slate-900">
+                    Nonce
+                  </label>
+                  <InfoTooltip 
+                    content={tooltipContent['nonce-tool-tip']} 
+                    id="nonce-tool-tip" 
+                  />
+                </div>
                 <textarea
                   id="nonce"
                   className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
