@@ -1,12 +1,21 @@
 
 import React from 'react';
-import {FileText} from 'lucide-react';
+import {FileText, Wallet, Copy, RefreshCw} from 'lucide-react';
 
 // Transactions Page
 export const Transactions = () => {
+
+
+
+
+
+
+
+
+
   return (
-    <div className="p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7x1 mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-white">
@@ -18,6 +27,57 @@ export const Transactions = () => {
             </div>
           </div>
           <p className="text-slate-600">Transaction list and management interface would go here...</p>
+        </div>
+        
+        <div className="mt-4 bg-white rounded-xl shadow-2xl overflow-hidden">
+          <div className='rounded-t-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6'>
+            <div className='flex items-center gap-2'>
+              <Wallet className='w-8 h-8' />
+              <div>
+                <h1 className='text-2x1 font-bold'>Cryptocurrency Wallet & Mining</h1>
+                <p className='text-blue-100'>Send money and mine blocks!</p>
+              </div>
+            </div>
+          </div>
+
+          <div className='p-6 border-b bg-gray-100'>
+            <div className='flex flex-col gap-4'>
+              <div>
+                <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
+                <div className='mt-4 flex items-center gap-2'>
+                  <code className='text-sm bg-gray-200 p-2 rounded-lg font-mono'>
+                    WalletAddressHashString10000000000000000000000000000000000000000.substring(0,30)
+                  </code>
+
+                  <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'>
+                    <Copy className='w-5 h-5'/>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className='block text-base font-medium text-gray-700 mb-2'>Current Balance</label>
+                <div className='flex items-center gap-2'>
+                  <span className="text-2xl font-bold text-green-600">250 coins</span>
+                  <button
+
+                    className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                    title="Refresh balance"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool</label>
+                <div className='flex items-center gap-2'>
+                  <span className='text-2xl font-bold text-orange-600'>0</span>
+                  <span className='text-sm text-gray-500'>pending transactions</span>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
         </div>
       </div>
     </div>

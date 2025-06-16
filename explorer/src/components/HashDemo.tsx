@@ -184,7 +184,7 @@ export const HashDemo = () => {
 
           {/* Header Section */}
           <div className="flex items-center justify-between mb-6">
-            <label htmlFor="hash-output" className="text-sm font-semibold text-slate-900">
+            <label htmlFor="hash-output" className="text-base font-semibold text-slate-900">
               Hash Output (Hexadecimal)
             </label>
             <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export const HashDemo = () => {
           />
 
           {/* Binary Section */}
-          <label htmlFor="hash-binary" className="block mt-6 mb-3 text-sm font-semibold text-slate-900">
+          <label htmlFor="hash-binary" className="block mt-6 mb-3 text-base font-semibold text-slate-900">
             Hash Binary (Binary)
           </label>
           <textarea 
@@ -234,7 +234,7 @@ export const HashDemo = () => {
 
           {/* Target Info */}
           <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="text-sm text-slate-700">
+            <div className="text-base text-slate-700">
               <span className="font-semibold text-slate-900">Target:</span> Hash must start with{' '}
               <span className="font-mono font-semibold text-slate-900">{difficulty}</span> zeros in binary →{' '}
               <span className="font-mono text-slate-600">{Number(difficulty) >150 ? "0".repeat(150) : "0".repeat(Number(difficulty))}...</span>
