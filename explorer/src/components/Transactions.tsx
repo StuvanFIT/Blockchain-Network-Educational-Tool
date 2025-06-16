@@ -6,8 +6,15 @@ import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe} from 'lucide-react';
 export const Transactions = () => {
 
   const [activeTab, setActiveTab] = useState(''); //send or mine
+  const [recipentAddress, setRecipientAddress] = useState('');
+  const [amount, setAmount] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSendMoney = () =>{
 
 
+
+  }
 
 
 
@@ -74,7 +81,7 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool</label>
                 <div className='flex items-center gap-2'>
-                  <span className='text-2xl font-bold text-purple-600'>0</span>
+                  <span className='text-2xl font-bold text-red-600'>0</span>
                   <span className='text-sm text-gray-500'>pending transactions...</span>
                 </div>
               </div>
@@ -117,15 +124,67 @@ export const Transactions = () => {
             {/*Tab Content */}
             <div className='p-6'>
               {activeTab === 'send' && (
-                <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
-                  <Send className='w-4 h-4 inline mr-2'/>
-                  <span>Send Money</span>
-                </h2>
+                <div>
+                  <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
+                    <Send className='w-4 h-4 inline mr-2'/>
+                    <span>Send Money</span>
+                  </h2>
 
-                
+                  <div className='space-y-4'>
+                    <div>
+                      <label htmlFor='recipent' className='block text-sm font-medium text-gray-700 mb-2'> Recipent Address *</label>
+                      <input
+                        type='text'
+                        id='recipent'
+                        value={recipentAddress}
+                        onChange={(e) => setRecipientAddress(e.target.value)}
+                        placeholder='04a1b2c3d4e5f6789abc123def456789...'
+                        className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
+                        disabled={isLoading}
+                      ></input>
+                    </div>
+
+                    <div className='relative'>
+                      <label htmlFor='amount' className='block text-sm font-medium text-gray-700 mb-2'>  Amount *</label>
+                      <input
+                        type='number'
+                        id='amount'
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder='0.00'
+                        min="0"
+                        step="0.01"
+                        className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
+                        disabled={isLoading}
+                      ></input>
+                      <span className='absolute right-9 top-1/2 text-gray-500 text-base'>coins</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleSendMoney}
+                    disabled={isLoading || !recipentAddress || !amount}
+                    className='w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-3 py-4 rounded-lg
+                    hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed 
+                    transition-all duration-200 flex items-center justify-center gap-2'>
 
 
+                    {isLoading ? (
 
+                      <div className='flex items-center gap-2'>
+                        <RefreshCw className='w-4 h-4 animate-spin'/>
+                        Creating Transaction...
+                      </div>
+                    ): (
+
+                     <div className='flex items-center gap-2'>
+                        <Send className='w-4 h-4'/>
+                        Send Money
+                      </div>
+
+                    )}
+                  </button>
+                </div>
               )}
 
               {activeTab === 'mine' && (
@@ -136,12 +195,33 @@ export const Transactions = () => {
               )}
 
             </div>
-
-
-
-
-
           </div>
+          
+          {/* Sample Addresses */}
+          <div className="p-6 border-t bg-blue-50">
+            <h3 className="text-base font-semibold mb-2 text-blue-800">Sample Addresses for Testing</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                "04b2c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
+                "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
+              ].map((addr, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <code className="text-base bg-white p-1 rounded flex-1">{addr.substring(0, 40)}...</code>
+                  <button
+                    onClick={() => setRecipientAddress(addr)}
+                    className="text-base text-blue-600 hover:text-blue-800"
+                  >
+                    <div className='bg-blue-500 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
+                      Use
+                    </div>
+                    
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+
         </div>
       </div>
     </div>
