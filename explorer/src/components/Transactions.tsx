@@ -66,7 +66,7 @@ export const Transactions = () => {
                 </div>
               </div>
               <div>
-                <label className='block text-base font-medium text-gray-700 mb-2'>Current Balance</label>
+                <label className='block text-base font-medium text-gray-700 mb-2'>Your Current Balance</label>
                 <div className='flex items-center gap-2'>
                   <span className="text-2xl font-bold text-green-600">250 coins</span>
                   <button
@@ -79,7 +79,7 @@ export const Transactions = () => {
                 </div>
               </div>
               <div>
-                <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool</label>
+                <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool (No. of transactions)</label>
                 <div className='flex items-center gap-2'>
                   <span className='text-2xl font-bold text-red-600'>0</span>
                   <span className='text-sm text-gray-500'>pending transactions...</span>
@@ -199,19 +199,19 @@ export const Transactions = () => {
           
           {/* Sample Addresses */}
           <div className="p-6 border-t bg-blue-50">
-            <h3 className="text-base font-semibold mb-2 text-blue-800">Sample Addresses for Testing</h3>
+            <h2 className="text-base font-semibold mb-2 text-blue-800">Sample Addresses for Testing</h2>
             <div className="grid md:grid-cols-2 gap-8">
               {[
                 "04b2c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
                 "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
               ].map((addr, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <code className="text-base bg-white p-1 rounded flex-1">{addr.substring(0, 40)}...</code>
+                  <code className="text-base bg-white p-2 rounded flex-1">{addr.substring(0, 40)}...</code>
                   <button
                     onClick={() => setRecipientAddress(addr)}
                     className="text-base text-blue-600 hover:text-blue-800"
                   >
-                    <div className='bg-blue-500 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
+                    <div className=' bg-gradient-to-r from-blue-600 to-indigo-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
                       Use
                     </div>
                     
