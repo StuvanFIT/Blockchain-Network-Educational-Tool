@@ -1,8 +1,9 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle} from 'lucide-react';
-import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction } from '../blockchain/transaction';
+import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary } from 'lucide-react';
+import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT } from '../blockchain/transaction';
 import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
-import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction} from './Wallet';
+import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock } from './Wallet';
+
 
 
 // Transactions Page
@@ -17,6 +18,16 @@ export const Transactions = () => {
   const [transactionPool, setTransactionPool] = useState<Transaction[]>([]);
   const poolRef = useRef<Transaction[]>([]);
 
+  const [blocksMined, setBlocksMined] = useState<Block[]>([]);
+  const [isMining, setIsMining] = useState(false);
+  const isMiningRef = useRef(false);
+  const [miningTime, setMiningTime] = useState(0);
+  const [hashRate, setHashRate] = useState(0);
+  const [hash, setHash] = useState('');
+  const [difficulty, setDifficulty] = useState(5);
+  const [timestamp, setTimestamp] = useState(0);
+
+
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +40,7 @@ export const Transactions = () => {
     setWalletAddress(address);
     setBalance(currentBalance);
     setTransactionPool(getTransactionPool());
+    setBlocksMined(getBlockchain());
   },[]);  
 
 
@@ -140,11 +152,73 @@ export const Transactions = () => {
 
   }
 
+  const handleMineBlock = async () =>{
+
+    if (transactionPool.length ===0){
+      setError('No transactions in the transaction pool!');
+      return;
+    }
+
+    setIsMining(true);
+    isMiningRef.current = true;
+    setMiningTime(0);
+    setError('');
+
+    try{
+      const startTime = Date.now();
+      let hashCount = 0;
+
+      //Create a coinbase transaction:
+      const blockIndex = blocksMined.length;
+      const coinbaseTx = getCoinbaseTransaction(walletAddress,blockIndex);
+
+      //Then, we create a new block with all the transactions in the pool + coinbase reward
+      const blockTransactions = [coinbaseTx, ...transactionPool];
+
+      const blockChain = getBlockchain();
+      const latestBlock = getLatestBlock();
+      const previousHash = latestBlock.hash; //this is gonna be the previous hash
+
+      //calculate the hash of the new block
+      let nonce =0
+
+      while (true){
+        const time = Date.now();
+        const currHash = calculateHash(blockIndex, previousHash, timestamp,blockTransactions, difficulty, nonce );
+        if (hashMatchesDifficulty(currHash, difficulty)){
+          setHash(currHash);
+          setTimestamp(time);
+          console.log('Found valid hash with matching difficulty!');
+          break;
+        }
+        nonce++;
+      }
+
+      //Create new block
+      const newBlock = new Block(blockIndex, hash, previousHash, timestamp, blockTransactions, difficulty, nonce);
+
+      //Add the new block
+      addNewBlock(newBlock);
+
+      //Clear transaction pool
+      clearTransactionPool();
+      setTransactionPool([]);
+
+      //Update balance
+      setBalance(prev=> prev + COINBASE_AMOUNT);
+
+      setSuccess(`Block #${blockIndex} mined successfully! Added ${blockTransactions.length} transactions to the blockchain. Earned ${COINBASE_AMOUNT} coins reward!`);
 
 
+    } catch (err:any) {
+      setError('Mining failed: ' + err.message);
+    } finally {
+      setIsMining(false);
+      setHashRate(0);
+      setMiningTime(0);
 
-
-
+    }
+  };
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -207,7 +281,7 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool (No. of transactions)</label>
                 <div className='flex items-center gap-2'>
-                  <span className='text-2xl font-bold text-red-600'>0</span>
+                  <span className='text-2xl font-bold text-red-600'>{transactionPool.length}</span>
                   <span className='text-sm text-gray-500'>pending transactions...</span>
                 </div>
               </div>
@@ -314,12 +388,139 @@ export const Transactions = () => {
               )}
 
               {activeTab === 'mine' && (
-                <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
-                  <Pickaxe className='w-4 h-4 inline mr-2'/>
-                  <span>Mine Blocks</span>
-                </h2>
-              )}
+                <div>
+                  <h2 className='text-xl font-semibold mb-4 flex items-center gap-2'>
+                    <Pickaxe className='w-4 h-4 inline mr-2'/>
+                    <span>Mine Blocks</span>
+                  </h2>
 
+                  <div className='space-y-4'>
+                    <div className='bg-gray-50 p-4 rounded-lg'>
+                      <h3 className='font-semibold mb-2'>Mining Status</h3>
+                      <div className='space-y-2'>
+                        <div className='flex justify-between'>
+                          <span className='text-base text-gray-500'>Transactions in Pool:</span>
+                          <span className='text-xl font-medium'>{transactionPool.length}</span>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span className='text-base text-gray-500'>Blocks Mined:</span>
+                          <span className='text-xl font-medium'>{blocksMined.length}</span>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span className='text-base text-gray-500'>Difficulty:</span>
+                          <span className='text-xl font-medium'>{difficulty}</span>
+                        </div>  
+
+                        {isMining && (
+
+                          <>
+                            <div className='flex justify-between'>
+                              <span className='text-base text-gray-500'>Hash Rate:</span>
+                              <span className='text-xl font-medium'>{hashRate.toLocaleString()} H/s</span>
+                            </div>
+                            <div className='flex justify-between'>
+                              <span className='text-base text-gray-500'>Mining Time:</span>
+                              <span className='text-xl font-medium'>{miningTime}s</span>
+                            </div>                      
+                          </>
+
+
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleMineBlock}
+                      disabled={isMining || transactionPool.length === 0}
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-4 rounded-lg font-semibold 
+                              hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed 
+                              transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      {isMining ? (
+                        <>
+                          <Zap className="w-4 h-4 animate-pulse" />
+                          Mining Block...
+                        </>
+                      ) : (
+                        <>
+                          <Pickaxe className="w-4 h-4" />
+                          Mine Block ({transactionPool.length} txns)
+                        </>
+                      )}
+                    </button>
+
+                    {transactionPool.length ===0 &&(
+                      <p className='text-sm text-gray-500 text-center'>No transactions in the pool. Send money to create transactions for mining!</p>
+                    )}
+                  </div>
+                  
+                  {/*Transaction pool */}
+                  <div>
+                    <h3 className='font-semibold mt-8 mb-2 flex items-center gap-2'>
+                      <SquareLibrary className='w-4 h-4'/>
+                      Transaction Pool
+                    </h3>
+                    <div className='bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto'>
+                      {transactionPool.length ===0 ? (
+                        <p className='text-sm text-gray-500'>No Pending Transactions</p>
+                      ): (
+                        <div className='space-y-2'>
+                          {transactionPool.map((tx,idx) => (
+                          <div key={idx} className="bg-white p-3 rounded border">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                  {tx.id.substring(0, 16)}...
+                                </code>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {tx.txOuts.length} output(s)
+                                </p>
+                              </div>
+                              <Clock className="w-4 h-4 text-gray-400" />
+                            </div>
+                          </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {blocksMined.length >0 && (
+                      <div className='mt-6'>
+                        <h3 className='flex items-center font-semibold gap-2'>
+                          <Blocks className='w-4 h-4' />
+                          Blockchain ({blocksMined.length} blocks)
+                        </h3>
+                        <div className="space-y-2 mt-4 max-h-60 overflow-y-auto">
+                          {blocksMined.map((block: Block, idx) => (
+                            <div key={idx} className="bg-green-50 border border-green-200 p-3 rounded">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold">Block #{block.index}</span>
+                                    <code className="text-xs bg-green-100 px-2 py-1 rounded">
+                                      {block.hash.substring(0, 16)}...
+                                    </code>
+                                  </div>
+                                  <p className="text-xs text-gray-600 mt-1">
+                                    {block.data.length} transactions
+                                  </p>
+                                </div>
+                                <span className={`text-xs ${idx===0 ? "text-blue-600 font-bold":"text-green-600 font-bold"}`}>
+                                  {idx===0 ? 'Genesis Block': `+${COINBASE_AMOUNT} coins`}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+
+
+
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

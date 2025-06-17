@@ -299,5 +299,5 @@ export {
     Block, getBlockchain, getUnspentTxOuts, getLatestBlock, sendTransaction,
     generateRawNextBlock, generateNextBlock, generatenextBlockWithTransaction,
     handleReceivedTransaction, getMyUnspentTransactionOutputs,
-    getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain, findBlock
+    getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain, findBlock,calculateHash, hashMatchesDifficulty
 };
