@@ -9,9 +9,15 @@ import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, 
 // Transactions Page
 export const Transactions = () => {
 
+  const HEX_CHARS = '0123456789abcdef';
+  const ADDRESS_PREFIX = '04';
+  const ADDRESS_BODY_LENGTH = 128;
+  const MAX_GENERATION_ATTEMPTS = 10;
+
   const [activeTab, setActiveTab] = useState(''); //send or mine
   const [recipientAddress, setRecipientAddress] = useState('');
   const [walletAddress, setWalletAddress] = useState(mockWalletFunctions.getPublicFromWallet());
+  const [randomAddress, setRandomAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState(0);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -59,22 +65,6 @@ export const Transactions = () => {
     setBalance(currentBalance);
   };
 
-
-
-
-
-  /*
-
-  When using secp256k1 (the elliptic curve used in Bitcoin and Ethereum), a public key can be represented in uncompressed format
-  An uncompressed public key is 130 hex characters long:
-
-  1 byte (2 hex chars) prefix → 04
-
-  32 bytes (64 hex chars) x-coordinate
-
-  32 bytes (64 hex chars) y-coordinate
-  
-  */
   const validateAddress = (address:string) =>{
     if (address.length !== 130){
       return false;
@@ -88,6 +78,36 @@ export const Transactions = () => {
     };
     return true;
   };
+
+  // Separate generation from side effects
+  const generateRandomAddress = (): string => {
+    const hexChars = HEX_CHARS;
+    let address = ADDRESS_PREFIX;
+
+    for (let i = 0; i < ADDRESS_BODY_LENGTH; i++) {
+      const randIndex = Math.floor(Math.random() * hexChars.length);
+      address += hexChars[randIndex];
+    }
+
+    return address;
+  };
+
+  // Handle the setting logic separately
+  const generateAndSetRandomAddress = (): boolean => {
+    for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
+      const address = generateRandomAddress();
+      
+      if (validateAddress(address)) {
+        setRandomAddress(address);
+        return true;
+      }
+    }
+    // If we get here, all attempts failed
+    console.error('Failed to generate valid address after maximum attempts');
+    setRandomAddress(''); 
+    return false;
+  };
+
 
 
 
@@ -425,7 +445,24 @@ export const Transactions = () => {
                   </button>
 
                   {/* Sample Addresses */}
-                  <div className="mt-8 rounded-lg p-6 border border-green-700 bg-green-50">
+                  <div className="mt-8 space-y-2 rounded-lg p-6 border border-green-700 bg-green-50">
+                    <h2 className="text-base font-semibold mb-2 text-emerald-800">Generate Random Valid Address</h2>
+                    <div className='flex items-center gap-2'>
+                      <code className='text-base bg-gray-200 p-6 rounded-lg font-mono p-2 flex-1'>
+                        {randomAddress}
+                      </code>
+                        <button
+                          onClick={() => generateAndSetRandomAddress()}
+                          className="text-base text-blue-600 hover:text-blue-800"
+                        >
+                          <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500 rounded-lg text-white font-semibold px-3 py-1'>
+                            Generate
+                          </div>
+                          
+                        </button>
+                    </div>
+
+
                     <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
                     <div className="grid md:grid-cols-2 gap-8">
                       {[
@@ -433,7 +470,7 @@ export const Transactions = () => {
                         "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
                       ].map((addr, idx) => (
                         <div key={idx} className="flex items-center gap-2">
-                          <code className="text-base bg-gray-200 p-2 rounded-lg font-mono p-2 flex-1">{addr.substring(0, 40)}...</code>
+                          <code className="text-base bg-gray-200 rounded-lg font-mono p-2 flex-1">{addr.substring(0, 40)}...</code>
                           <button
                             onClick={() => setRecipientAddress(addr)}
                             className="text-base text-blue-600 hover:text-blue-800"
