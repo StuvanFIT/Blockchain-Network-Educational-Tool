@@ -1,18 +1,142 @@
+import React, {useState, useEffect, useRef} from 'react';
+import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle} from 'lucide-react';
+import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction } from '../blockchain/transaction';
+import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
+import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction} from './Wallet';
 
-import React, {useState} from 'react';
-import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe} from 'lucide-react';
 
 // Transactions Page
 export const Transactions = () => {
 
   const [activeTab, setActiveTab] = useState(''); //send or mine
-  const [recipentAddress, setRecipientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState('lol');
   const [amount, setAmount] = useState('');
+  const [balance, setBalance] = useState(0);
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [transactionPool, setTransactionPool] = useState<Transaction[]>([]);
+  const poolRef = useRef<Transaction[]>([]);
+
+
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleSendMoney = () =>{
+
+  useEffect(() => {
+    const address = mockWalletFunctions.getPublicFromWallet();
+    const currentBalance = getBalance(address, mockUnspentTxOuts);
+    setWalletAddress(address);
+    setBalance(currentBalance);
+    setTransactionPool(getTransactionPool());
+  },[]);  
 
 
+  const copyToClipboard = (text:string) => {
+    navigator.clipboard.writeText(text);
+  };
+  const refreshBalance = () =>{
+    const address = mockWalletFunctions.getPublicFromWallet();
+    const currentBalance = getBalance(address, mockUnspentTxOuts);
+    setBalance(currentBalance);
+  };
+
+
+
+
+
+  /*
+
+  When using secp256k1 (the elliptic curve used in Bitcoin and Ethereum), a public key can be represented in uncompressed format
+  An uncompressed public key is 130 hex characters long:
+
+  1 byte (2 hex chars) prefix → 04
+
+  32 bytes (64 hex chars) x-coordinate
+
+  32 bytes (64 hex chars) y-coordinate
+  
+  */
+  const validateAddress = (address:string) =>{
+    if (address.length !== 130){
+      return false;
+    };
+    if (!address.match('^[a-fA-F0-9]+$')){
+      return false;
+    };
+
+    if (!address.startsWith('04')){
+      return false;
+    };
+    return true;
+  };
+
+
+
+
+  const handleSendMoney = async () =>{
+
+    setTransaction(null);
+
+    //Validate recipient address
+    if (!recipientAddress){
+      setError('Please enter in a recipient address. Have a look at the example addresses below!');
+      return;
+    }
+
+    if (!validateAddress(recipientAddress)){
+      setError('Invalid recipient address format.')
+      return;
+    }
+
+    if (recipientAddress === walletAddress ){
+      setError('You cannot send money to yourself.');
+      return;
+    }
+
+    const sendAmount = parseFloat(amount);
+    if (!sendAmount || sendAmount <=0){
+      setError('Please enter in an amount of coins address.');
+      return;
+    };
+
+    if (sendAmount > balance){
+      setError('Insufficient balance!');
+      return;
+    };
+
+    setIsLoading(true);
+
+    try{
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const privateKey = mockWalletFunctions.getPrivateFromWallet();
+      console.log('before transaction')
+
+      const newTransaction = createTransaction(recipientAddress, sendAmount,privateKey, mockUnspentTxOuts,transactionPool);
+      console.log('after transaction')
+      //Add to the transaction pool
+      if (addToTransactionPool(newTransaction, mockUnspentTxOuts)){
+        setTransaction(newTransaction);
+        setSuccess(`New Transaction was created and added to the pool! Transaction ID: ${newTransaction.id.substring(0,16)}`);
+
+        setTransactionPool(getTransactionPool());
+        poolRef.current = getTransactionPool();
+
+        // Clear form
+        setRecipientAddress('');
+        setAmount('');
+      } else {
+        setError('Failed to add to transaction pool!');
+      }
+
+    } catch (error:any) {
+      setError('Failed to create new transaction!' + error.message)
+    } finally {
+      setIsLoading(false);
+
+    }
 
   }
 
@@ -57,10 +181,11 @@ export const Transactions = () => {
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
                 <div className='mt-4 flex items-center gap-2'>
                   <code className='text-sm bg-gray-200 p-2 rounded-lg font-mono'>
-                    WalletAddressHashString10000000000000000000000000000000000000000.substring(0,30)
+                    {walletAddress.substring(0,30)}...
                   </code>
 
-                  <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'>
+                  <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'
+                    onClick={() => copyToClipboard(walletAddress)}>
                     <Copy className='w-5 h-5'/>
                   </button>
                 </div>
@@ -68,11 +193,12 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Current Balance</label>
                 <div className='flex items-center gap-2'>
-                  <span className="text-2xl font-bold text-green-600">250 coins</span>
+                  <span className="text-2xl font-bold text-green-600">{balance} coins</span>
                   <button
 
                     className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
                     title="Refresh balance"
+                    onClick={refreshBalance}
                   >
                     <RefreshCw className="w-4 h-4" />
                   </button>
@@ -136,7 +262,7 @@ export const Transactions = () => {
                       <input
                         type='text'
                         id='recipent'
-                        value={recipentAddress}
+                        value={recipientAddress}
                         onChange={(e) => setRecipientAddress(e.target.value)}
                         placeholder='04a1b2c3d4e5f6789abc123def456789...'
                         className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
@@ -163,7 +289,7 @@ export const Transactions = () => {
 
                   <button
                     onClick={handleSendMoney}
-                    disabled={isLoading || !recipentAddress || !amount}
+                    disabled={isLoading || !recipientAddress || !amount}
                     className='w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-3 py-4 rounded-lg
                     hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed 
                     transition-all duration-200 flex items-center justify-center gap-2'>
@@ -196,6 +322,24 @@ export const Transactions = () => {
 
             </div>
           </div>
+
+          {/* Messages */}
+          {(error || success) && (
+            <div className="p-6 border-t">
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm">{error}</span>
+                </div>
+              )}
+              {success && (
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm">{success}</span>
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Sample Addresses */}
           <div className="p-6 border-t bg-blue-50">
