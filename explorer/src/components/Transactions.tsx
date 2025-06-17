@@ -341,6 +341,24 @@ export const Transactions = () => {
                 </button>
               </nav>
             </div>
+
+            {/* Messages */}
+            {(error || success) && (
+              <div className="p-6 border-t">
+                {error && (
+                  <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">{error}</span>
+                  </div>
+                )}
+                {success && (
+                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">{success}</span>
+                  </div>
+                )}
+              </div>
+            )}
             
             {/*Tab Content */}
             <div className='p-6'>
@@ -407,7 +425,7 @@ export const Transactions = () => {
                   </button>
 
                   {/* Sample Addresses */}
-                  <div className="mt-8 rounded-lg p-6 border-t bg-green-50">
+                  <div className="mt-8 rounded-lg p-6 border border-green-700 bg-green-50">
                     <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
                     <div className="grid md:grid-cols-2 gap-8">
                       {[
@@ -415,12 +433,12 @@ export const Transactions = () => {
                         "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
                       ].map((addr, idx) => (
                         <div key={idx} className="flex items-center gap-2">
-                          <code className="text-base bg-white p-2 rounded flex-1">{addr.substring(0, 40)}...</code>
+                          <code className="text-base bg-gray-200 p-2 rounded-lg font-mono p-2 flex-1">{addr.substring(0, 40)}...</code>
                           <button
                             onClick={() => setRecipientAddress(addr)}
                             className="text-base text-blue-600 hover:text-blue-800"
                           >
-                            <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
+                            <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500 rounded-lg text-white font-semibold px-3 py-1'>
                               Use
                             </div>
                             
@@ -568,24 +586,6 @@ export const Transactions = () => {
               )}
             </div>
           </div>
-
-          {/* Messages */}
-          {(error || success) && (
-            <div className="p-6 border-t">
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm">{error}</span>
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
-                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm">{success}</span>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>
