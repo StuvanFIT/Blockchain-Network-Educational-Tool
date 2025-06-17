@@ -22,6 +22,8 @@ const initHttpServer = (myHttpPort: number) => {
 
     app.use((err:Error, req:any, res:any, next:any) => {
         if (err) {
+            console.log(req);
+            console.log(next);
             res.status(400).send(err.message);
         }
     });

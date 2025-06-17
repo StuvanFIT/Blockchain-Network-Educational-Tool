@@ -130,18 +130,18 @@ const generatenextBlockWithTransaction = (receiverAddress: string, amount: numbe
 };
 
 const findBlock = (index: number, previousHash: string, timestamp: number, data: Transaction[], difficulty: number): Block => {
-    let nonce = 0;
-    let attempts = 0;
+    let resBlock: Block | null = null;
+    let nonce =0;
 
-    while (true) {
-        const hash: string = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
-        attempts++;
-        
+    while (!resBlock) {
+        const hash = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
         if (hashMatchesDifficulty(hash, difficulty)) {
-            return new Block(index, hash, previousHash, timestamp, data, difficulty, nonce);
+            resBlock = new Block(index, hash, previousHash, timestamp, data, difficulty, nonce);
         }
         nonce++;
     }
+
+    return resBlock!;
 };
 
 const getAccountBalance = (): number => {
@@ -299,5 +299,5 @@ export {
     Block, getBlockchain, getUnspentTxOuts, getLatestBlock, sendTransaction,
     generateRawNextBlock, generateNextBlock, generatenextBlockWithTransaction,
     handleReceivedTransaction, getMyUnspentTransactionOutputs,
-    getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain, findBlock
+    getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain, findBlock,calculateHash, hashMatchesDifficulty
 };

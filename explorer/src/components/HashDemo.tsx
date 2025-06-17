@@ -23,10 +23,11 @@ export const HashDemo = () => {
 
   //Mining Status
   const isMiningRef = useRef(false);
+  const [isMining, setIsMining] = useState(false);
+
   const [miningStatus, setMiningStatus] = useState({attempts: 0, timeStarted: 0});
   const [miningSuccess, setMiningSuccess] = useState(false);
   const [estimatedTime , setEstimatedTime] = useState(0);
-
 
  
   //Handling user input data changes:
@@ -68,11 +69,13 @@ export const HashDemo = () => {
   //Stop mining
   const stopMining = () => {
     isMiningRef.current = false;
+    setIsMining(false);
   }
 
   //Start mining
   const startMining = () => {
     isMiningRef.current = true;
+    setIsMining(true);
   }
   
 
@@ -184,7 +187,7 @@ export const HashDemo = () => {
 
           {/* Header Section */}
           <div className="flex items-center justify-between mb-6">
-            <label htmlFor="hash-output" className="text-sm font-semibold text-slate-900">
+            <label htmlFor="hash-output" className="text-base font-semibold text-slate-900">
               Hash Output (Hexadecimal)
             </label>
             <div className="flex items-center gap-3">
@@ -217,7 +220,7 @@ export const HashDemo = () => {
           />
 
           {/* Binary Section */}
-          <label htmlFor="hash-binary" className="block mt-6 mb-3 text-sm font-semibold text-slate-900">
+          <label htmlFor="hash-binary" className="block mt-6 mb-3 text-base font-semibold text-slate-900">
             Hash Binary (Binary)
           </label>
           <textarea 
@@ -234,7 +237,7 @@ export const HashDemo = () => {
 
           {/* Target Info */}
           <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="text-sm text-slate-700">
+            <div className="text-base text-slate-700">
               <span className="font-semibold text-slate-900">Target:</span> Hash must start with{' '}
               <span className="font-mono font-semibold text-slate-900">{difficulty}</span> zeros in binary →{' '}
               <span className="font-mono text-slate-600">{Number(difficulty) >150 ? "0".repeat(150) : "0".repeat(Number(difficulty))}...</span>
@@ -257,9 +260,9 @@ export const HashDemo = () => {
                 className={`flex items-center gap-2 px-6 py-6 rounded-lg font-medium ${
                   isMiningRef.current
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'}`}>
+                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-700 hover:to-red-700 shadow-lg hover:shadow-xl'}`}>
 
-                    {isMiningRef.current ? (
+                    {(isMiningRef.current || isMining) ? (
                       <>
                         <Loader2 className='w-4 h-4 animate-spin' />
                         Mining...
@@ -274,7 +277,7 @@ export const HashDemo = () => {
                     )}
                 </button>
 
-                {isMiningRef.current && (
+                {(isMiningRef.current || isMining) && (
                   <button
                   onClick={stopMining}
                   className='flex items-center gap-2 px-6 py-6 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
@@ -405,7 +408,7 @@ export const HashDemo = () => {
 
                 <textarea
                   id="data-message"
-                  className="w-full h-24 p-4 text-left border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 text-left border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setData)}
                   value={data}
                   spellCheck={false}
@@ -425,7 +428,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="index"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setIndex)}
                   value={index}
                   spellCheck={false}
@@ -445,7 +448,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="previous-hash"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setPreviousHash)}
                   value={previousHash}
                   spellCheck={false}
@@ -465,7 +468,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="timestamp"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setTimeStamp)}
                   value={timestamp}
                   spellCheck={false}
@@ -485,7 +488,7 @@ export const HashDemo = () => {
               </div>
                 <textarea
                   id="difficulty"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setDifficulty)}
                   value={difficulty}
                   spellCheck={false}
@@ -505,7 +508,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="nonce"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setNonce)}
                   value={nonce}
                   spellCheck={false}

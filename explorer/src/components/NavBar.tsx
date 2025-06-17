@@ -10,7 +10,7 @@ const NavBar = () =>{
         { path: '/', icon: Home, label: 'Dashboard' },
         { path: '/explorer', icon: BarChart3, label: 'Block Explorer' },
         { path: '/createTransactions', icon: FileText, label: 'Create Transactions' },
-        { path: '/hash', icon: Hash, label: 'Hash Demo' },
+        { path: '/hash', icon: Hash, label: 'Block Mining Simulator' },
     ];
 
     const isActiveItem = (path:string) => location.pathname ===path;
