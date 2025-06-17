@@ -27,7 +27,7 @@ const BlockExplorer = () => {
   }, []);
 
   const formatHash = (hash: string, length = 8) => `${hash.slice(0, length)}...${hash.slice(-4)}`;
-  const formatAddress = (address: string) => `${address.slice(0, 8)}...${address.slice(-6)}`;
+  const formatAddress = (address: string) => `${address.slice(0, 18)}...${address.slice(-6)}`;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,7 +138,7 @@ const BlockExplorer = () => {
                   <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
                     <div className="flex items-center gap-3 mb-2">
                       <Coins className="w-5 h-5 text-amber-600" />
-                      <span className="text-sm font-medium text-gray-600">Total Outputs</span>
+                      <span className="text-sm font-medium text-gray-600">Total Coins</span>
                     </div>
                     <p className="text-2xl font-bold text-gray-800">
                       {selectedBlock.data.reduce((sum, tx) => sum + tx.txOuts.reduce((txSum, out) => txSum + out.amount, 0), 0)}
@@ -225,9 +225,12 @@ const BlockExplorer = () => {
                                   <div key={idx} className="bg-red-50 rounded-lg p-4 border border-red-100">
                                     <div className="flex items-start gap-3">
                                       <Hash className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                                      <div className="flex-1 min-w-0">
+                                      <div className="flex-1 space-y-2 min-w-0">
                                         <p className="font-mono text-sm text-gray-700 break-all">
-                                          {formatHash(input.txOutId, 12)}:{input.txOutIndex}
+                                          TXOUT ID: {(input.txOutId)}
+                                        </p>
+                                        <p className="font-mono text-sm text-gray-700 break-all">
+                                          TXOUT INDEX: {input.txOutIndex}
                                         </p>
                                         <p className="text-xs text-gray-500 mt-1">Output Reference</p>
                                       </div>
@@ -237,12 +240,6 @@ const BlockExplorer = () => {
                               </div>
                             </div>
 
-                            {/* Arrow (hidden on mobile) */}
-                            <div className="hidden xl:flex items-center justify-center">
-                              <div className="p-3 bg-gray-100 rounded-full">
-                                <ArrowRight className="w-6 h-6 text-gray-400" />
-                              </div>
-                            </div>
 
                             {/* Outputs */}
                             <div>
@@ -259,7 +256,7 @@ const BlockExplorer = () => {
                                       <Coins className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                                       <div className="flex-1 min-w-0">
                                         <p className="font-mono text-sm text-gray-700 break-all mb-2">
-                                          {formatAddress(output.address)}
+                                          RECIPIENT ADDRESS: {(output.address)}
                                         </p>
                                         <div className="flex items-center gap-2">
                                           <span className="text-xs text-gray-500">Amount:</span>
