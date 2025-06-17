@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary } from 'lucide-react';
 import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT } from '../blockchain/transaction';
 import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
-import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock } from './Wallet';
+import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock, updateUTXOsAfterMining, updateMockUTXO } from './Wallet';
 
 
 
@@ -36,12 +36,13 @@ export const Transactions = () => {
 
   useEffect(() => {
     const address = mockWalletFunctions.getPublicFromWallet();
+    updateMockUTXO(mockUnspentTxOuts);
     const currentBalance = getBalance(address, mockUnspentTxOuts);
     setWalletAddress(address);
     setBalance(currentBalance);
     setTransactionPool(getTransactionPool());
     setBlocksMined(getBlockchain());
-  },[]);  
+  }, []);
 
 
   const copyToClipboard = (text:string) => {
@@ -198,18 +199,29 @@ export const Transactions = () => {
       //Add the new block
       addNewBlock(newBlock);
 
-      console.log(newBlock);
-      console.log('blockchain:')
-      console.log(getBlockchain())
-
       //Clear transaction pool
       clearTransactionPool();
-      setTransactionPool([]);
 
-      //Update balance
-      setBalance(prev=> prev + COINBASE_AMOUNT);
+      // Update UTXOs FIRST
+      const newUTXO = updateUTXOsAfterMining(newBlock, mockUnspentTxOuts);
+      updateMockUTXO(newUTXO);
+      
+      // Then update all dependent state
+      const updatedBalance = getBalance(walletAddress, newUTXO);
+      const updatedBlockchain = getBlockchain();
+      const updatedTransactionPool = getTransactionPool(); // Should be empty now
+      
+      // Update state in correct order
+      setBalance(updatedBalance);
+      setBlocksMined(updatedBlockchain);
+      setTransactionPool(updatedTransactionPool);
+      
+      setSuccess(
+        `Block #${blockIndex} mined successfully! ` +
+        `Added ${blockTransactions.length} transactions to the blockchain. ` +
+        `Earned ${COINBASE_AMOUNT} coins reward!`
+      );
 
-      setSuccess(`Block #${blockIndex} mined successfully! Added ${blockTransactions.length} transactions to the blockchain. Earned ${COINBASE_AMOUNT} coins reward!`);
 
 
     } catch (err:any) {
