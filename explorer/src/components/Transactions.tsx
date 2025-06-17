@@ -11,7 +11,7 @@ export const Transactions = () => {
 
   const [activeTab, setActiveTab] = useState(''); //send or mine
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [walletAddress, setWalletAddress] = useState('lol');
+  const [walletAddress, setWalletAddress] = useState(mockWalletFunctions.getPublicFromWallet());
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState(0);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -35,22 +35,27 @@ export const Transactions = () => {
 
 
   useEffect(() => {
-    const address = mockWalletFunctions.getPublicFromWallet();
     updateMockUTXO(mockUnspentTxOuts);
-    const currentBalance = getBalance(address, mockUnspentTxOuts);
-    setWalletAddress(address);
-    setBalance(currentBalance);
     setTransactionPool(getTransactionPool());
     setBlocksMined(getBlockchain());
   }, []);
+
+  useEffect(() => {
+    const currentBalance = getBalance(walletAddress, mockUnspentTxOuts);
+    setBalance(currentBalance);
+  }, [walletAddress, mockUnspentTxOuts]);
+
+  const handleWalletAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const addressVal = e.target.value;
+    setWalletAddress(addressVal);
+  };
 
 
   const copyToClipboard = (text:string) => {
     navigator.clipboard.writeText(text);
   };
   const refreshBalance = () =>{
-    const address = mockWalletFunctions.getPublicFromWallet();
-    const currentBalance = getBalance(address, mockUnspentTxOuts);
+    const currentBalance = getBalance(walletAddress, mockUnspentTxOuts);
     setBalance(currentBalance);
   };
 
@@ -270,9 +275,9 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
                 <div className='mt-4 flex items-center gap-2'>
-                  <code className='text-sm bg-gray-200 p-2 rounded-lg font-mono'>
-                    {walletAddress.substring(0,30)}...
-                  </code>
+                  <input type='text' onChange={handleWalletAddress} value={walletAddress} className='w-full text-sm bg-gray-200 p-2 rounded-lg font-mono'>
+
+                  </input>
 
                   <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'
                     onClick={() => copyToClipboard(walletAddress)}>
