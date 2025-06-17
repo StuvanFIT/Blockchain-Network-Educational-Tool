@@ -17,11 +17,15 @@ const mockWalletFunctions = {
 }
 
 // Mock data
-const mockUnspentTxOuts = [
+let mockUnspentTxOuts = [
   new UnspentTxOut("tx1", 0, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa",75 ),
   new UnspentTxOut("tx2", 1, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa",25 ),
   new UnspentTxOut("tx3", 3, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa",200 ),
 ];
+
+const updateMockUTXO = (newUTXO: UnspentTxOut[]) =>{
+    mockUnspentTxOuts = [...newUTXO];
+}
 
 
 
@@ -177,7 +181,33 @@ const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
     return hashInBinary.startsWith(requiredPrefix);
 };
 
+function updateUTXOsAfterMining(block:Block, currentUTXOs: UnspentTxOut[]) {
+  let newUTXOs = [...currentUTXOs];
+  
+  // For each transaction in the block
+
+  block.data.forEach(transaction => {
+
+    console.log(";")
+    console.log(transaction)
+    
+    // Remove spent UTXOs (referenced by transaction inputs)
+    transaction.txIns.forEach(input => {
+      newUTXOs = newUTXOs.filter(utxo => 
+        !(utxo.txOutId === input.txOutId && utxo.txOutIndex === input.txOutIndex)
+      );
+    });
+    
+    // Add new UTXOs (transaction outputs)
+    transaction.txOuts.forEach((output, index) => {
+      newUTXOs.push(new UnspentTxOut(transaction.id, index, output.address, output.amount));
+    });
+  });
+  
+  return newUTXOs;
+}
 
 
-export {mockWalletFunctions, mockUnspentTxOuts, Block, getBalance, findUnspentTxOuts, createTransaction, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock}
+export {mockWalletFunctions, mockUnspentTxOuts, Block, getBalance, findUnspentTxOuts, createTransaction, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty
+    ,updateUTXOsAfterMining,updateMockUTXO, addNewBlock}
 

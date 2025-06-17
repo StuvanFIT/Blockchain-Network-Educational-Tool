@@ -1,17 +1,23 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary } from 'lucide-react';
-import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT } from '../blockchain/transaction';
+import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT, updateUnspentTxOuts } from '../blockchain/transaction';
 import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
-import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock } from './Wallet';
+import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock, updateUTXOsAfterMining, updateMockUTXO } from './Wallet';
 
 
 
 // Transactions Page
 export const Transactions = () => {
 
+  const HEX_CHARS = '0123456789abcdef';
+  const ADDRESS_PREFIX = '04';
+  const ADDRESS_BODY_LENGTH = 128;
+  const MAX_GENERATION_ATTEMPTS = 10;
+
   const [activeTab, setActiveTab] = useState(''); //send or mine
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [walletAddress, setWalletAddress] = useState('lol');
+  const [walletAddress, setWalletAddress] = useState(mockWalletFunctions.getPublicFromWallet());
+  const [randomAddress, setRandomAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState(0);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -35,40 +41,30 @@ export const Transactions = () => {
 
 
   useEffect(() => {
-    const address = mockWalletFunctions.getPublicFromWallet();
-    const currentBalance = getBalance(address, mockUnspentTxOuts);
-    setWalletAddress(address);
-    setBalance(currentBalance);
+    updateMockUTXO(mockUnspentTxOuts);
     setTransactionPool(getTransactionPool());
     setBlocksMined(getBlockchain());
-  },[]);  
+  }, []);
+
+  useEffect(() => {
+    const currentBalance = getBalance(walletAddress, mockUnspentTxOuts);
+    setBalance(currentBalance);
+  }, [walletAddress, mockUnspentTxOuts]);
+
+  const handleWalletAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const addressVal = e.target.value;
+    setWalletAddress(addressVal);
+  };
 
 
   const copyToClipboard = (text:string) => {
     navigator.clipboard.writeText(text);
   };
   const refreshBalance = () =>{
-    const address = mockWalletFunctions.getPublicFromWallet();
-    const currentBalance = getBalance(address, mockUnspentTxOuts);
+    const currentBalance = getBalance(walletAddress, mockUnspentTxOuts);
     setBalance(currentBalance);
   };
 
-
-
-
-
-  /*
-
-  When using secp256k1 (the elliptic curve used in Bitcoin and Ethereum), a public key can be represented in uncompressed format
-  An uncompressed public key is 130 hex characters long:
-
-  1 byte (2 hex chars) prefix → 04
-
-  32 bytes (64 hex chars) x-coordinate
-
-  32 bytes (64 hex chars) y-coordinate
-  
-  */
   const validateAddress = (address:string) =>{
     if (address.length !== 130){
       return false;
@@ -82,6 +78,36 @@ export const Transactions = () => {
     };
     return true;
   };
+
+  // Separate generation from side effects
+  const generateRandomAddress = (): string => {
+    const hexChars = HEX_CHARS;
+    let address = ADDRESS_PREFIX;
+
+    for (let i = 0; i < ADDRESS_BODY_LENGTH; i++) {
+      const randIndex = Math.floor(Math.random() * hexChars.length);
+      address += hexChars[randIndex];
+    }
+
+    return address;
+  };
+
+  // Handle the setting logic separately
+  const generateAndSetRandomAddress = (): boolean => {
+    for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
+      const address = generateRandomAddress();
+      
+      if (validateAddress(address)) {
+        setRandomAddress(address);
+        return true;
+      }
+    }
+    // If we get here, all attempts failed
+    console.error('Failed to generate valid address after maximum attempts');
+    setRandomAddress(''); 
+    return false;
+  };
+
 
 
 
@@ -198,18 +224,31 @@ export const Transactions = () => {
       //Add the new block
       addNewBlock(newBlock);
 
-      console.log(newBlock);
-      console.log('blockchain:')
-      console.log(getBlockchain())
-
       //Clear transaction pool
       clearTransactionPool();
-      setTransactionPool([]);
 
-      //Update balance
-      setBalance(prev=> prev + COINBASE_AMOUNT);
+      // Update UTXOs FIRST
+      const newUTXO = updateUnspentTxOuts(newBlock.data, mockUnspentTxOuts);
+      console.log("pol")
+      console.log(newUTXO)
+      updateMockUTXO(newUTXO);
+      
+      // Then update all dependent state
+      const updatedBalance = getBalance(walletAddress, newUTXO);
+      const updatedBlockchain = getBlockchain();
+      const updatedTransactionPool = getTransactionPool(); // Should be empty now
+      
+      // Update state in correct order
+      setBalance(updatedBalance);
+      setBlocksMined(updatedBlockchain);
+      setTransactionPool(updatedTransactionPool);
+      
+      setSuccess(
+        `Block #${blockIndex} mined successfully! ` +
+        `Added ${blockTransactions.length} transactions to the blockchain. ` +
+        `Earned ${COINBASE_AMOUNT} coins reward!`
+      );
 
-      setSuccess(`Block #${blockIndex} mined successfully! Added ${blockTransactions.length} transactions to the blockchain. Earned ${COINBASE_AMOUNT} coins reward!`);
 
 
     } catch (err:any) {
@@ -256,9 +295,9 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
                 <div className='mt-4 flex items-center gap-2'>
-                  <code className='text-sm bg-gray-200 p-2 rounded-lg font-mono'>
-                    {walletAddress.substring(0,30)}...
-                  </code>
+                  <input type='text' onChange={handleWalletAddress} value={walletAddress} className='w-full text-sm bg-gray-200 p-2 rounded-lg font-mono'>
+
+                  </input>
 
                   <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'
                     onClick={() => copyToClipboard(walletAddress)}>
@@ -322,6 +361,24 @@ export const Transactions = () => {
                 </button>
               </nav>
             </div>
+
+            {/* Messages */}
+            {(error || success) && (
+              <div className="p-6 border-t">
+                {error && (
+                  <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">{error}</span>
+                  </div>
+                )}
+                {success && (
+                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">{success}</span>
+                  </div>
+                )}
+              </div>
+            )}
             
             {/*Tab Content */}
             <div className='p-6'>
@@ -386,6 +443,47 @@ export const Transactions = () => {
 
                     )}
                   </button>
+
+                  {/* Sample Addresses */}
+                  <div className="mt-8 space-y-2 rounded-lg p-6 border border-green-700 bg-green-50">
+                    <h2 className="text-base font-semibold mb-2 text-emerald-800">Generate Random Valid Address</h2>
+                    <div className='flex items-center gap-2'>
+                      <code className='text-base bg-gray-200 p-6 rounded-lg font-mono p-2 flex-1'>
+                        {randomAddress}
+                      </code>
+                        <button
+                          onClick={() => generateAndSetRandomAddress()}
+                          className="text-base text-blue-600 hover:text-blue-800"
+                        >
+                          <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500 rounded-lg text-white font-semibold px-3 py-1'>
+                            Generate
+                          </div>
+                          
+                        </button>
+                    </div>
+
+
+                    <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
+                    <div className="grid md:grid-cols-2 gap-8">
+                      {[
+                        "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
+                        "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
+                      ].map((addr, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <code className="text-base bg-gray-200 rounded-lg font-mono p-2 flex-1">{addr.substring(0, 40)}...</code>
+                          <button
+                            onClick={() => setRecipientAddress(addr)}
+                            className="text-base text-blue-600 hover:text-blue-800"
+                          >
+                            <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500 rounded-lg text-white font-semibold px-3 py-1'>
+                              Use
+                            </div>
+                            
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -525,50 +623,6 @@ export const Transactions = () => {
               )}
             </div>
           </div>
-
-          {/* Messages */}
-          {(error || success) && (
-            <div className="p-6 border-t">
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm">{error}</span>
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
-                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm">{success}</span>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Sample Addresses */}
-          <div className="p-6 border-t bg-green-50">
-            <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
-                "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
-              ].map((addr, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <code className="text-base bg-white p-2 rounded flex-1">{addr.substring(0, 40)}...</code>
-                  <button
-                    onClick={() => setRecipientAddress(addr)}
-                    className="text-base text-blue-600 hover:text-blue-800"
-                  >
-                    <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
-                      Use
-                    </div>
-                    
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-
         </div>
       </div>
     </div>
