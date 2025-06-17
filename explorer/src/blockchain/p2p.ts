@@ -1,4 +1,4 @@
-import WebSocket, {WebSocketServer} from 'ws';
+import WebSocket from 'ws';
 import {Server} from 'ws';
 import {
     addBlockToChain, Block, getBlockchain, getLatestBlock, handleReceivedTransaction, isValidBlockStructure,

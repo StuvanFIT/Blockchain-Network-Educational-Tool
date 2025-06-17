@@ -23,9 +23,9 @@ export const Transactions = () => {
   const isMiningRef = useRef(false);
   const [miningTime, setMiningTime] = useState(0);
   const [hashRate, setHashRate] = useState(0);
-  const [hash, setHash] = useState('');
+  const hashRef = useRef('');
   const [difficulty, setDifficulty] = useState(5);
-  const [timestamp, setTimestamp] = useState(0);
+  const timestampRef = useRef(0);
 
 
 
@@ -138,6 +138,7 @@ export const Transactions = () => {
 
         // Clear form
         setRecipientAddress('');
+        setError('');
         setAmount('');
       } else {
         setError('Failed to add to transaction pool!');
@@ -165,9 +166,6 @@ export const Transactions = () => {
     setError('');
 
     try{
-      const startTime = Date.now();
-      let hashCount = 0;
-
       //Create a coinbase transaction:
       const blockIndex = blocksMined.length;
       const coinbaseTx = getCoinbaseTransaction(walletAddress,blockIndex);
@@ -184,10 +182,10 @@ export const Transactions = () => {
 
       while (true){
         const time = Date.now();
-        const currHash = calculateHash(blockIndex, previousHash, timestamp,blockTransactions, difficulty, nonce );
+        const currHash = calculateHash(blockIndex, previousHash, time, blockTransactions, difficulty, nonce );
         if (hashMatchesDifficulty(currHash, difficulty)){
-          setHash(currHash);
-          setTimestamp(time);
+          hashRef.current = currHash;
+          timestampRef.current = time;
           console.log('Found valid hash with matching difficulty!');
           break;
         }
@@ -195,10 +193,14 @@ export const Transactions = () => {
       }
 
       //Create new block
-      const newBlock = new Block(blockIndex, hash, previousHash, timestamp, blockTransactions, difficulty, nonce);
+      const newBlock = new Block(blockIndex, hashRef.current, previousHash, timestampRef.current, blockTransactions, difficulty, nonce);
 
       //Add the new block
       addNewBlock(newBlock);
+
+      console.log(newBlock);
+      console.log('blockchain:')
+      console.log(getBlockchain())
 
       //Clear transaction pool
       clearTransactionPool();
@@ -237,7 +239,7 @@ export const Transactions = () => {
         </div>
         
         <div className="mt-4 bg-white rounded-xl shadow-2xl overflow-hidden">
-          <div className='rounded-t-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6'>
+          <div className='rounded-t-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6'>
             <div className='flex items-center gap-2'>
               <Wallet className='w-8 h-8' />
               <div>
@@ -281,7 +283,7 @@ export const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Transaction Pool (No. of transactions)</label>
                 <div className='flex items-center gap-2'>
-                  <span className='text-2xl font-bold text-red-600'>{transactionPool.length}</span>
+                  <span className='text-2xl font-bold text-emerald-500'>{transactionPool.length}</span>
                   <span className='text-sm text-gray-500'>pending transactions...</span>
                 </div>
               </div>
@@ -294,7 +296,7 @@ export const Transactions = () => {
                   onClick={() => setActiveTab('send')}
                   className={`flex-1 py-4 px-6 text-center font-semibold transition-colors ${
                     activeTab === 'send'
-                    ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                    ? 'bg-green-50 text-green-600 border-b-2 border-green-600'
                     : 'text-gray-500 hover:text-gray-700'
 
                   }`}
@@ -308,7 +310,7 @@ export const Transactions = () => {
                   onClick={() => setActiveTab('mine')}
                   className={`flex-1 py-4 px-6 text-center font-semibold transition-colors ${
                     activeTab === 'mine'
-                    ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                    ? 'bg-green-50 text-green-600 border-b-2 border-green-600'
                     : 'text-gray-500 hover:text-gray-700'
 
                   }`}
@@ -364,8 +366,8 @@ export const Transactions = () => {
                   <button
                     onClick={handleSendMoney}
                     disabled={isLoading || !recipientAddress || !amount}
-                    className='w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-3 py-4 rounded-lg
-                    hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed 
+                    className='w-full mt-8 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold px-3 py-4 rounded-lg
+                    hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed 
                     transition-all duration-200 flex items-center justify-center gap-2'>
 
 
@@ -432,8 +434,8 @@ export const Transactions = () => {
                     <button
                       onClick={handleMineBlock}
                       disabled={isMining || transactionPool.length === 0}
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-4 rounded-lg font-semibold 
-                              hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed 
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-4 rounded-lg font-semibold 
+                              hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed 
                               transition-all duration-200 flex items-center justify-center gap-2"
                     >
                       {isMining ? (
@@ -505,7 +507,7 @@ export const Transactions = () => {
                                     {block.data.length} transactions
                                   </p>
                                 </div>
-                                <span className={`text-xs ${idx===0 ? "text-blue-600 font-bold":"text-green-600 font-bold"}`}>
+                                <span className={`text-xs ${idx===0 ? " bg-blue-600 p-2 text-white rounded-lg text-blue-600 font-bold":"text-green-600 font-bold"}`}>
                                   {idx===0 ? 'Genesis Block': `+${COINBASE_AMOUNT} coins`}
                                 </span>
                               </div>
@@ -543,11 +545,11 @@ export const Transactions = () => {
           )}
           
           {/* Sample Addresses */}
-          <div className="p-6 border-t bg-blue-50">
-            <h2 className="text-base font-semibold mb-2 text-blue-800">Sample Addresses for Testing</h2>
+          <div className="p-6 border-t bg-green-50">
+            <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
             <div className="grid md:grid-cols-2 gap-8">
               {[
-                "04b2c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
+                "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
                 "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
               ].map((addr, idx) => (
                 <div key={idx} className="flex items-center gap-2">
@@ -556,7 +558,7 @@ export const Transactions = () => {
                     onClick={() => setRecipientAddress(addr)}
                     className="text-base text-blue-600 hover:text-blue-800"
                   >
-                    <div className=' bg-gradient-to-r from-blue-600 to-indigo-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
+                    <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
                       Use
                     </div>
                     

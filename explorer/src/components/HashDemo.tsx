@@ -29,7 +29,6 @@ export const HashDemo = () => {
   const [miningSuccess, setMiningSuccess] = useState(false);
   const [estimatedTime , setEstimatedTime] = useState(0);
 
-
  
   //Handling user input data changes:
   const handleChange = (setter: Function) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -261,7 +260,7 @@ export const HashDemo = () => {
                 className={`flex items-center gap-2 px-6 py-6 rounded-lg font-medium ${
                   isMiningRef.current
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'}`}>
+                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-700 hover:to-red-700 shadow-lg hover:shadow-xl'}`}>
 
                     {(isMiningRef.current || isMining) ? (
                       <>
@@ -409,7 +408,7 @@ export const HashDemo = () => {
 
                 <textarea
                   id="data-message"
-                  className="w-full h-24 p-4 text-left border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 text-left border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setData)}
                   value={data}
                   spellCheck={false}
@@ -429,7 +428,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="index"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setIndex)}
                   value={index}
                   spellCheck={false}
@@ -449,7 +448,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="previous-hash"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setPreviousHash)}
                   value={previousHash}
                   spellCheck={false}
@@ -469,7 +468,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="timestamp"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setTimeStamp)}
                   value={timestamp}
                   spellCheck={false}
@@ -489,7 +488,7 @@ export const HashDemo = () => {
               </div>
                 <textarea
                   id="difficulty"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setDifficulty)}
                   value={difficulty}
                   spellCheck={false}
@@ -509,7 +508,7 @@ export const HashDemo = () => {
                 </div>
                 <textarea
                   id="nonce"
-                  className="w-full h-24 p-4 border border-gray-500 rounded-md resize-none"
+                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setNonce)}
                   value={nonce}
                   spellCheck={false}
