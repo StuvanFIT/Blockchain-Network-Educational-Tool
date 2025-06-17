@@ -405,6 +405,30 @@ export const Transactions = () => {
 
                     )}
                   </button>
+
+                  {/* Sample Addresses */}
+                  <div className="mt-8 rounded-lg p-6 border-t bg-green-50">
+                    <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
+                    <div className="grid md:grid-cols-2 gap-8">
+                      {[
+                        "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
+                        "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
+                      ].map((addr, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <code className="text-base bg-white p-2 rounded flex-1">{addr.substring(0, 40)}...</code>
+                          <button
+                            onClick={() => setRecipientAddress(addr)}
+                            className="text-base text-blue-600 hover:text-blue-800"
+                          >
+                            <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
+                              Use
+                            </div>
+                            
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -562,32 +586,6 @@ export const Transactions = () => {
               )}
             </div>
           )}
-          
-          {/* Sample Addresses */}
-          <div className="p-6 border-t bg-green-50">
-            <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
-                "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
-              ].map((addr, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <code className="text-base bg-white p-2 rounded flex-1">{addr.substring(0, 40)}...</code>
-                  <button
-                    onClick={() => setRecipientAddress(addr)}
-                    className="text-base text-blue-600 hover:text-blue-800"
-                  >
-                    <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-blue-500 rounded-lg text-white font-semibold px-3 py-1'>
-                      Use
-                    </div>
-                    
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-
         </div>
       </div>
     </div>
