@@ -185,7 +185,12 @@ function updateUTXOsAfterMining(block:Block, currentUTXOs: UnspentTxOut[]) {
   let newUTXOs = [...currentUTXOs];
   
   // For each transaction in the block
+
   block.data.forEach(transaction => {
+
+    console.log(";")
+    console.log(transaction)
+    
     // Remove spent UTXOs (referenced by transaction inputs)
     transaction.txIns.forEach(input => {
       newUTXOs = newUTXOs.filter(utxo => 

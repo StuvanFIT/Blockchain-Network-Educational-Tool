@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary } from 'lucide-react';
-import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT } from '../blockchain/transaction';
+import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT, updateUnspentTxOuts } from '../blockchain/transaction';
 import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
 import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock, updateUTXOsAfterMining, updateMockUTXO } from './Wallet';
 
@@ -203,7 +203,9 @@ export const Transactions = () => {
       clearTransactionPool();
 
       // Update UTXOs FIRST
-      const newUTXO = updateUTXOsAfterMining(newBlock, mockUnspentTxOuts);
+      const newUTXO = updateUnspentTxOuts(newBlock.data, mockUnspentTxOuts);
+      console.log("pol")
+      console.log(newUTXO)
       updateMockUTXO(newUTXO);
       
       // Then update all dependent state

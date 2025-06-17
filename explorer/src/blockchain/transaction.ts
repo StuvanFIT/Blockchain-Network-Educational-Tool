@@ -204,8 +204,8 @@ const findUnspentTxOut = (transactionId: string, index: number, aUnspentTxOuts: 
 const getCoinbaseTransaction = (address: string, blockIndex: number): Transaction => {
     const t = new Transaction("null", [],[]);
     const txIn: TxIn = new TxIn('',blockIndex, '');
-    txIn.signature = '';
-    txIn.txOutId = '';
+    txIn.signature = 'System Reward';
+    txIn.txOutId = 'System';
     txIn.txOutIndex = blockIndex;
 
     t.txIns = [txIn];
@@ -254,7 +254,7 @@ const updateUnspentTxOuts = (aTransactions: Transaction[], aUnspentTxOuts: Unspe
     const resultingUnspentTxOuts = aUnspentTxOuts
         .filter(((uTxO) => !findUnspentTxOut(uTxO.txOutId, uTxO.txOutIndex, consumedTxOuts)))
         .concat(newUnspentTxOuts);
-
+    
     return resultingUnspentTxOuts;
 };
 
@@ -360,5 +360,5 @@ const isValidAddress = (address: string): boolean => {
 export {
     processTransactions, signTxIn, getTransactionId, isValidAddress, validateTransaction,
     UnspentTxOut, TxIn, TxOut, getCoinbaseTransaction, getPublicKey, hasDuplicates,
-    Transaction, COINBASE_AMOUNT
+    Transaction, COINBASE_AMOUNT, updateUnspentTxOuts
 };
