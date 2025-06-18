@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary } from 'lucide-react';
+import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary, LocationEdit, Check} from 'lucide-react';
 import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT, updateUnspentTxOuts } from '../blockchain/transaction';
 import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
 import { mockWalletFunctions, mockUnspentTxOuts, getBalance, createTransaction, Block, getBlockchain, getLatestBlock, calculateHash, hashMatchesDifficulty, addNewBlock, updateUTXOsAfterMining, updateMockUTXO } from './Wallet';
@@ -32,6 +32,8 @@ export const Transactions = () => {
   const hashRef = useRef('');
   const [difficulty, setDifficulty] = useState(5);
   const timestampRef = useRef(0);
+  const [isGeneratingRandAddress, setIsGeneratingRandAddress] = useState(false);
+  const [copied, setCopied] = useState(false);
 
 
 
@@ -59,6 +61,7 @@ export const Transactions = () => {
 
   const copyToClipboard = (text:string) => {
     navigator.clipboard.writeText(text);
+    setCopied(true);
   };
   const refreshBalance = () =>{
     const currentBalance = getBalance(walletAddress, mockUnspentTxOuts);
@@ -93,19 +96,32 @@ export const Transactions = () => {
   };
 
   // Handle the setting logic separately
-  const generateAndSetRandomAddress = (): boolean => {
-    for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
-      const address = generateRandomAddress();
-      
-      if (validateAddress(address)) {
-        setRandomAddress(address);
-        return true;
+  const generateAndSetRandomAddress = () => {
+
+    setIsGeneratingRandAddress(true);
+
+    setTimeout(() =>{
+
+      let foundValidAddress = false;
+
+      for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
+        const address = generateRandomAddress();
+        
+        if (validateAddress(address)) {
+          setRandomAddress(address);
+          setIsGeneratingRandAddress(false);
+          setCopied(false);
+          foundValidAddress = true;
+          return
+        }
       }
-    }
-    // If we get here, all attempts failed
-    console.error('Failed to generate valid address after maximum attempts');
-    setRandomAddress(''); 
-    return false;
+      // Only runs if no valid address was found
+      if (!foundValidAddress) {
+        console.error('Failed to generate valid address after maximum attempts');
+        setRandomAddress('Error: Could not generate valid address');
+        setIsGeneratingRandAddress(false);
+      }
+    }, 300)
   };
 
 
@@ -445,43 +461,51 @@ export const Transactions = () => {
                   </button>
 
                   {/* Sample Addresses */}
-                  <div className="mt-8 space-y-2 rounded-lg p-6 border border-green-700 bg-green-50">
-                    <h2 className="text-base font-semibold mb-2 text-emerald-800">Generate Random Valid Address</h2>
-                    <div className='flex items-center gap-2'>
-                      <code className='text-base bg-gray-200 p-6 rounded-lg font-mono p-2 flex-1'>
-                        {randomAddress}
-                      </code>
-                        <button
-                          onClick={() => generateAndSetRandomAddress()}
-                          className="text-base text-blue-600 hover:text-blue-800"
-                        >
-                          <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500 rounded-lg text-white font-semibold px-3 py-1'>
-                            Generate
+
+                  <div className='max-w-4xl mx-auto p-6 space-y-8 mt-4'>
+                    <div className='space-y-8 bg-gradient-to-br from-emerald-50 to-green-50 border border-green-100 rounded-lg p-8 shadow-lg'>
+
+                      <div className='flex items-center gap-2'>
+                        <LocationEdit className='w-6 h-6'/>
+                        <h2 className='text-xl text-emerald-700 font-bold'>Generate Random Address</h2>
+                      </div>
+
+                      <div className='space-y-4'>
+                        <div className='flex items-center gap-4'>
+                          <div className='flex-1 bg-white border-2 border-gray-500 rounded-lg p-4 transition-all duration-200 hover:border-emerald-300 focus-within:border-emerald-400 focus-within:ring-4 focus-within:ring-emerald-100'>
+                            <code className='text-sm text-mono font-bold rounded-lg break-all leading-relaxed block'>
+                              {randomAddress}
+                            </code>
                           </div>
-                          
-                        </button>
-                    </div>
 
-
-                    <h2 className="text-base font-semibold mb-2 text-emerald-800">Sample Addresses for Testing</h2>
-                    <div className="grid md:grid-cols-2 gap-8">
-                      {[
-                        "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
-                        "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
-                      ].map((addr, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <code className="text-base bg-gray-200 rounded-lg font-mono p-2 flex-1">{addr.substring(0, 40)}...</code>
                           <button
-                            onClick={() => setRecipientAddress(addr)}
-                            className="text-base text-blue-600 hover:text-blue-800"
-                          >
-                            <div className=' bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500 rounded-lg text-white font-semibold px-3 py-1'>
-                              Use
-                            </div>
-                            
+                            onClick={() =>copyToClipboard(randomAddress)}
+                            title='Copy Address'
+                            className=''
+                            >
+                              {copied ? (
+                                <Check className="w-8 h-8 text-green-600" />
+                              ) : (
+                                <Copy className="w-8 h-8 text-gray-500" />
+
+                              )}
+                              
                           </button>
                         </div>
-                      ))}
+
+                        <button
+                          onClick={() => generateAndSetRandomAddress()}
+                          disabled={isGeneratingRandAddress}
+                          className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                        >
+                    
+                          <RefreshCw className={`w-4 h-4 ${isGeneratingRandAddress ? 'animate-spin' : ''}`} />
+                          {isGeneratingRandAddress ? 'Generating...' : 'Generate New'}
+
+                        </button>
+
+
+                      </div>
                     </div>
                   </div>
                 </div>
