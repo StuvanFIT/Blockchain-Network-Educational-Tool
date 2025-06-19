@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Hash, Clock, ArrowRight, Coins, FileText, Database } from 'lucide-react';
-import { getBlockchain } from './Wallet';
+import { useBlockchainStore, testChain } from '../stores/BlockChainStore';
+import test from 'node:test';
 
 
 type TxIn = { txOutId: string; txOutIndex: number; signature: string };
@@ -18,10 +19,10 @@ type Block = {
 const BlockExplorer = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const {blockchain}  = useBlockchainStore();
 
   useEffect(() => {
-    // Using mock data - replace with actual blockchain call
-    const currBlockChain = [...getBlockchain()].reverse();
+    const currBlockChain = [...blockchain].reverse();
     setBlocks(currBlockChain);
     setSelectedBlock(currBlockChain[0]);
   }, []);

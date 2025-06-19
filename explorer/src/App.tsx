@@ -8,6 +8,7 @@ import {Dashboard} from './components/Dashboard';
 import {HashDemo} from './components/HashDemo';
 import {Transactions} from './components/Transactions';
 import NotFound from './components/NotFound';
+import { Wallet } from './components/Wallet';
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
                 {/*Other pages */}
                 <Route path="explorer" element={<BlockExplorer/>}/>
                 <Route path="createTransactions" element={<Transactions/>}/>
+                <Route path="createWallets" element={<Wallet/>}/>
                 <Route path="hash" element={<HashDemo/>}/>
 
                 {/*Not found page */}

@@ -1,7 +1,6 @@
 import CryptoJS from 'crypto-js';
 import ecdsa from 'elliptic';
 import _ from 'lodash';
-import { mockWalletFunctions } from '../components/Wallet';
 
 
 const ec = new ecdsa.ec('secp256k1');
