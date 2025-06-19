@@ -2,7 +2,18 @@ import React, { useState } from 'react';
 import { Info } from 'lucide-react';
 
 
-const InfoTooltip = ({ content, id }:any) => {
+interface TooltipContent {
+  title: string;
+  description: string;
+}
+
+interface InfoTooltipProps {
+  content: TooltipContent;
+  id: string;
+}
+
+
+const InfoTooltip = ({ content, id }:InfoTooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
@@ -17,8 +28,8 @@ const InfoTooltip = ({ content, id }:any) => {
       {isVisible && (
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50">
           <div className="bg-slate-800 text-white text-sm rounded-lg px-9 py-6 shadow-lg w-96 whitespace-normal">
-            <div className="font-medium mb-2">{content.title}</div>
-            <div className="text-slate-200">{content.description}</div>
+            <div className="font-medium mb-2">{typeof content.title === 'string' ? content.title : '[Invalid Title]'}</div>
+            <div className="text-slate-200"> {typeof content.description === 'string' ? content.description : '[Invalid Description]'}</div>
             
             {/* Speech bubble arrow */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2">

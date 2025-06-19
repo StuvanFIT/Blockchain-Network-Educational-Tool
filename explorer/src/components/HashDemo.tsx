@@ -430,7 +430,7 @@ export const HashDemo = () => {
                   id="index"
                   className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setIndex)}
-                  value={index}
+                  value={index.toString()}
                   spellCheck={false}
                   placeholder="Enter index..."
                 ></textarea>
@@ -450,7 +450,7 @@ export const HashDemo = () => {
                   id="previous-hash"
                   className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setPreviousHash)}
-                  value={previousHash}
+                  value={previousHash.toString()}
                   spellCheck={false}
                   placeholder="Enter Previous Hash..."
                 ></textarea>
@@ -470,7 +470,7 @@ export const HashDemo = () => {
                   id="timestamp"
                   className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setTimeStamp)}
-                  value={timestamp}
+                  value={timestamp.toString()}
                   spellCheck={false}
                   placeholder="Timestamp..."
                 ></textarea>
@@ -490,7 +490,7 @@ export const HashDemo = () => {
                   id="difficulty"
                   className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setDifficulty)}
-                  value={difficulty}
+                  value={difficulty.toString()}
                   spellCheck={false}
                   placeholder="Enter difficulty level..."
                 ></textarea>
@@ -510,7 +510,7 @@ export const HashDemo = () => {
                   id="nonce"
                   className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
                   onChange={handleChange(setNonce)}
-                  value={nonce}
+                  value={nonce.toString()}
                   spellCheck={false}
                   placeholder="Enter nonce..."
                 ></textarea>
