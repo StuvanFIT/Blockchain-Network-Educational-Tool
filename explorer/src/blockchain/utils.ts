@@ -27,5 +27,17 @@ const toHexString = (byteArray:any): string => {
     }).join('');
 };
 
+// Utility functions for cryptographic operations
+const sha256 = async (data:string) => {
+    const encoder = new TextEncoder();
+    const dataBuffer = typeof data === 'string' ? encoder.encode(data) : data;
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    return new Uint8Array(hashBuffer);
+};
 
-export {hexToBinary, toHexString};
+const arrayToHex = (array:Uint8Array) => {
+    return Array.from(array).map((b:number) => b.toString().padStart(2, '0')).join('');
+};
+
+
+export {hexToBinary, toHexString, sha256, arrayToHex};

@@ -47,6 +47,10 @@ const BlockExplorer = () => {
               </div>
             </div>
             <p className="text-blue-100 text-sm leading-relaxed opacity-90">
+              Head to the 'Create Transactions' page and send money! You should see your new block down below!
+            </p>
+            <br/>
+            <p className="text-blue-100 text-sm leading-relaxed opacity-90">
               Explore blocks and transactions on the blockchain. Click any block to view its details.
             </p>
           </div>

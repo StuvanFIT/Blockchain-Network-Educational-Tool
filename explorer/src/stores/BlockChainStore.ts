@@ -33,7 +33,7 @@ const genesisTransaction: Transaction = {
 const genesisBlock = new Block(
   0,
   '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627',
-  '',
+  'This is the first (genesis) block, there is no previous block.',
   1465154705,
   [genesisTransaction],
   0,

@@ -299,7 +299,7 @@ const Transactions = () => {
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-7x1 mx-auto">
+      <div className="max-w-7x1 mx-auto space-y-8">
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-white">
@@ -344,7 +344,7 @@ const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Current Balance</label>
                 <div className='flex items-center gap-2'>
-                  <span className="text-2xl font-bold text-green-600">{balance} coins</span>
+                  <span className="text-2xl font-bold text-green-600">{balance} BTC</span>
                   <button
 
                     className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
