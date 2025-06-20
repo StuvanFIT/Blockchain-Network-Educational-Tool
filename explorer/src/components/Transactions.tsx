@@ -344,7 +344,7 @@ const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Current Balance</label>
                 <div className='flex items-center gap-2'>
-                  <span className="text-2xl font-bold text-green-600">{balance} coins</span>
+                  <span className="text-2xl font-bold text-green-600">{balance} BTC</span>
                   <button
 
                     className="p-1 text-gray-500 hover:text-gray-700 transition-colors"

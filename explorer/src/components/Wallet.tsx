@@ -117,7 +117,7 @@ const Wallet = () => {
                             <WalletCards className='w-8 h-8' />
                         </div>
                         <div>
-                            <h1 className='text-3xl font-bold text-slate-800'>Create Wallet Accounts! </h1>
+                            <h1 className='text-3xl font-bold text-slate-800'>Create Wallet Accounts </h1>
                             <p className='text-slate-500 mt-1'>Create multiple wallet accounts with public & private key pairs!</p>
                         </div>
                     </div>
@@ -184,7 +184,7 @@ const Wallet = () => {
                             <div key={wallet.id} className='bg-white rounded-xl p-6 shadow-md border border-slate-200'>
                                 <div className='flex justify-between items-start mb-4'>
                                     <h3 className='text-xl font-semibold text-slate-800'>{wallet.name}</h3>
-                                    <span className='text-sm text-slate-500 bg-slate-100 p-2 rounded-full'>{wallet.balance} ETH</span>
+                                    <span className='text-sm text-slate-500 bg-slate-100 p-2 rounded-full'>{wallet.balance.toFixed(2)} BTC</span>
                                 </div>
 
                                 <div className='space-y-4'>
