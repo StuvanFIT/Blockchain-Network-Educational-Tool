@@ -113,7 +113,7 @@ const Wallet = () => {
             <div className='max-w-7xl mx-auto space-y-8'>
                 <div className='bg-white rounded-2xl p-8 shadow-lg border border-slate-200'>
                     <div className='flex items-center gap-4 mb-4'>
-                        <div className='p-8 bg-gradient-to-r from-fuchsia-600 to-pink-600 rounded-xl text-white'>
+                        <div className='p-3 bg-gradient-to-r from-fuchsia-600 to-pink-600 rounded-xl text-white'>
                             <WalletCards className='w-8 h-8' />
                         </div>
                         <div>

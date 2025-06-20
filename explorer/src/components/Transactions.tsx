@@ -299,7 +299,7 @@ const Transactions = () => {
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-7x1 mx-auto">
+      <div className="max-w-7x1 mx-auto space-y-8">
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-white">
