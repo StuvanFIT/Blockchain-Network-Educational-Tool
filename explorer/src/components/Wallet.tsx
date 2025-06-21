@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check} from 'lucide-react';
 import { arrayToHex, sha256 } from '../blockchain/utils';
 
+import { useWalletStore } from '../stores/WalletStore';
 
 type WalletStructure = {
     id: number,
@@ -12,8 +13,14 @@ type WalletStructure = {
 };
 
 const Wallet = () => {
+    //use the wallest store
+    const {
+        exampleWallets,
+        updateWallets
+    } = useWalletStore();
 
-    const [wallets, setWallets] = useState<WalletStructure[]>([]);
+
+    //const [wallets, setWallets] = useState<WalletStructure[]>([]);
     const [showPrivateKeys, setShowPrivateKeys] = useState<Record<number, boolean>>({});
     const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
     
@@ -54,13 +61,14 @@ const Wallet = () => {
 
             const newWallet: WalletStructure = {
                 id: Date.now() + Math.random(),
-                name: `Wallet ${wallets.length + 1}`,
+                name: `Wallet ${exampleWallets.length + 1}`,
                 publicKey: '0x' + publicKey,
                 privateKey: '0x' + privateKey,
                 balance: 0.00,
             };
 
-            setWallets([...wallets, newWallet]);
+            updateWallets([...exampleWallets, newWallet])
+
 
         } catch (error:any){
             console.error('Error generating wallet', error.message);
@@ -71,7 +79,7 @@ const Wallet = () => {
     };
 
     const clearAllWallets = () =>{
-        setWallets([]);
+        updateWallets([]);
         setShowPrivateKeys({});
         setCopiedStates({});
     };
@@ -126,7 +134,7 @@ const Wallet = () => {
                 </div>  
 
                 {/* Technical Info */}
-                {wallets.length > 0 && (
+                {exampleWallets.length > 0 && (
                     <div className='bg-blue-50 rounded-xl p-6 mt-6 border border-blue-200'>
                         <h3 className='font-semibold text-blue-900 mb-3'>🔐 Cryptographic Details:</h3>
                         <div className='grid md:grid-cols-2 gap-4 text-sm text-blue-800'>
@@ -160,7 +168,7 @@ const Wallet = () => {
                             </div>
                     </button>
 
-                    {wallets.length >0 &&(
+                    {exampleWallets.length >0 &&(
                         <button onClick={clearAllWallets} className='bg-gray-500 px-6 py-4 rounded-lg'>
                             <div className='flex items-center gap-2 text-white font-bold'>
                                 <RefreshCcw className='w-4 h-5' />
@@ -174,13 +182,13 @@ const Wallet = () => {
 
                 {/*Generated Wallets */}
 
-                {wallets.length > 0 &&(
+                {exampleWallets.length > 0 &&(
                     <div className='space-y-4'>
                         <h2 className='text-2xl font-bold text-slate-800 mb-4'>
-                            Generated Wallets ({wallets.length})
+                            Generated Wallets ({exampleWallets  .length})
                         </h2>
 
-                        {wallets.map((wallet) => (
+                        {exampleWallets.map((wallet) => (
                             <div key={wallet.id} className='bg-white rounded-xl p-6 shadow-md border border-slate-200'>
                                 <div className='flex justify-between items-start mb-4'>
                                     <h3 className='text-xl font-semibold text-slate-800'>{wallet.name}</h3>
@@ -264,3 +272,4 @@ const Wallet = () => {
 }
 
 export {Wallet}
+export type {WalletStructure};

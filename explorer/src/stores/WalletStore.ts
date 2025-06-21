@@ -3,6 +3,7 @@ import {create} from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { UnspentTxOut } from '../blockchain/transaction';
 import { Transaction } from '../blockchain/transaction';
+import { WalletStructure } from '../components/Wallet';
 
 /*
 We will be utilising the Zustand store management
@@ -26,11 +27,13 @@ interface WalletStore {
   utxos: UnspentTxOut[];
   transactionPool: Transaction[];
   balance: number;
+  exampleWallets: WalletStructure[];
   
   // Actions
   setPublicKey: (publicKey: string) => void;
   setPrivateKey: (privateKey: string) => void;
   updateUTXOs: (utxos: UnspentTxOut[]) => void;
+  updateWallets: (wallets: WalletStructure[]) => void;
   addTransaction: (transaction: Transaction) => void;
   removeTransaction: (transactionId: string) => void;
   clearTransactionPool: () => void;
@@ -62,6 +65,12 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
     ],
     transactionPool: [],
     balance: 300,
+
+    exampleWallets: [],
+
+    updateWallets: (exampleWallets: WalletStructure[]) =>{
+      set({exampleWallets});
+    },
 
     // Actions
     setPublicKey: (publicKey: string) => {
