@@ -40,6 +40,8 @@ interface WalletStore {
   clearTransactionPool: () => void;
   calculateBalance: (address?: string) => number;
   updateBalance: () => void;
+  resetWallets: () => void;
+  recalculateAllBalances: () => void;
   
   // Computed getters
   getPublicFromPrivateKey: (privateKeyInput: string) => string;
@@ -55,23 +57,37 @@ const generatePrivateKey = (): string => {
     return privateKey.toString(16);
 };
 
+//Initial wallet
+const initialWallet: WalletStructure = {
+  id: Date.now() + Math.random(),
+  name: `Wallet 0`,
+  publicKey: '0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf',
+  privateKey: '15c8692bdce6cba00b99c469b59cc051e878b9ef07780defc75f9a283190c3f4',
+  balance: 300.0,
+}
+
+
 //Use Wallet Store
 export const useWalletStore = create<WalletStore>()(((set, get) => ({
     // Initial state
-    publicKey: "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa",
-    privateKey: "1234567890abcdef1234567890abcdef12345678",
+    publicKey: "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf",
+    privateKey: "15c8692bdce6cba00b99c469b59cc051e878b9ef07780defc75f9a283190c3f4",
     utxos: [
-      new UnspentTxOut("tx1", 0, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa", 75),
-      new UnspentTxOut("tx2", 1, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa", 25),
-      new UnspentTxOut("tx3", 3, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa", 200),
+      new UnspentTxOut("tx1", 0, "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf", 75),
+      new UnspentTxOut("tx2", 1, "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf", 25),
+      new UnspentTxOut("tx3", 2, "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf", 200),
     ],
     transactionPool: [],
     balance: 300,
 
-    exampleWallets: [],
+    exampleWallets: [initialWallet],
 
     updateWallets: (exampleWallets: WalletStructure[]) =>{
       set({exampleWallets});
+    },
+
+    resetWallets: () =>{
+      set({exampleWallets: [initialWallet]})
     },
 
     // Actions
@@ -90,6 +106,8 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
       const { publicKey } = get();
       const newBalance = get().calculateBalance(publicKey);
       set({ balance: newBalance });
+
+      get().recalculateAllBalances();
     },
 
     addTransaction: (transaction: Transaction) =>
@@ -115,6 +133,18 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
       const {publicKey} = get();
       const newBalance = get().calculateBalance(publicKey);
       set({balance: newBalance});
+    },
+    recalculateAllBalances: () => {
+      const {utxos, exampleWallets} = get();
+
+      const updatedWallets = exampleWallets.map(wallet => {
+        const walletBalance = utxos
+          .filter(u => u.address === wallet.publicKey)
+          .reduce((sum, a) => sum + a.amount,0);
+        return {...wallet,  balance: walletBalance};
+      });
+
+      set({exampleWallets: updatedWallets});
     },
 
     // Computed getters

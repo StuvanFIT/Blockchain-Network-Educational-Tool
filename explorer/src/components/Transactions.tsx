@@ -142,35 +142,6 @@ const Transactions = () => {
     return address;
   };
 
-  // Handle the setting logic separately
-  const generateAndSetRandomAddress = () => {
-
-    setIsGeneratingRandAddress(true);
-
-    setTimeout(() =>{
-
-      let foundValidAddress = false;
-
-      for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
-        const address = generateRandomAddress();
-        
-        if (validateAddress(address)) {
-          setRandomAddress(address);
-          setIsGeneratingRandAddress(false);
-          setCopied(false);
-          foundValidAddress = true;
-          return
-        }
-      }
-      // Only runs if no valid address was found
-      if (!foundValidAddress) {
-        console.error('Failed to generate valid address after maximum attempts');
-        setRandomAddress('Error: Could not generate valid address');
-        setIsGeneratingRandAddress(false);
-      }
-    }, 300)
-  };
-
   const handleSendMoney = async () =>{
 
     setTransaction(null);

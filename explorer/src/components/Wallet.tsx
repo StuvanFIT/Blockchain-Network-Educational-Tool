@@ -19,7 +19,8 @@ const Wallet = () => {
     //use the wallest store
     const {
         exampleWallets,
-        updateWallets
+        updateWallets,
+        resetWallets,
     } = useWalletStore();
 
 
@@ -40,7 +41,7 @@ const Wallet = () => {
 
             const newWallet: WalletStructure = {
                 id: Date.now() + Math.random(),
-                name: `Wallet ${exampleWallets.length + 1}`,
+                name: `Wallet ${exampleWallets.length}`,
                 publicKey: publicKey,
                 privateKey: privateKey,
                 balance: 0.00,
@@ -58,7 +59,7 @@ const Wallet = () => {
     };
 
     const clearAllWallets = () =>{
-        updateWallets([]);
+        resetWallets();
         setShowPrivateKeys({});
         setCopiedStates({});
     };
@@ -164,13 +165,15 @@ const Wallet = () => {
                 {exampleWallets.length > 0 &&(
                     <div className='space-y-4'>
                         <h2 className='text-2xl font-bold text-slate-800 mb-4'>
-                            Generated Wallets ({exampleWallets  .length})
+                            Generated Wallets ({exampleWallets.length})
                         </h2>
 
                         {exampleWallets.map((wallet) => (
                             <div key={wallet.id} className='bg-white rounded-xl p-6 shadow-md border border-slate-200'>
                                 <div className='flex justify-between items-start mb-4'>
-                                    <h3 className='text-xl font-semibold text-slate-800'>{wallet.name}</h3>
+                                    <h3 className='text-xl font-semibold text-slate-800'>
+                                        {wallet.name === 'Wallet 0' ? wallet.name + ' (DEFAULT)': wallet.name}
+                                    </h3>
                                     <span className='text-sm text-slate-500 bg-slate-100 p-2 rounded-full'>{wallet.balance.toFixed(2)} BTC</span>
                                 </div>
 
