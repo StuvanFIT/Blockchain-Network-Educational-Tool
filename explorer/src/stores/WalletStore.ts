@@ -66,6 +66,14 @@ const initialWallet: WalletStructure = {
   balance: 300.0,
 }
 
+const secondaryWallet: WalletStructure = {
+  id: Date.now() + Math.random(),
+  name: `Wallet 1`,
+  publicKey: '0413dc50b61bf04d4e6b55deb2bcb8de7e1147f06e58c2d55bf5a7539de1a7c3ba33a2cc02a0982b2ae114a368096a8509838b7b6e318dee5a5b67f3249f64cd6c',
+  privateKey: '8d937e1f2556f8df06a2ad999551014ee9b2843cbe7d4a50e7a103f59d556a6d',
+  balance: 0.00,
+}
+
 
 //Use Wallet Store
 export const useWalletStore = create<WalletStore>()(((set, get) => ({
@@ -80,14 +88,14 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
     transactionPool: [],
     balance: 300,
 
-    exampleWallets: [initialWallet],
+    exampleWallets: [initialWallet, secondaryWallet],
 
     updateWallets: (exampleWallets: WalletStructure[]) =>{
       set({exampleWallets});
     },
 
     resetWallets: () =>{
-      set({exampleWallets: [initialWallet]})
+      set({exampleWallets: [initialWallet, secondaryWallet]})
     },
 
     // Actions

@@ -81,7 +81,7 @@ const Transactions = () => {
   }, []);
 
 
-  const handleWalletAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWalletAddress = (e: React.ChangeEvent<HTMLSelectElement>) => {
 
     const addressVal = e.target.value;
 
@@ -129,18 +129,6 @@ const Transactions = () => {
     return true;
   };
 
-  // Separate generation from side effects
-  const generateRandomAddress = (): string => {
-    const hexChars = HEX_CHARS;
-    let address = ADDRESS_PREFIX;
-
-    for (let i = 0; i < ADDRESS_BODY_LENGTH; i++) {
-      const randIndex = Math.floor(Math.random() * hexChars.length);
-      address += hexChars[randIndex];
-    }
-
-    return address;
-  };
 
   const handleSendMoney = async () =>{
 
@@ -158,7 +146,7 @@ const Transactions = () => {
     }
 
     if (recipientAddress === walletAddress ){
-      setError('You cannot send money to yourself.');
+      setError('You cannot send money to yourself. Select a different wallet.');
       return;
     }
 
@@ -282,11 +270,6 @@ const Transactions = () => {
 
     }
   };
-  const sampleAddresses = [
-    "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
-    "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-    "04a1b2c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
-  ];
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -322,9 +305,12 @@ const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
                 <div className='mt-4 flex items-center gap-2'>
-                  <input type='text' onChange={handleWalletAddress}  value={walletAddress} className='w-full text-sm bg-gray-200 p-2 rounded-lg font-mono'>
+                  <select onChange={handleWalletAddress} value={walletAddress} className='w-full text-sm bg-gray-200 p-2 rounded-lg font-mono'>
 
-                  </input>
+                    {exampleWallets.map((wallet, index) => (
+                      <option key={`sender-${wallet.publicKey}`} value={wallet.publicKey}>{wallet.name}: {wallet.publicKey}</option>
+                    ))}
+                  </select>
 
                   <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'
                     onClick={() => copyToClipboard(walletAddress)}>
@@ -418,16 +404,17 @@ const Transactions = () => {
 
                   <div className='space-y-4'>
                     <div>
-                      <label htmlFor='recipent' className='block text-sm font-medium text-gray-700 mb-2'> Recipent Address *</label>
-                      <input
-                        type='text'
-                        id='recipent'
+                      <label htmlFor='recipient' className='block text-sm font-medium text-gray-700 mb-2'> Recipient Address *</label>
+                      <select
                         value={recipientAddress}
                         onChange={(e) => setRecipientAddress(e.target.value)}
-                        placeholder='04a1b2c3d4e5f6789abc123def456789...'
-                        className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
+                        className='w-full p-2 bg-gray-200 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
                         disabled={isLoading}
-                      ></input>
+                      >
+                        {exampleWallets.map((wallet, index) => (
+                          <option key={`recipient-${wallet.publicKey}`} value={wallet.publicKey}>{wallet.name}: {wallet.publicKey}</option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className='relative'>

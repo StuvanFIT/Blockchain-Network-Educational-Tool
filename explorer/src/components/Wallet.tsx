@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {ec as EC} from 'elliptic';
-import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check} from 'lucide-react';
+import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check, Lock} from 'lucide-react';
 import { arrayToHex, sha256 } from '../blockchain/utils';
 
 import { useWalletStore } from '../stores/WalletStore';
@@ -116,7 +116,12 @@ const Wallet = () => {
                 {/* Technical Info */}
                 {exampleWallets.length > 0 && (
                     <div className='bg-blue-50 rounded-xl p-6 mt-6 border border-blue-200'>
-                        <h3 className='font-semibold text-blue-900 mb-3'>🔐 Cryptographic Details:</h3>
+                        <h3 className='font-semibold text-blue-900 mb-3'> 
+                            <div className='flex items-center gap-2'>
+                                <Lock className='w-5 h-5'/>
+                                Cryptographic Details:
+                            </div>
+                        </h3>
                         <div className='grid md:grid-cols-2 gap-4 text-sm text-blue-800'>
                             <div>
                                 <h4 className='font-medium mb-2'>Key Generation Process:</h4>
@@ -172,7 +177,7 @@ const Wallet = () => {
                             <div key={wallet.id} className='bg-white rounded-xl p-6 shadow-md border border-slate-200'>
                                 <div className='flex justify-between items-start mb-4'>
                                     <h3 className='text-xl font-semibold text-slate-800'>
-                                        {wallet.name === 'Wallet 0' ? wallet.name + ' (DEFAULT)': wallet.name}
+                                        {wallet.name === 'Wallet 0' || wallet.name === 'Wallet 1' ? wallet.name + ' (DEFAULT)': wallet.name}
                                     </h3>
                                     <span className='text-sm text-slate-500 bg-slate-100 p-2 rounded-full'>{wallet.balance.toFixed(2)} BTC</span>
                                 </div>
