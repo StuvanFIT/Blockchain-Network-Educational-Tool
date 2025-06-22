@@ -17,8 +17,10 @@ const Transactions = () => {
     privateKey,
     balance,
     utxos,
+    exampleWallets,
     transactionPool: storeTransactionPool,
     setPublicKey,
+    setPrivateKey,
     updateUTXOs,
     addTransaction,
     clearTransactionPool: clearStoreTransactionPool,
@@ -79,10 +81,28 @@ const Transactions = () => {
   }, []);
 
 
-  const handleWalletAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWalletAddress = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
     const addressVal = e.target.value;
-    setPublicKey(addressVal); 
-    console.log(generatePrivateKey())
+
+    //Set the public key
+    setPublicKey(addressVal);
+
+    //Set the private key
+    setPrivateKey('None');
+
+    for (let i=0; i< exampleWallets.length; i++){
+      let currWallet = exampleWallets[i];
+
+      if (currWallet.publicKey === addressVal){
+        setPrivateKey(currWallet.privateKey);
+        console.log(currWallet.privateKey)
+      };
+    };
+    console.log(privateKey)
+
+
+
   };
 
 
@@ -109,47 +129,6 @@ const Transactions = () => {
     return true;
   };
 
-  // Separate generation from side effects
-  const generateRandomAddress = (): string => {
-    const hexChars = HEX_CHARS;
-    let address = ADDRESS_PREFIX;
-
-    for (let i = 0; i < ADDRESS_BODY_LENGTH; i++) {
-      const randIndex = Math.floor(Math.random() * hexChars.length);
-      address += hexChars[randIndex];
-    }
-
-    return address;
-  };
-
-  // Handle the setting logic separately
-  const generateAndSetRandomAddress = () => {
-
-    setIsGeneratingRandAddress(true);
-
-    setTimeout(() =>{
-
-      let foundValidAddress = false;
-
-      for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
-        const address = generateRandomAddress();
-        
-        if (validateAddress(address)) {
-          setRandomAddress(address);
-          setIsGeneratingRandAddress(false);
-          setCopied(false);
-          foundValidAddress = true;
-          return
-        }
-      }
-      // Only runs if no valid address was found
-      if (!foundValidAddress) {
-        console.error('Failed to generate valid address after maximum attempts');
-        setRandomAddress('Error: Could not generate valid address');
-        setIsGeneratingRandAddress(false);
-      }
-    }, 300)
-  };
 
   const handleSendMoney = async () =>{
 
@@ -167,7 +146,7 @@ const Transactions = () => {
     }
 
     if (recipientAddress === walletAddress ){
-      setError('You cannot send money to yourself.');
+      setError('You cannot send money to yourself. Select a different wallet.');
       return;
     }
 
@@ -189,7 +168,7 @@ const Transactions = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       console.log('before transaction')
-      const newTransaction = createTransaction(recipientAddress, sendAmount,privateKey, walletAddress,utxos,storeTransactionPool);
+      const newTransaction = createTransaction(recipientAddress, sendAmount,walletAddress,privateKey, walletAddress,utxos,storeTransactionPool);
       console.log('after transaction')
 
       //Add to the transaction pool
@@ -291,11 +270,6 @@ const Transactions = () => {
 
     }
   };
-  const sampleAddresses = [
-    "04c1d2e3f4a5b6c7d8e9fa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
-    "04c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-    "04a1b2c3d4e5f6789abc123def456789012345678901234567890123456789abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
-  ];
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -331,9 +305,12 @@ const Transactions = () => {
               <div>
                 <label className='block text-base font-medium text-gray-700 mb-2'>Your Wallet Address</label>
                 <div className='mt-4 flex items-center gap-2'>
-                  <input type='text' onChange={handleWalletAddress}  value={walletAddress} className='w-full text-sm bg-gray-200 p-2 rounded-lg font-mono'>
+                  <select onChange={handleWalletAddress} value={walletAddress} className='w-full text-sm bg-gray-200 p-2 rounded-lg font-mono'>
 
-                  </input>
+                    {exampleWallets.map((wallet, index) => (
+                      <option key={`sender-${wallet.publicKey}`} value={wallet.publicKey}>{wallet.name}: {wallet.publicKey}</option>
+                    ))}
+                  </select>
 
                   <button className='p-2 text-gray-500 hover:text-gray-700 transition-colors'
                     onClick={() => copyToClipboard(walletAddress)}>
@@ -427,16 +404,17 @@ const Transactions = () => {
 
                   <div className='space-y-4'>
                     <div>
-                      <label htmlFor='recipent' className='block text-sm font-medium text-gray-700 mb-2'> Recipent Address *</label>
-                      <input
-                        type='text'
-                        id='recipent'
+                      <label htmlFor='recipient' className='block text-sm font-medium text-gray-700 mb-2'> Recipient Address *</label>
+                      <select
                         value={recipientAddress}
                         onChange={(e) => setRecipientAddress(e.target.value)}
-                        placeholder='04a1b2c3d4e5f6789abc123def456789...'
-                        className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
+                        className='w-full p-2 bg-gray-200 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
                         disabled={isLoading}
-                      ></input>
+                      >
+                        {exampleWallets.map((wallet, index) => (
+                          <option key={`recipient-${wallet.publicKey}`} value={wallet.publicKey}>{wallet.name}: {wallet.publicKey}</option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className='relative'>
@@ -479,101 +457,6 @@ const Transactions = () => {
 
                     )}
                   </button>
-
-                  {/* Sample Addresses */}
-
-                  <div className='max-w-4xl mx-auto p-6 space-y-8 mt-4'>
-                    <div className='space-y-8 bg-gradient-to-br from-emerald-50 to-green-50 border border-green-100 rounded-lg p-8 shadow-lg'>
-
-                      <div className='flex items-center gap-2'>
-                        <LocationEdit className='w-6 h-6'/>
-                        <h2 className='text-xl text-emerald-700 font-bold'>Generate Random Address</h2>
-                      </div>
-
-                      <div className='space-y-4'>
-                        <div className='flex items-center gap-4'>
-                          <div className='flex-1 bg-white border-2 border-gray-500 rounded-lg p-4 transition-all duration-200 hover:border-emerald-300 focus-within:border-emerald-400 focus-within:ring-4 focus-within:ring-emerald-100'>
-                            <code className='text-sm text-mono font-bold rounded-lg break-all leading-relaxed block'>
-                              {randomAddress}
-                            </code>
-                          </div>
-
-                          <button
-                            onClick={() =>copyToClipboard(randomAddress)}
-                            title='Copy Address'
-                            className=''
-                            >
-                              {copied ? (
-                                <Check className="w-8 h-8 text-green-600" />
-                              ) : (
-                                <Copy className="w-8 h-8 text-gray-500" />
-
-                              )}
-                              
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() => generateAndSetRandomAddress()}
-                          disabled={isGeneratingRandAddress}
-                          className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed"
-                        >
-                    
-                          <RefreshCw className={`w-4 h-4 ${isGeneratingRandAddress ? 'animate-spin' : ''}`} />
-                          {isGeneratingRandAddress ? 'Generating...' : 'Generate New'}
-
-                        </button>
-
-
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                      {sampleAddresses.map((addr, idx) => (
-                        <div key={idx} className="group relative">
-                          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 transition-all duration-200 hover:bg-gray-100 hover:border-gray-300">
-                            <div className="flex items-center gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="text-xs text-gray-500 font-medium mb-1">
-                                  Sample Address #{idx + 1}
-                                  </div>
-                                    <code className="text-sm font-mono text-gray-700 block break-all">
-                                      {typeof addr === 'string'
-                                        ? addr.length > 60
-                                          ? `${addr.substring(0, 60)}...`
-                                          : addr
-                                        : 'Invalid address'}
-                                    </code>
-                                </div>
-                              
-                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <button
-                                  onClick={() => copyToClipboard(addr)}
-                                  className="p-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
-                                  title="Copy address"
-                                >
-                                  {copied ? (
-                                    <Check className="w-4 h-4 text-green-600" />
-                                  ) : (
-                                    <Copy className="w-4 h-4 text-gray-500" />
-                                  )}
-                                </button>
-                                
-                                <button
-                                  onClick={() => {
-                                    setRandomAddress(addr);
-                                    copyToClipboard(addr);
-                                  }}
-                                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
-                                >
-                                  Use This
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
                 </div>
               )}
 

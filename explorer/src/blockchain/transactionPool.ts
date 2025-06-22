@@ -12,7 +12,9 @@ const clearTransactionPool = () => {
 };
 
 const addToTransactionPool = (tx: Transaction, unspentTxOuts: UnspentTxOut[]): boolean => {
-
+    console.log("WE ARE IN THE POOL")
+    console.log(tx)
+    console.log(unspentTxOuts)
     if (!validateTransaction(tx, unspentTxOuts)) {
         throw Error('Trying to add invalid tx to pool');
     }

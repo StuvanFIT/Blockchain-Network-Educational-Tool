@@ -176,10 +176,16 @@ const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: Unsp
         console.log('referenced txOut not found: ' + JSON.stringify(txIn));
         return false;
     }
-    const address = referencedUTxOut.address;
-
-    const key = ec.keyFromPublic(address, 'hex');
+    const address = referencedUTxOut.address; // This is a hex-encoded public key
+    const key = ec.keyFromPublic(address, 'hex'); // Create an EC key object from it
+    console.log("This is the key = ec.keyfromPublic: " + key)
+    console.log("This is the key = ec.keyfromPublic: " + key.getPublic('hex'))
+    console.log(transaction)
+    console.log(aUnspentTxOuts)
     const validSignature: boolean = key.verify(transaction.id, txIn.signature);
+
+    console.log(validSignature)
+
     if (!validSignature) {
         console.log('invalid txIn signature: %s txId: %s address: %s', txIn.signature, transaction.id, referencedUTxOut.address);
         return false;
@@ -213,7 +219,7 @@ const getCoinbaseTransaction = (address: string, blockIndex: number): Transactio
     return t;
 };
 
-const signTxIn = (transaction: Transaction, txInIndex: number,
+const signTxIn = (transaction: Transaction, txInIndex: number,publicKey: string,
                   privateKey: string, aUnspentTxOuts: UnspentTxOut[]): string => {
     const txIn: TxIn = transaction.txIns[txInIndex];
 
@@ -224,10 +230,8 @@ const signTxIn = (transaction: Transaction, txInIndex: number,
         throw Error();
     }
     const referencedAddress = referencedUnspentTxOut.address;
-    console.log(getPublicKey(privateKey))
-    console.log(referencedAddress);
 
-    if (getPublicKey(privateKey) !== referencedAddress) {
+    if (publicKey !== referencedAddress) {
         console.log('trying to sign an input with private' +
             ' key that does not match the address that is referenced in txIn');
         throw Error();

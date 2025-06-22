@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check} from 'lucide-react';
+import {ec as EC} from 'elliptic';
+import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check, Lock} from 'lucide-react';
 import { arrayToHex, sha256 } from '../blockchain/utils';
 
+import { useWalletStore } from '../stores/WalletStore';
+
+const ec = new EC('secp256k1');
 
 type WalletStructure = {
     id: number,
@@ -12,55 +16,39 @@ type WalletStructure = {
 };
 
 const Wallet = () => {
+    //use the wallest store
+    const {
+        exampleWallets,
+        updateWallets,
+        resetWallets,
+    } = useWalletStore();
 
-    const [wallets, setWallets] = useState<WalletStructure[]>([]);
+
+    //const [wallets, setWallets] = useState<WalletStructure[]>([]);
     const [showPrivateKeys, setShowPrivateKeys] = useState<Record<number, boolean>>({});
     const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
     
-
-    //Step 1: Generate a new private key:
-    const generatePrivateKey = () =>{
-        const array = new Uint8Array(32);        // Create 32-byte array (256 bits)
-        crypto.getRandomValues(array);           // Fill with cryptographically secure random bytes
-        return arrayToHex(array);                // Convert to hexadecimal string
-    };
-
-    //Step 2: Derive a public key from the private key (i.e. private key --> public key)
-    // Simplified deterministic public key derivation from private key
-    // In real implementation, this would use elliptic curve multiplication
-    const derivePublicKey = async (privateKeyHex:string) => {
-
-        const hash1 = await sha256(privateKeyHex);
-        
-        //Hash again with a constant to simulate elliptic curve operations
-        const hash2 = await sha256(arrayToHex(hash1) + 'GENERATOR_POINT');
-        
-        //Create a 64-byte public key (uncompressed format simulation)
-        const hash3 = await sha256(arrayToHex(hash2) + 'PUBLIC_KEY_DERIVATION');
-        
-        // Combine hashes to create a deterministic 64-byte public key
-        const publicKeyBytes = new Uint8Array(64);
-        publicKeyBytes.set(hash2.slice(0, 32), 0);
-        publicKeyBytes.set(hash3.slice(0, 32), 32);
-        
-        return arrayToHex(publicKeyBytes);
-    };
-
     const generateWallet = async () =>{
         try {
+            const keyPair = ec.genKeyPair();
 
-            const privateKey = generatePrivateKey();
-            const publicKey = await derivePublicKey(privateKey);
+            const publicKey = keyPair.getPublic('hex');
+            const privateKey = keyPair.getPrivate('hex');
+            
+            console.log("{PUBLIC KEY, PRIVATE KEY")
+            console.log(publicKey);
+            console.log(privateKey);
 
             const newWallet: WalletStructure = {
                 id: Date.now() + Math.random(),
-                name: `Wallet ${wallets.length + 1}`,
-                publicKey: '0x' + publicKey,
-                privateKey: '0x' + privateKey,
+                name: `Wallet ${exampleWallets.length}`,
+                publicKey: publicKey,
+                privateKey: privateKey,
                 balance: 0.00,
             };
 
-            setWallets([...wallets, newWallet]);
+            updateWallets([...exampleWallets, newWallet])
+
 
         } catch (error:any){
             console.error('Error generating wallet', error.message);
@@ -71,7 +59,7 @@ const Wallet = () => {
     };
 
     const clearAllWallets = () =>{
-        setWallets([]);
+        resetWallets();
         setShowPrivateKeys({});
         setCopiedStates({});
     };
@@ -126,9 +114,14 @@ const Wallet = () => {
                 </div>  
 
                 {/* Technical Info */}
-                {wallets.length > 0 && (
+                {exampleWallets.length > 0 && (
                     <div className='bg-blue-50 rounded-xl p-6 mt-6 border border-blue-200'>
-                        <h3 className='font-semibold text-blue-900 mb-3'>🔐 Cryptographic Details:</h3>
+                        <h3 className='font-semibold text-blue-900 mb-3'> 
+                            <div className='flex items-center gap-2'>
+                                <Lock className='w-5 h-5'/>
+                                Cryptographic Details:
+                            </div>
+                        </h3>
                         <div className='grid md:grid-cols-2 gap-4 text-sm text-blue-800'>
                             <div>
                                 <h4 className='font-medium mb-2'>Key Generation Process:</h4>
@@ -160,7 +153,7 @@ const Wallet = () => {
                             </div>
                     </button>
 
-                    {wallets.length >0 &&(
+                    {exampleWallets.length >0 &&(
                         <button onClick={clearAllWallets} className='bg-gray-500 px-6 py-4 rounded-lg'>
                             <div className='flex items-center gap-2 text-white font-bold'>
                                 <RefreshCcw className='w-4 h-5' />
@@ -174,16 +167,18 @@ const Wallet = () => {
 
                 {/*Generated Wallets */}
 
-                {wallets.length > 0 &&(
+                {exampleWallets.length > 0 &&(
                     <div className='space-y-4'>
                         <h2 className='text-2xl font-bold text-slate-800 mb-4'>
-                            Generated Wallets ({wallets.length})
+                            Generated Wallets ({exampleWallets.length})
                         </h2>
 
-                        {wallets.map((wallet) => (
+                        {exampleWallets.map((wallet) => (
                             <div key={wallet.id} className='bg-white rounded-xl p-6 shadow-md border border-slate-200'>
                                 <div className='flex justify-between items-start mb-4'>
-                                    <h3 className='text-xl font-semibold text-slate-800'>{wallet.name}</h3>
+                                    <h3 className='text-xl font-semibold text-slate-800'>
+                                        {wallet.name === 'Wallet 0' || wallet.name === 'Wallet 1' ? wallet.name + ' (DEFAULT)': wallet.name}
+                                    </h3>
                                     <span className='text-sm text-slate-500 bg-slate-100 p-2 rounded-full'>{wallet.balance.toFixed(2)} BTC</span>
                                 </div>
 
@@ -264,3 +259,4 @@ const Wallet = () => {
 }
 
 export {Wallet}
+export type {WalletStructure};

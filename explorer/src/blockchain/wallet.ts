@@ -95,7 +95,7 @@ const filterTxPoolTxs = (unspentTxOuts: UnspentTxOut[], transactionPool: Transac
     return _.without(unspentTxOuts, ...removable);
 };
 
-const createTransaction = (receiverAddress: string, amount: number, privateKey: string,
+const createTransaction = (receiverAddress: string, amount: number,publicKey:string, privateKey: string,
                            unspentTxOuts: UnspentTxOut[], txPool: Transaction[]): Transaction => {
 
     console.log('txPool: %s', JSON.stringify(txPool));
@@ -122,7 +122,7 @@ const createTransaction = (receiverAddress: string, amount: number, privateKey: 
     tx.id = getTransactionId(tx);
 
     tx.txIns = tx.txIns.map((txIn: TxIn, index: number) => {
-        txIn.signature = signTxIn(tx, index, privateKey, unspentTxOuts);
+        txIn.signature = signTxIn(tx, index,publicKey, privateKey, unspentTxOuts);
         return txIn;
     });
 

@@ -1,8 +1,10 @@
 import { ec } from 'elliptic';
 import {create} from 'zustand';
+import { persist } from 'zustand/middleware';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { UnspentTxOut } from '../blockchain/transaction';
+import { getPublicKey, UnspentTxOut } from '../blockchain/transaction';
 import { Transaction } from '../blockchain/transaction';
+import { WalletStructure } from '../components/Wallet';
 
 /*
 We will be utilising the Zustand store management
@@ -26,18 +28,23 @@ interface WalletStore {
   utxos: UnspentTxOut[];
   transactionPool: Transaction[];
   balance: number;
+  exampleWallets: WalletStructure[];
   
   // Actions
   setPublicKey: (publicKey: string) => void;
   setPrivateKey: (privateKey: string) => void;
   updateUTXOs: (utxos: UnspentTxOut[]) => void;
+  updateWallets: (wallets: WalletStructure[]) => void;
   addTransaction: (transaction: Transaction) => void;
   removeTransaction: (transactionId: string) => void;
   clearTransactionPool: () => void;
   calculateBalance: (address?: string) => number;
   updateBalance: () => void;
+  resetWallets: () => void;
+  recalculateAllBalances: () => void;
   
   // Computed getters
+  getPublicFromPrivateKey: (privateKeyInput: string) => string;
   getCurrentBalance: () => number;
   getPublicKey: () => string;
   getPrivateKey: () => string;
@@ -50,18 +57,46 @@ const generatePrivateKey = (): string => {
     return privateKey.toString(16);
 };
 
+//Initial wallet
+const initialWallet: WalletStructure = {
+  id: Date.now() + Math.random(),
+  name: `Wallet 0`,
+  publicKey: '0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf',
+  privateKey: '15c8692bdce6cba00b99c469b59cc051e878b9ef07780defc75f9a283190c3f4',
+  balance: 300.0,
+}
+
+const secondaryWallet: WalletStructure = {
+  id: Date.now() + Math.random(),
+  name: `Wallet 1`,
+  publicKey: '0413dc50b61bf04d4e6b55deb2bcb8de7e1147f06e58c2d55bf5a7539de1a7c3ba33a2cc02a0982b2ae114a368096a8509838b7b6e318dee5a5b67f3249f64cd6c',
+  privateKey: '8d937e1f2556f8df06a2ad999551014ee9b2843cbe7d4a50e7a103f59d556a6d',
+  balance: 0.00,
+}
+
+
 //Use Wallet Store
 export const useWalletStore = create<WalletStore>()(((set, get) => ({
     // Initial state
-    publicKey: "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa",
-    privateKey: "1234567890abcdef1234567890abcdef12345678",
+    publicKey: "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf",
+    privateKey: "15c8692bdce6cba00b99c469b59cc051e878b9ef07780defc75f9a283190c3f4",
     utxos: [
-      new UnspentTxOut("tx1", 0, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa", 75),
-      new UnspentTxOut("tx2", 1, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa", 25),
-      new UnspentTxOut("tx3", 3, "0498eaebc69ddc929d4b9c4834a41179fb4b4dad8ba2b60661de4b261a9de996376a43fdc5160a1a9ac8dc9d15f34c14e8dba8624dc2fa4ee13d53b0d1aed2c8aa", 200),
+      new UnspentTxOut("tx1", 0, "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf", 75),
+      new UnspentTxOut("tx2", 1, "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf", 25),
+      new UnspentTxOut("tx3", 2, "0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf", 200),
     ],
     transactionPool: [],
     balance: 300,
+
+    exampleWallets: [initialWallet, secondaryWallet],
+
+    updateWallets: (exampleWallets: WalletStructure[]) =>{
+      set({exampleWallets});
+    },
+
+    resetWallets: () =>{
+      set({exampleWallets: [initialWallet, secondaryWallet]})
+    },
 
     // Actions
     setPublicKey: (publicKey: string) => {
@@ -79,6 +114,8 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
       const { publicKey } = get();
       const newBalance = get().calculateBalance(publicKey);
       set({ balance: newBalance });
+
+      get().recalculateAllBalances();
     },
 
     addTransaction: (transaction: Transaction) =>
@@ -105,12 +142,32 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
       const newBalance = get().calculateBalance(publicKey);
       set({balance: newBalance});
     },
+    recalculateAllBalances: () => {
+      const {utxos, exampleWallets} = get();
+
+      const updatedWallets = exampleWallets.map(wallet => {
+        const walletBalance = utxos
+          .filter(u => u.address === wallet.publicKey)
+          .reduce((sum, a) => sum + a.amount,0);
+        return {...wallet,  balance: walletBalance};
+      });
+
+      set({exampleWallets: updatedWallets});
+    },
 
     // Computed getters
+    getPublicFromPrivateKey: (privateKeyInput:string):string => {
+
+      if (privateKeyInput === get().getPrivateKey()){
+        return get().getPublicKey();
+      }
+      return 'Private key does not match with the current {Public, Private} key pair!';
+    },
     getCurrentBalance: () => get().balance,
     getPublicKey: () => get().publicKey,
     getPrivateKey: () => get().privateKey,
-  }))
+  })
+  )
 );
 
 export {generatePrivateKey}

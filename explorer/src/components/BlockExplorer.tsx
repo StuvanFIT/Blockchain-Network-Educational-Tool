@@ -237,7 +237,7 @@ const BlockExplorer = () => {
                                         <p className="font-mono text-sm text-gray-700 break-all">
                                           TXOUT INDEX: {input.txOutIndex}
                                         </p>
-                                        <p className="text-xs text-gray-500 mt-1">Output Reference</p>
+                                        <p className="text-base text-gray-500 mt-1">Output Reference</p>
                                       </div>
                                     </div>
                                   </div>
@@ -264,7 +264,7 @@ const BlockExplorer = () => {
                                           RECIPIENT ADDRESS: {(output.address)}
                                         </p>
                                         <div className="flex items-center gap-2">
-                                          <span className="text-xs text-gray-500">Amount:</span>
+                                          <span className="text-base text-gray-500">Amount:</span>
                                           <span className="font-bold text-emerald-700">{output.amount} coins</span>
                                         </div>
                                       </div>

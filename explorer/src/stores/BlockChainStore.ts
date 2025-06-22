@@ -94,6 +94,7 @@ const filterTxPoolTxs = (unspentTxOuts: UnspentTxOut[], transactionPool: Transac
 const createTransaction = (
   receiverAddress: string,
   amount: number,
+  publicKey:string,
   privateKey: string,
   myAddress: string, 
   unspentTxOuts: UnspentTxOut[],
@@ -115,7 +116,7 @@ const createTransaction = (
   tx.id = getTransactionId(tx);
   tx.txIns = tx.txIns.map((txIn, index) => ({
     ...txIn,
-    signature: signTxIn(tx, index, privateKey, unspentTxOuts)
+    signature: signTxIn(tx, index,publicKey, privateKey, unspentTxOuts)
   }));
 
   return tx;
