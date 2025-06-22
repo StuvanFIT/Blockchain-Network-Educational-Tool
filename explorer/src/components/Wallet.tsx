@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import {ec as EC} from 'elliptic';
 import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check} from 'lucide-react';
 import { arrayToHex, sha256 } from '../blockchain/utils';
 
 import { useWalletStore } from '../stores/WalletStore';
+
+const ec = new EC('secp256k1');
 
 type WalletStructure = {
     id: number,
@@ -24,46 +27,22 @@ const Wallet = () => {
     const [showPrivateKeys, setShowPrivateKeys] = useState<Record<number, boolean>>({});
     const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
     
-
-    //Step 1: Generate a new private key:
-    const generatePrivateKey = () =>{
-        const array = new Uint8Array(32);        // Create 32-byte array (256 bits)
-        crypto.getRandomValues(array);           // Fill with cryptographically secure random bytes
-        return arrayToHex(array);                // Convert to hexadecimal string
-    };
-
-    //Step 2: Derive a public key from the private key (i.e. private key --> public key)
-    // Simplified deterministic public key derivation from private key
-    // In real implementation, this would use elliptic curve multiplication
-    const derivePublicKey = async (privateKeyHex:string) => {
-
-        const hash1 = await sha256(privateKeyHex);
-        
-        //Hash again with a constant to simulate elliptic curve operations
-        const hash2 = await sha256(arrayToHex(hash1) + 'GENERATOR_POINT');
-        
-        //Create a 64-byte public key (uncompressed format simulation)
-        const hash3 = await sha256(arrayToHex(hash2) + 'PUBLIC_KEY_DERIVATION');
-        
-        // Combine hashes to create a deterministic 64-byte public key
-        const publicKeyBytes = new Uint8Array(64);
-        publicKeyBytes.set(hash2.slice(0, 32), 0);
-        publicKeyBytes.set(hash3.slice(0, 32), 32);
-        
-        return arrayToHex(publicKeyBytes);
-    };
-
     const generateWallet = async () =>{
         try {
+            const keyPair = ec.genKeyPair();
 
-            const privateKey = generatePrivateKey();
-            const publicKey = await derivePublicKey(privateKey);
+            const publicKey = keyPair.getPublic('hex');
+            const privateKey = keyPair.getPrivate('hex');
+            
+            console.log("{PUBLIC KEY, PRIVATE KEY")
+            console.log(publicKey);
+            console.log(privateKey);
 
             const newWallet: WalletStructure = {
                 id: Date.now() + Math.random(),
                 name: `Wallet ${exampleWallets.length + 1}`,
-                publicKey: '0x' + publicKey,
-                privateKey: '0x' + privateKey,
+                publicKey: publicKey,
+                privateKey: privateKey,
                 balance: 0.00,
             };
 

@@ -1,7 +1,8 @@
 import { ec } from 'elliptic';
 import {create} from 'zustand';
+import { persist } from 'zustand/middleware';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { UnspentTxOut } from '../blockchain/transaction';
+import { getPublicKey, UnspentTxOut } from '../blockchain/transaction';
 import { Transaction } from '../blockchain/transaction';
 import { WalletStructure } from '../components/Wallet';
 
@@ -41,6 +42,7 @@ interface WalletStore {
   updateBalance: () => void;
   
   // Computed getters
+  getPublicFromPrivateKey: (privateKeyInput: string) => string;
   getCurrentBalance: () => number;
   getPublicKey: () => string;
   getPrivateKey: () => string;
@@ -116,10 +118,18 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
     },
 
     // Computed getters
+    getPublicFromPrivateKey: (privateKeyInput:string):string => {
+
+      if (privateKeyInput === get().getPrivateKey()){
+        return get().getPublicKey();
+      }
+      return 'Private key does not match with the current {Public, Private} key pair!';
+    },
     getCurrentBalance: () => get().balance,
     getPublicKey: () => get().publicKey,
     getPrivateKey: () => get().privateKey,
-  }))
+  })
+  )
 );
 
 export {generatePrivateKey}
