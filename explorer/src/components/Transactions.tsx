@@ -411,6 +411,7 @@ const Transactions = () => {
                         className='w-full p-2 bg-gray-200 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm' 
                         disabled={isLoading}
                       >
+                        <option value="">Select a Wallet...</option>
                         {exampleWallets.map((wallet, index) => (
                           <option key={`recipient-${wallet.publicKey}`} value={wallet.publicKey}>{wallet.name}: {wallet.publicKey}</option>
                         ))}
