@@ -163,6 +163,20 @@ const PeerToPeerNetwork = () => {
         addActivity(`New Peer ${newPeer.name} has joined the network!`);
     };
 
+    const togglePeerConnection = (peerId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setPeers(prev => prev.map(peer => {
+        if (peer.id === peerId) {
+            const newStatus = !peer.connected;
+            addActivity(`${peer.name} ${newStatus ? 'connected to' : 'disconnected from'} the network`);
+            return { ...peer, connected: newStatus };
+        }
+        return peer;
+        }));
+    };
+
+
+
 
 
 
@@ -253,13 +267,13 @@ const PeerToPeerNetwork = () => {
                                     <Server className='text-white' />
 
                                     {/*Wifi circle */}
-                                    <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center 
+                                    <button title={peer.connected ? 'Disconnect' : 'Connect'} onClick={(e) => togglePeerConnection(peer.id, e)} className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center 
                                         ${peer.connected ?'bg-green-400': 'bg-red-400'}
                                     `}>
                                         {/*Wifi icon */}
-                                        {peer.connected ? <Wifi className='w-3 h-3 text-white' /> : <WifiOff className='text-white'/>}
+                                        {peer.connected ? <Wifi className='w-3 h-3 text-white' /> : <WifiOff className='w-3 h-3 text-white'/>}
 
-                                    </div>
+                                    </button>
                                     {/*Block chain length for peer */}
                                     <div className='absolute -bottom-1 -right-1 bg-white text-xs font-bold text-gray-700 rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200'>
                                         {peer.blockchain.length}
