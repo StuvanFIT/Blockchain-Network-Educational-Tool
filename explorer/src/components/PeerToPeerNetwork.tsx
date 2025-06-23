@@ -92,29 +92,29 @@ const PeerToPeerNetwork = () => {
         const initialPeers: Peer[] = [
             {
                 id: '1',
-                name: 'Node A',
+                name: 'Steven',
                 blockchain: [genesisBlock],
                 transactionPool: [],
                 connected: true,
-                connections: ['2'],
+                connections: [],
                 color: peerColors[0]
             },
             {
                 id: '2',
-                name: 'Node B',
+                name: 'Jason',
                 blockchain: [genesisBlock],
                 transactionPool: [],
                 connected: true,
-                connections: ['1', '3'],
+                connections: [],
                 color: peerColors[1]
             },
             {
                 id: '3',
-                name: 'Node C',
+                name: 'Mike',
                 blockchain: [genesisBlock],
                 transactionPool: [],
                 connected: true,
-                connections: ['2'],
+                connections: [],
                 color: peerColors[2]
             }
         ]
@@ -201,13 +201,13 @@ const PeerToPeerNetwork = () => {
 
                             <div
                                 key={peer.id}
-                                className= {`cursor-pointer transition-all duration-5 ${
+                                className= {`relative cursor-pointer transition-all duration-5 ${
                                     selectedPeer === peer.id ? 'transform scale-110': 'hover:transform hover:scale-105'
                                 }`}
                                 onClick={() => setSelectedPeer(peer.id)}
                             >
-                                {/*Wifi */}
-                                <div className={`relative w-16 h-16 ${peer.color} rounded-full flex items-center justify-center shadow-lg ${selectedPeer == peer.id ? 'border-4 border-indigo-600': '' }`}>
+                                {/*Peer bubble */}
+                                <div className={`relative w-16 h-16 ${peer.color} rounded-full flex items-center justify-center shadow-lg ${selectedPeer == peer.id ? 'outline outline-4 outline-indigo-600 animate-pulse': '' }`}>
                                     <Server className='text-white' />
 
                                     {/*Wifi circle */}
@@ -218,11 +218,17 @@ const PeerToPeerNetwork = () => {
                                         {peer.connected ? <Wifi className='w-3 h-3 text-white' /> : <WifiOff className='text-white'/>}
 
                                     </div>
+                                    {/*Block chain length for peer */}
+                                    <div className='absolute -bottom-1 -right-1 bg-white text-xs font-bold text-gray-700 rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200'>
+                                        {peer.blockchain.length}
+                                    </div>
                                 </div>
 
-                                {/*Block chain length for peer */}
-                                <div className='absolute -bottom-1 -right-1 w-5 h-5 bg-white text-xs font-bold text-gray-700 border border-gray-200 rounded-full flex items-center justify-center shadow-lg'>
-                                    {peer.blockchain.length}
+                                <div className="text-center mt-2">
+                                    <div className="text-sm font-medium text-gray-800">{peer.name}</div>
+                                    <div className="text-xs text-gray-500">
+                                    {peer.connections.length} connects
+                                    </div>
                                 </div>
                             </div>
 
