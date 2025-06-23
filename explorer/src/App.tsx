@@ -9,6 +9,7 @@ import {HashDemo} from './components/HashDemo';
 import {Transactions} from './components/Transactions';
 import NotFound from './components/NotFound';
 import { Wallet } from './components/Wallet';
+import { PeerToPeerNetwork } from './components/PeerToPeerNetwork';
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
                 <Route path="createTransactions" element={<Transactions/>}/>
                 <Route path="createWallets" element={<Wallet/>}/>
                 <Route path="hash" element={<HashDemo/>}/>
+                <Route path="peertopeer" element={<PeerToPeerNetwork/>}/>
 
                 {/*Not found page */}
                 <Route path="*" element={<NotFound />} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import { Hash, Home, FileText, BarChart3, Wallet } from 'lucide-react';
+import { Hash, Home, FileText, BarChart3, Wallet, Network } from 'lucide-react';
 
 const NavBar = () =>{
 
@@ -11,6 +11,7 @@ const NavBar = () =>{
         { path: '/explorer', icon: BarChart3, label: 'Block Explorer' },
         { path: '/createTransactions', icon: FileText, label: 'Create Transactions' },
         { path: '/createWallets', icon: Wallet, label: 'Create Wallet Accounts'},
+        { path: '/peertopeer', icon: Network, label: 'P2P Network'},
         { path: '/hash', icon: Hash, label: 'Block Mining Simulator' },
 
     ];
