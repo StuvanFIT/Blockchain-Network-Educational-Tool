@@ -77,8 +77,12 @@ const peerColors = [
 
 const PeerToPeerNetwork = () => {
 
+    //Peers
     const [peers, setPeers] = useState<Peer[]>([]);
     const [selectedPeer, setSelectedPeer] = useState('');
+    const [newPeerName, setNewPeerName] = useState('');
+
+
     const [networkActivity, setNetworkActivity] = useState<string[]>([]);
 
     //Add activity to network activoty log
@@ -96,7 +100,7 @@ const PeerToPeerNetwork = () => {
                 blockchain: [genesisBlock],
                 transactionPool: [],
                 connected: true,
-                connections: [],
+                connections: ['2'],
                 color: peerColors[0]
             },
             {
@@ -105,7 +109,7 @@ const PeerToPeerNetwork = () => {
                 blockchain: [genesisBlock],
                 transactionPool: [],
                 connected: true,
-                connections: [],
+                connections: ['1', '3'],
                 color: peerColors[1]
             },
             {
@@ -114,7 +118,7 @@ const PeerToPeerNetwork = () => {
                 blockchain: [genesisBlock],
                 transactionPool: [],
                 connected: true,
-                connections: [],
+                connections: ['2'],
                 color: peerColors[2]
             }
         ]
@@ -122,7 +126,42 @@ const PeerToPeerNetwork = () => {
         setPeers(initialPeers);
         setSelectedPeer('1');
         addActivity("Network intialised with 3 default peers.")
-    },[addActivity])
+    },[addActivity]);
+
+
+    const addPeer = () => {
+
+        //If no new peer name was entered:
+        if (!newPeerName.trim()){
+            return;
+        };
+
+        //Create new Peer object
+        const newPeer: Peer = {
+            id: Date.now().toString(),
+            name: newPeerName,
+            blockchain: [genesisBlock],
+            transactionPool: [],
+            connected: true,
+            connections: peers.length > 0 ? [peers[0].id] : [],
+            color: peerColors[peers.length % peerColors.length]
+        };
+
+        //Set new Peer
+        setPeers(prev => {
+            const updated = [...peers, newPeer];
+
+            // Connect the first peer to the new peer
+            if (prev.length > 0) {
+                updated[0] = { ...updated[0], connections: [...updated[0].connections, newPeer.id] };
+            }
+            return updated;
+        });
+
+        setNewPeerName('');
+        setSelectedPeer(newPeer.id);
+        addActivity(`New Peer ${newPeer.name} has joined the network!`);
+    };
 
 
 
@@ -162,11 +201,14 @@ const PeerToPeerNetwork = () => {
                             <input
                                 type= "text"
                                 placeholder= 'Node Name...'
+                                value={newPeerName}
+                                onChange={(e) => setNewPeerName(e.target.value)}
                                 className='px-3 py-3 border border-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                             />
                         </div>
                         <div>
                             <button
+                                onClick={addPeer}
                                 className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
                             >
                                 <div className='flex items-center gap-2'>
@@ -196,7 +238,7 @@ const PeerToPeerNetwork = () => {
                     </div>
 
                     {/*Peer icons */}
-                    <div className='flex flex-wrap gap-4'>
+                    <div className='flex flex-wrap gap-8'>
                         {peers.map(peer => (
 
                             <div
