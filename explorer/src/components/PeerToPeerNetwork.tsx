@@ -89,7 +89,7 @@ const initialPeers: Peer[] = [
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
-        connections: ['2'],
+        connections: ['1','2'],
         color: peerColors[2]
     }
 ];
@@ -173,7 +173,7 @@ const PeerToPeerNetwork = () => {
         if (!autoSync) return;
         
         const interval = setInterval(() => {
-        syncAllPeers();
+            syncAllPeers();
         }, 3000);
         
         return () => clearInterval(interval);
@@ -246,55 +246,39 @@ const PeerToPeerNetwork = () => {
         setNewBlockData('');
     };
 
-    const syncPeerWithNetwork = (peerId: string) => {
-        let syncMessage: string = '';
-
-        const peerData = peers.find(p => p.id === peerId);
-
-        const updatedBlockChainsPeers = peers.map(peer => {
-
-            if (peer.id !== peerId) return peer;
-            
-            // Find the longest blockchain among connected peers
-            let longestChain = peer.blockchain;
-            let sourcePeer = '';
-            
-            peer.connections.forEach(connId => {
-                const connectedPeer = peers.find(p => p.id === connId);
-                if (connectedPeer && connectedPeer.blockchain.length > longestChain.length) {
-                    longestChain = connectedPeer.blockchain;
-                    sourcePeer = connectedPeer.name;
-                }
-            });
-
-            if (longestChain !== peer.blockchain) {
-                syncMessage = `${peer.name} synced blockchain from ${sourcePeer} (${longestChain.length} blocks)`;
-                return { ...peer, blockchain: [...longestChain] };
-
-            }
-            
-            return peer;
-        })
-
-        setPeers(updatedBlockChainsPeers);
-
-        if (syncMessage){
-            addActivity(syncMessage);
-        } else {
-            addActivity(`${peerData?.name} attempted sync but already had the longest chain.`);
-
-        }
-
-
-
-    };
 
     const syncAllPeers = () => {
-        peers.forEach(peer => {
-            if (peer.connected) {
-                syncPeerWithNetwork(peer.id);
-            }
-        });
+        let changed = false;
+        let newPeers = [...peers];
+
+        do {
+            changed = false;
+
+            newPeers = newPeers.map(peer => {
+                if (!peer.connected) return peer;
+
+                let longestChain = peer.blockchain;
+                let sourcePeer = '';
+
+                peer.connections.forEach(connId => {
+                    const connectedPeer = newPeers.find(p => p.id === connId);
+                    if (connectedPeer && connectedPeer.blockchain.length > longestChain.length) {
+                        longestChain = connectedPeer.blockchain;
+                        sourcePeer = connectedPeer.name;
+                    }
+                });
+
+                if (longestChain !== peer.blockchain) {
+                    addActivity(`${peer.name} synced blockchain from ${sourcePeer} (${longestChain.length} blocks)`);
+                    changed = true;
+                    return { ...peer, blockchain: [...longestChain] };
+                }
+
+                return peer;
+            });
+        } while (changed);
+
+        setPeers(newPeers);
     };
 
 
