@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
 import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw } from 'lucide-react';
-import { update } from 'lodash';
+import { get, update } from 'lodash';
 
 interface Block {
   index: number;
@@ -246,11 +246,19 @@ const PeerToPeerNetwork = () => {
         setNewBlockData('');
     };
 
+    const getPeerFromID = (peerId:string): Peer | undefined => {
+        const peerData = peers.find(p => p.id === peerId);
+        return peerData;
+    };
+
     const syncPeerWithNetwork = (peerId: string) => {
+
         if (!peerId) return;
 
         let newPeers = [...peers];
         const peerData = newPeers.find(p => p.id === peerId);
+
+        alert(peerData?.name)
         
         if (!peerData || !peerData.connected) {
             addActivity(`Cannot sync ${peerData?.name || 'unknown peer'} - peer not found or disconnected`);
@@ -457,17 +465,140 @@ const PeerToPeerNetwork = () => {
                             </h2>
                         </div>
 
-                        <div className={`w-full p-8 ${selectedPeerData.color} bg-opacity-20 rounded-lg text-gray-500`}>
-                            <h2>Connections: {selectedPeerData.connections.map((connection, index)=> (
-                                connection
+                        <div className={`p-8 ${selectedPeerData.color} bg-opacity-20 rounded-lg text-gray-500`}>
+                        <h2 className='text-2xl font-semibold mb-6'>Connections:</h2>
 
+                        {selectedPeerData.connections.length === 0 ? (
+                            <div className="text-center py-8">
+                                <div className="text-gray-400 text-lg">No connections</div>
+                                <div className="text-sm text-gray-500 mt-2">This peer is isolated from the network</div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {selectedPeerData.connections.map((connection, index) => {
+                                    const connectedPeer = getPeerFromID(connection);
+                                    if (!connectedPeer) return null;
+                                    
+                                    const isOnline = connectedPeer.connected;
+                                    const hasLongerChain = connectedPeer?.blockchain.length > (selectedPeerData?.blockchain.length || 0) ;
+                                    const hasSameChain = connectedPeer?.blockchain.length === selectedPeerData?.blockchain.length;
+                                    
+                                    return (
+                                        <div 
+                                            key={connection}
+                                            className={`
+                                                relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer
+                                                ${isOnline ? 'border-green-200 hover:border-green-300 hover:shadow-lg' : 'border-red-200 opacity-60'}
+                                                ${hasLongerChain ? 'bg-yellow-50 border-yellow-300' : 'bg-white'}
+                                                hover:scale-105 group
+                                            `}
+                                            onClick={() => setSelectedPeer(connection)}
+                                            title={`Click to select ${connectedPeer.name}`}
+                                        >
+                                            {/* Status Indicator */}
+                                            <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-md
+                                                ${isOnline ? 'bg-green-500' : 'bg-red-500'}
+                                            `}>
+                                                {isOnline ? 
+                                                    <Wifi className='w-3 h-3 text-white' /> : 
+                                                    <WifiOff className='w-3 h-3 text-white'/>
+                                                }
+                                            </div>
 
+                                            {/* Chain Status Indicator */}
+                                            {hasLongerChain && (
+                                                <div className="absolute -top-2 -left-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center border-2 border-white shadow-md">
+                                                    <span className="text-white text-xs font-bold">!</span>
+                                                </div>
+                                            )}
 
-                            ))}
-                            </h2>
+                                            {/* Peer Avatar */}
+                                            <div className={`w-16 h-16 ${connectedPeer.color} rounded-full flex items-center justify-center shadow-lg mx-auto mb-3 group-hover:shadow-xl transition-shadow`}>
+                                                <Server className='text-white w-6 h-6' />
+                                            </div>
 
+                                            {/* Peer Info */}
+                                            <div className="text-center">
+                                                <div className="text-lg font-semibold text-gray-800 mb-1">
+                                                    {connectedPeer.name}
+                                                </div>
+                                                
+                                                {/* Blockchain Info */}
+                                                <div className="flex items-center justify-center gap-2 mb-2">
+                                                    <Database className="w-4 h-4 text-gray-500" />
+                                                    <span className={`text-sm font-medium ${hasLongerChain ? 'text-orange-600' : 'text-gray-600'}`}>
+                                                        {connectedPeer.blockchain.length} blocks
+                                                    </span>
+                                                    {hasLongerChain && (
+                                                        <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                                                            Longer chain!
+                                                        </span>
+                                                    )}
+                                                    {hasSameChain && (
+                                                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                                            Synced
+                                                        </span>
+                                                    )}
+                                                </div>
 
+                                                {/* Connection Info */}
+                                                <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                                                    <Link2 className="w-3 h-3" />
+                                                    <span>{connectedPeer.connections.length} connections</span>
+                                                </div>
 
+                                                {/* Status Text */}
+                                                <div className={`text-xs mt-2 px-2 py-1 rounded-full ${
+                                                    isOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                    {isOnline ? 'Online' : 'Offline'}
+                                                </div>
+                                            </div>
+
+                                            {/* Action Buttons */}
+                                            <div className="flex gap-2 mt-4">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        syncPeerWithNetwork(connection);
+                                                    }}
+                                                    disabled={!isOnline}
+                                                    className={`flex-1 px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+                                                        isOnline 
+                                                            ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' 
+                                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    }`}
+                                                    title={isOnline ? `Sync ${connectedPeer.name} with network` : 'Peer is offline'}
+                                                >
+                                                    Sync
+                                                </button>
+                                                
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        togglePeerConnection(connection, e);
+                                                    }}
+                                                    className={`px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+                                                        isOnline 
+                                                            ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                                                            : 'bg-green-100 text-green-800 hover:bg-green-200'
+                                                    }`}
+                                                    title={isOnline ? `Disconnect ${connectedPeer.name}` : `Connect ${connectedPeer.name}`}
+                                                >
+                                                    {isOnline ? 'Disconnect' : 'Connect'}
+                                                </button>
+                                            </div>
+
+                                            {/* Hover Tooltip */}
+                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                                                Click to select • {isOnline ? 'Online' : 'Offline'} • {connectedPeer.blockchain.length} blocks
+                                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                         </div>
 
 
