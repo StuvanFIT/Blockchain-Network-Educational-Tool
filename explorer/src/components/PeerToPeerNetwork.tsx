@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
-import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X } from 'lucide-react';
+import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw } from 'lucide-react';
 import { update } from 'lodash';
 
 interface Block {
@@ -246,9 +246,58 @@ const PeerToPeerNetwork = () => {
         setNewBlockData('');
     };
 
+    const syncPeerWithNetwork = (peerId: string) => {
+        if (!peerId) return;
+
+        let newPeers = [...peers];
+        const peerData = newPeers.find(p => p.id === peerId);
+        
+        if (!peerData || !peerData.connected) {
+            addActivity(`Cannot sync ${peerData?.name || 'unknown peer'} - peer not found or disconnected`);
+            return;
+        }
+
+        // Find the longest blockchain among the selected peer's connections
+        let longestChain = peerData.blockchain;
+        let sourcePeer = '';
+
+        peerData.connections.forEach(connId => {
+            const connectedPeer = newPeers.find(p => p.id === connId);
+            if (connectedPeer && connectedPeer.connected && 
+                connectedPeer.blockchain.length > longestChain.length) {
+                longestChain = connectedPeer.blockchain;
+                sourcePeer = connectedPeer.name;
+            }
+        });
+
+        // Update the selected peer with the longest chain
+        newPeers = newPeers.map(peer => {
+            if (peer.id !== peerId) return peer;
+            
+            if (longestChain !== peer.blockchain) {
+                addActivity(`${peer.name} synced blockchain from ${sourcePeer} (${longestChain.length} blocks)`);
+                return { ...peer, blockchain: [...longestChain] };
+            }
+            
+            return peer;
+        });
+
+        // Check if any sync happened
+        const originalPeer = peers.find(p => p.id === peerId);
+        const updatedPeer = newPeers.find(p => p.id === peerId);
+        
+        if (originalPeer && updatedPeer && 
+            originalPeer.blockchain.length === updatedPeer.blockchain.length) {
+            addActivity(`${peerData.name} attempted sync but already had the longest chain.`);
+        }
+
+        // Actually update the state!
+        setPeers(newPeers);
+    };
 
     const syncAllPeers = () => {
         let changed = false;
+        //We have a local copy of the peers, having the updated version of peers each iteration
         let newPeers = [...peers];
 
         do {
@@ -407,6 +456,21 @@ const PeerToPeerNetwork = () => {
                                 </span>
                             </h2>
                         </div>
+
+                        <div className={`w-full p-8 ${selectedPeerData.color} bg-opacity-20 rounded-lg text-gray-500`}>
+                            <h2>Connections: {selectedPeerData.connections.map((connection, index)=> (
+                                connection
+
+
+
+                            ))}
+                            </h2>
+
+
+
+                        </div>
+
+
                         <div className='flex items-center gap-6'>
                             <div>
                                 <input
@@ -429,6 +493,19 @@ const PeerToPeerNetwork = () => {
                                     </div>
                                 </button>
                             </div>
+                            <div>
+                                <button
+                                    onClick={() => syncPeerWithNetwork(selectedPeerData?.id ?? '')}
+                                    className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
+                                >
+                                    <div className='flex items-center gap-2'>
+                                        <RefreshCcw className='w-4 h-4' />
+                                        Sync Current Node with Network
+                                    </div>
+                                </button>
+
+                            </div>
+
                         </div>
 
                         {/*block chain visualisation */}
