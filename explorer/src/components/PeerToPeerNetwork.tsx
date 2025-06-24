@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
-import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2 } from 'lucide-react';
+import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X } from 'lucide-react';
 
 interface Block {
   index: number;
@@ -138,13 +138,9 @@ const PeerToPeerNetwork = () => {
         }
     });
 
-
-
-
-    const [newPeerName, setNewPeerName] = useState('');
-
-    //Mined block
-    const [newBlockData, setNewBlockData] = useState('');
+    const [newPeerName, setNewPeerName] = useState(''); // New added peer/node
+    const [newBlockData, setNewBlockData] = useState(''); //Mined block Data
+    const [showActivityLog, setShowActivityLog] =useState(false);
 
 
     let selectedPeerData: Peer | undefined = peers.find(p => p.id === selectedPeer);
@@ -231,17 +227,6 @@ const PeerToPeerNetwork = () => {
 
         setNewBlockData('');
     };
-
-
-
-
-
-
-
-
-
-
-
 
     return (
         <div className='p-8 bg-gray-50 min-h-screen'>
@@ -437,23 +422,97 @@ const PeerToPeerNetwork = () => {
                                                 </div>
                                             </div>
                                         ))}
-
-
-
-
                                     </div>
                                 </div>
                             )}
                         </div>
-
-
-
                     </div>
 
                 ) : (
                     <div>
                     </div>
                 )}
+
+                {/* Floating Network activity button */}
+                <button
+                    onClick={() => setShowActivityLog(!showActivityLog)}
+                    title='Network Activity'
+                    className='fixed bottom-6 right-6 p-4 w-15 h-15 bg-cyan-500 hover:bg-cyan-700 text-white rounded-full shadow-lg flex items-center justify-center gap-2 transition-all duration-200 hover:scale-110'
+                >
+                    <MessageCircle  size={30}/>
+                    {networkActivity.length > 0 && (
+                        <div className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold'>
+                            {networkActivity.length >99 ? '99+': networkActivity.length}
+                        </div>
+
+
+                    )}
+                </button>
+                
+                {showActivityLog && (
+                    
+                    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+                        <div className='bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col'>
+
+                            {/*Header */}
+                            <div className='flex items-center justify-between p-4 border-b'>
+                                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                    <Activity className="text-orange-600" />
+                                    Network Activity Log
+                                </h3>
+                                <button
+                                    onClick={() => setShowActivityLog(false)}
+                                    className="text-gray-500 hover:text-gray-700 p-1"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {/*Chat Messages */}
+                            <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+                                {networkActivity.length === 0 ? (
+                                    <div className='text-center text-gray-500'>
+                                        <MessageCircle size={48} className="mx-auto mb-4 opacity-50" />
+                                        <p>No network activity yet...</p>
+                                        <p className="text-sm mt-2">Network events will appear here as they happen</p>
+                                    </div>
+                                ) : (
+
+                                    networkActivity.map((activity, index) => (
+                                        <div key={index} className='flex flex-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
+                                            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                                            <div className="flex-1">
+                                            <p className="text-sm text-gray-800">{activity.split(': ')[1]}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{activity.split(': ')[0]}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            {/* Chat Footer */}
+                            <div className="p-4 border-t bg-gray-50">
+                                <div className="flex items-center justify-between text-sm text-gray-600">
+                                    <span>{networkActivity.length} total events</span>
+                                    <button
+                                    onClick={() => setNetworkActivity([])}
+                                    className="text-red-600 hover:text-red-700 font-medium"
+                                    >
+                                    Clear Log
+                                    </button>
+                                </div>
+                            </div>
+                            
+
+                        </div>
+
+
+                    </div>
+
+
+
+                )}
+
+
 
 
 
