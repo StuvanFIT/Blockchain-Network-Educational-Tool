@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
 import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X } from 'lucide-react';
+import { update } from 'lodash';
 
 interface Block {
   index: number;
@@ -96,7 +97,7 @@ const initialPeers: Peer[] = [
 const PeerToPeerNetwork = () => {
     //Add activity to network activoty log
     const addActivity = useCallback((message:string) =>{
-        setNetworkActivity(prev => [`${new Date().toLocaleTimeString()}: ${message}`, ...prev.slice(0,9)]);
+        setNetworkActivity(prev => [`${new Date().toLocaleTimeString()}: ${message}`, ...prev]);
     },[])
 
     //Peers/Nodes
@@ -227,54 +228,72 @@ const PeerToPeerNetwork = () => {
     const mineNewBlock = () => {
         if (!newBlockData.trim()) return;
 
-        setPeers(prev => prev.map(peer => {
+        let minedMessage:string = '';
+
+        const updatedPeers = peers.map(peer => {
             if (peer.id === selectedPeerData?.id){
                 const lastBlock = peer.blockchain[peer.blockchain.length -1];
                 const newMinedBlock = createBlock(lastBlock, newBlockData, 5, 5);
-                addActivity(`${peer.name} mined a new block: "${newBlockData}"`);
+                minedMessage = `${peer.name} mined a new block: "${newBlockData}"`;
                 return { ...peer, blockchain: [...peer.blockchain, newMinedBlock] };
             }
             return peer;
-        }));
+        })
 
+        //Set updated peers
+        setPeers(updatedPeers);
+        addActivity(minedMessage);
         setNewBlockData('');
     };
 
     const syncPeerWithNetwork = (peerId: string) => {
-        setPeers(prev => {
-        const peerToSync = prev.find(p => p.id === peerId);
-        if (!peerToSync) return prev;
-        
-        // Find the longest blockchain among connected peers
-        let longestChain = peerToSync.blockchain;
-        let sourcePeer = '';
-        
-        peerToSync.connections.forEach(connId => {
-            const connectedPeer = prev.find(p => p.id === connId);
-            if (connectedPeer && connectedPeer.blockchain.length > longestChain.length) {
-                longestChain = connectedPeer.blockchain;
-                sourcePeer = connectedPeer.name;
+        let syncMessage: string = '';
+
+        const peerData = peers.find(p => p.id === peerId);
+
+        const updatedBlockChainsPeers = peers.map(peer => {
+
+            if (peer.id !== peerId) return peer;
+            
+            // Find the longest blockchain among connected peers
+            let longestChain = peer.blockchain;
+            let sourcePeer = '';
+            
+            peer.connections.forEach(connId => {
+                const connectedPeer = peers.find(p => p.id === connId);
+                if (connectedPeer && connectedPeer.blockchain.length > longestChain.length) {
+                    longestChain = connectedPeer.blockchain;
+                    sourcePeer = connectedPeer.name;
+                }
+            });
+
+            if (longestChain !== peer.blockchain) {
+                syncMessage = `${peer.name} synced blockchain from ${sourcePeer} (${longestChain.length} blocks)`;
+                return { ...peer, blockchain: [...longestChain] };
+
             }
-        });
-        
-        if (longestChain !== peerToSync.blockchain) {
-            addActivity(`${peerToSync.name} synced blockchain from ${sourcePeer} (${longestChain.length} blocks)`);
-            return prev.map(peer => 
-            peer.id === peerId 
-                ? { ...peer, blockchain: [...longestChain] }
-                : peer
-            );
+            
+            return peer;
+        })
+
+        setPeers(updatedBlockChainsPeers);
+
+        if (syncMessage){
+            addActivity(syncMessage);
+        } else {
+            addActivity(`${peerData?.name} attempted sync but already had the longest chain.`);
+
         }
-        
-        return prev;
-        });
+
+
+
     };
 
     const syncAllPeers = () => {
         peers.forEach(peer => {
-        if (peer.connected) {
-            syncPeerWithNetwork(peer.id);
-        }
+            if (peer.connected) {
+                syncPeerWithNetwork(peer.id);
+            }
         });
     };
 
