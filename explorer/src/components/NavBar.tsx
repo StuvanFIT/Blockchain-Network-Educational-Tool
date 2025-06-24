@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import { Hash, Home, FileText, BarChart3, Wallet } from 'lucide-react';
+import { Hash, Home, FileText, BarChart3, Wallet, Network } from 'lucide-react';
 
 const NavBar = () =>{
 
@@ -11,11 +11,16 @@ const NavBar = () =>{
         { path: '/explorer', icon: BarChart3, label: 'Block Explorer' },
         { path: '/createTransactions', icon: FileText, label: 'Create Transactions' },
         { path: '/createWallets', icon: Wallet, label: 'Create Wallet Accounts'},
+        { path: '/peertopeer', icon: Network, label: 'P2P Network'},
         { path: '/hash', icon: Hash, label: 'Block Mining Simulator' },
 
     ];
 
     const isActiveItem = (path:string) => location.pathname ===path;
+
+    const reset = () =>{
+        localStorage.clear();
+    }
 
 
 
@@ -24,6 +29,7 @@ const NavBar = () =>{
         <nav className="bg-white shadow-lg border-b border-slate-200 sticky top-0 z-50">
             {/*Navigation Bar Links */}
             <div className='hidden md:flex items-center space-x-1'>
+                <button onClick={reset} className='bg-red-500 p-2 text-white font-semibold rounded-lg shadow-lg'> RESET CITY</button>
                 {navItems.map((item) =>{
 
                     const Icon = item.icon; //retrieve the icon

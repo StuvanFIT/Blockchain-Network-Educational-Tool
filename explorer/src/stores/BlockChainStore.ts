@@ -24,8 +24,8 @@ class Block {
 const genesisTransaction: Transaction = {
   txIns: [{ signature: '', txOutId: '', txOutIndex: 0 }],
   txOuts: [{
-    address: '04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534a',
-    amount: 50
+    address: '0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf',
+    amount: 300
   }],
   id: 'e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3'
 };

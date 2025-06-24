@@ -143,7 +143,7 @@ const BlockExplorer = () => {
                   <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
                     <div className="flex items-center gap-3 mb-2">
                       <Coins className="w-5 h-5 text-amber-600" />
-                      <span className="text-sm font-medium text-gray-600">Total Coins</span>
+                      <span className="text-sm font-medium text-gray-600">Total BTC</span>
                     </div>
                     <p className="text-2xl font-bold text-gray-800">
                       {selectedBlock.data.reduce((sum, tx) => sum + tx.txOuts.reduce((txSum, out) => txSum + out.amount, 0), 0)}
@@ -265,7 +265,7 @@ const BlockExplorer = () => {
                                         </p>
                                         <div className="flex items-center gap-2">
                                           <span className="text-base text-gray-500">Amount:</span>
-                                          <span className="font-bold text-emerald-700">{output.amount} coins</span>
+                                          <span className="font-bold text-emerald-700">{output.amount} BTC</span>
                                         </div>
                                       </div>
                                     </div>
