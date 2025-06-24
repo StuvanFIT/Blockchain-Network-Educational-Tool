@@ -141,6 +141,7 @@ const PeerToPeerNetwork = () => {
     const [newPeerName, setNewPeerName] = useState(''); // New added peer/node
     const [newBlockData, setNewBlockData] = useState(''); //Mined block Data
     const [showActivityLog, setShowActivityLog] =useState(false);
+    const [autoSync, setAutoSync] = useState(false);
 
 
     let selectedPeerData: Peer | undefined = peers.find(p => p.id === selectedPeer);
@@ -165,6 +166,17 @@ const PeerToPeerNetwork = () => {
     useEffect(() => {
         localStorage.setItem('networkActivity',JSON.stringify(networkActivity));
     }, [networkActivity]);
+
+    // Auto-sync functionality
+    useEffect(() => {
+        if (!autoSync) return;
+        
+        const interval = setInterval(() => {
+        syncAllPeers();
+        }, 3000);
+        
+        return () => clearInterval(interval);
+    }, [autoSync, peers]);
 
     const addPeer = () => {
 
@@ -228,6 +240,47 @@ const PeerToPeerNetwork = () => {
         setNewBlockData('');
     };
 
+    const syncPeerWithNetwork = (peerId: string) => {
+        setPeers(prev => {
+        const peerToSync = prev.find(p => p.id === peerId);
+        if (!peerToSync) return prev;
+        
+        // Find the longest blockchain among connected peers
+        let longestChain = peerToSync.blockchain;
+        let sourcePeer = '';
+        
+        peerToSync.connections.forEach(connId => {
+            const connectedPeer = prev.find(p => p.id === connId);
+            if (connectedPeer && connectedPeer.blockchain.length > longestChain.length) {
+                longestChain = connectedPeer.blockchain;
+                sourcePeer = connectedPeer.name;
+            }
+        });
+        
+        if (longestChain !== peerToSync.blockchain) {
+            addActivity(`${peerToSync.name} synced blockchain from ${sourcePeer} (${longestChain.length} blocks)`);
+            return prev.map(peer => 
+            peer.id === peerId 
+                ? { ...peer, blockchain: [...longestChain] }
+                : peer
+            );
+        }
+        
+        return prev;
+        });
+    };
+
+    const syncAllPeers = () => {
+        peers.forEach(peer => {
+        if (peer.connected) {
+            syncPeerWithNetwork(peer.id);
+        }
+        });
+    };
+
+
+
+
     return (
         <div className='p-8 bg-gray-50 min-h-screen'>
             <div className='max-w-7xl mx-auto space-y-8'>
@@ -274,6 +327,7 @@ const PeerToPeerNetwork = () => {
                         </div>
                         <div>
                             <button
+                            onClick={syncAllPeers}
                                 className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
                             >
                                 <div className='flex items-center gap-2'>
@@ -286,6 +340,8 @@ const PeerToPeerNetwork = () => {
                             <input 
                                 type="checkbox"
                                 className='rounded w-5 h-5'
+                                checked={autoSync}
+                                onChange={(e)=> setAutoSync(e.target.checked)}
                             />
                             <p className='text-base'>Auto Sync Nodes</p>
                             
@@ -507,26 +563,10 @@ const PeerToPeerNetwork = () => {
 
 
                     </div>
-
-
-
                 )}
-
-
-
-
-
-
-
             </div>
         </div>
-
-
-
-
     )
-
-
 }
 
 
