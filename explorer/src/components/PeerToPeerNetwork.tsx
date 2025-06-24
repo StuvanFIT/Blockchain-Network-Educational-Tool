@@ -1,8 +1,16 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import { Block } from '../stores/BlockChainStore';
 import { Transaction } from '../blockchain/transaction';
-import { Network, Users, Plus, Link, Server, Wifi, WifiOff } from 'lucide-react';
+import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2 } from 'lucide-react';
 
+interface Block {
+  index: number;
+  hash: string;
+  previousHash: string;
+  timestamp: number;
+  data: string;
+  difficulty: number;
+  nonce: number;
+}
 
 interface Peer {
     id: string,
@@ -25,46 +33,26 @@ const generateHash = (data: string): string => {
   return Math.abs(hash).toString(16);
 };
 
-const genesisTransaction: Transaction = {
-  txIns: [{ signature: '', txOutId: '', txOutIndex: 0 }],
-  txOuts: [{
-    address: '0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf',
-    amount: 300
-  }],
-  id: 'e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3'
-};
+const createGenesisBlock = (): Block => ({
+  index: 0,
+  hash: generateHash('genesis'),
+  previousHash: '0',
+  timestamp: Date.now(),
+  data: 'Genesis Block',
+  difficulty: 0,
+  nonce: 0
+});
 
-const genesisBlock = new Block(
-  0,
-  '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627',
-  'This is the first (genesis) block, there is no previous block.',
-  1465154705,
-  [genesisTransaction],
-  0,
-  0
-);
 
-const createDemoTransaction = ():Transaction[] =>{
-    const transaction: Transaction = new Transaction(
-        'e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3',
-        [{ signature: '', txOutId: '', txOutIndex: 0 }],
-        [{
-            address: '0488e683f272afc630c0e4798d99526a0d81fc40f42d8f081c72ffd37a43927a0797777b25b2c308223cb73721c6f0330cd5d7e293fe15e37ccac1ff7aad2cbdcf',
-            amount: 300
-        }],
-    );
-    return [transaction];
-}
-
-const createBlock = (prevBlock: Block, data: string): Block => {
+const createBlock = (prevBlock: Block |undefined, data: string, difficulty:number, nonce: number): Block => {
   const newBlock: Block = {
-    index: prevBlock.index + 1,
+    index: (prevBlock?.index ?? -1) + 1,
     hash: '',
-    previousHash: prevBlock.hash,
+    previousHash: (prevBlock?.hash ?? '0'),
     timestamp: Date.now(),
-    data: createDemoTransaction(),
-    difficulty: 5,
-    nonce: 5
+    data: data,
+    difficulty: difficulty,
+    nonce: nonce
   };
   newBlock.hash = generateHash(`${newBlock.index}${newBlock.previousHash}${newBlock.timestamp}${newBlock.data}`);
   return newBlock;
@@ -75,59 +63,112 @@ const peerColors = [
   'bg-yellow-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500'
 ];
 
+const initialPeers: Peer[] = [
+    {
+        id: '1',
+        name: 'Steven',
+        blockchain: [createGenesisBlock()],
+        transactionPool: [],
+        connected: true,
+        connections: ['2'],
+        color: peerColors[0]
+    },
+    {
+        id: '2',
+        name: 'Jason',
+        blockchain: [createGenesisBlock()],
+        transactionPool: [],
+        connected: true,
+        connections: ['1', '3'],
+        color: peerColors[1]
+    },
+    {
+        id: '3',
+        name: 'Mike',
+        blockchain: [createGenesisBlock()],
+        transactionPool: [],
+        connected: true,
+        connections: ['2'],
+        color: peerColors[2]
+    }
+];
+
 const PeerToPeerNetwork = () => {
-
-    //Peers
-    const [peers, setPeers] = useState<Peer[]>([]);
-    const [selectedPeer, setSelectedPeer] = useState('');
-    const [newPeerName, setNewPeerName] = useState('');
-
-
-    const [networkActivity, setNetworkActivity] = useState<string[]>([]);
-
     //Add activity to network activoty log
     const addActivity = useCallback((message:string) =>{
         setNetworkActivity(prev => [`${new Date().toLocaleTimeString()}: ${message}`, ...prev.slice(0,9)]);
     },[])
 
+    //Peers/Nodes
+    const [peers, setPeers] = useState<Peer[]>(() => {
+        try {
+            const storagePeers = localStorage.getItem('peers');
 
-    //Initialise peers with default peers
+            if (!storagePeers) {
+                addActivity("Network intialised with 3 default peers.")
+            };
+            return storagePeers ? JSON.parse(storagePeers) : initialPeers;
+        } catch (error) {
+            console.warn('Error parsing peers from localStorage: ', error);
+            return initialPeers;
+        }
+    });
+
+    //Current selected peer
+    const [selectedPeer, setSelectedPeer] = useState(() => {
+        try {
+            const storageSelectedPeer = localStorage.getItem('selectedPeer');
+            return storageSelectedPeer ? storageSelectedPeer : ''
+
+        } catch (error) {
+            console.warn('Error parsing selected peer from localStorage: ', error);
+            return ''
+        }
+    });
+
+    //Network activity
+    const [networkActivity, setNetworkActivity] = useState<string[]>(() =>{
+        try {
+            const storageNetworkActivity = localStorage.getItem('networkActivity');
+            return storageNetworkActivity ? JSON.parse(storageNetworkActivity) : [];
+
+        } catch (error) {
+            console.warn('Error parsing network activity from localStorage: ', error);
+            return [];
+        }
+    });
+
+
+
+
+    const [newPeerName, setNewPeerName] = useState('');
+
+    //Mined block
+    const [newBlockData, setNewBlockData] = useState('');
+
+
+    let selectedPeerData: Peer | undefined = peers.find(p => p.id === selectedPeer);
+
+
     useEffect(() =>{
-        const initialPeers: Peer[] = [
-            {
-                id: '1',
-                name: 'Steven',
-                blockchain: [genesisBlock],
-                transactionPool: [],
-                connected: true,
-                connections: ['2'],
-                color: peerColors[0]
-            },
-            {
-                id: '2',
-                name: 'Jason',
-                blockchain: [genesisBlock],
-                transactionPool: [],
-                connected: true,
-                connections: ['1', '3'],
-                color: peerColors[1]
-            },
-            {
-                id: '3',
-                name: 'Mike',
-                blockchain: [genesisBlock],
-                transactionPool: [],
-                connected: true,
-                connections: ['2'],
-                color: peerColors[2]
-            }
-        ]
+        const newSelectedPeer = peers.find(p => p.id === selectedPeer);
+        selectedPeerData = newSelectedPeer;
+    }, [selectedPeer])
 
-        setPeers(initialPeers);
-        setSelectedPeer('1');
-        addActivity("Network intialised with 3 default peers.")
-    },[addActivity]);
+    //Peers to localStorage
+    useEffect(() => {
+        localStorage.setItem('peers', JSON.stringify(peers));
+    }, [peers]);
 
+    //SelectedPeer to localStorage
+    useEffect(() => {
+        localStorage.setItem('selectedPeer', selectedPeer);
+    }, [selectedPeer]);
+
+    //networkActivity to localStorage
+    useEffect(() => {
+        localStorage.setItem('networkActivity',JSON.stringify(networkActivity));
+    }, [networkActivity]);
 
     const addPeer = () => {
 
@@ -140,7 +181,7 @@ const PeerToPeerNetwork = () => {
         const newPeer: Peer = {
             id: Date.now().toString(),
             name: newPeerName,
-            blockchain: [genesisBlock],
+            blockchain: [createGenesisBlock()],
             transactionPool: [],
             connected: true,
             connections: peers.length > 0 ? [peers[0].id] : [],
@@ -175,6 +216,21 @@ const PeerToPeerNetwork = () => {
         }));
     };
 
+    const mineNewBlock = () => {
+        if (!newBlockData.trim()) return;
+
+        setPeers(prev => prev.map(peer => {
+            if (peer.id === selectedPeerData?.id){
+                const lastBlock = peer.blockchain[peer.blockchain.length -1];
+                const newMinedBlock = createBlock(lastBlock, newBlockData, 5, 5);
+                addActivity(`${peer.name} mined a new block: "${newBlockData}"`);
+                return { ...peer, blockchain: [...peer.blockchain, newMinedBlock] };
+            }
+            return peer;
+        }));
+
+        setNewBlockData('');
+    };
 
 
 
@@ -283,20 +339,123 @@ const PeerToPeerNetwork = () => {
                                 <div className="text-center mt-2">
                                     <div className="text-sm font-medium text-gray-800">{peer.name}</div>
                                     <div className="text-xs text-gray-500">
-                                    {peer.connections.length} connects
+                                    {peer.connections.length} connections
                                     </div>
                                 </div>
                             </div>
 
 
                         ))}
+                    </div>
+                </div>
+
+    
+                {selectedPeerData ? (
+                    <div className='mt-4 space-y-12 bg-white rounded-xl shadow-2xl p-8 border border-slate-200'>
+                        <div className='flex items-center justify-between mb-6'>
+                            <h2 className='text-2xl font-semibold text-gray-800 flex items-center gap-3'>
+                                <div className= {`${selectedPeerData.color} p-4 rounded-full`}>
+                                    <Server className='text-white' />
+                                </div>
+                                {selectedPeerData.name}'s Blockchain
+                                <span className='text-sm font-normal text-gray-500'>
+                                    {selectedPeerData.blockchain.length > 1  ? `(${selectedPeerData.blockchain.length} blocks)` : `(${selectedPeerData.blockchain.length} block)` }
+                                </span>
+                            </h2>
+                        </div>
+                        <div className='flex items-center gap-6'>
+                            <div>
+                                <input
+                                    type= "text"
+                                    placeholder= 'Block Data Input...'
+                                    value={newBlockData}
+                                    onChange={(e) => setNewBlockData(e.target.value)}
+                                    className='px-3 py-3 border border-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                                />
+                            </div>
+                            <div>
+                                <button
+                                    onClick={mineNewBlock}
+                                    disabled={!selectedPeerData.connected || !newBlockData.trim()}
+                                    className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
+                                >
+                                    <div className='flex items-center gap-2'>
+                                        <Pickaxe className='w-4 h-4' />
+                                        Mine Block
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/*block chain visualisation */}
+                        <div className='space-y-4'>
+                            {!selectedPeerData.blockchain || selectedPeerData.blockchain.length ===0 ? (
+                                <div className='text-center py-12 text-gray-500'>
+                                    <Database size={48} className="mx-auto mb-4 opacity-50" />
+                                    <p>No blocks in blockchain</p>
+                                </div>
+
+                            ): (
+                                <div className='space-y-10'>
+                                    <div className='flex items-center gap-2 overflow-x-auto'>
+                                        {selectedPeerData && selectedPeerData.blockchain.map((block, idx) => (
+                                            <React.Fragment key={block.index}>
+                                                <div className={`flex-shrink-0 w-24 h-20 ${selectedPeerData?.color} bg-opacity-20 border-2 border-current rounded-lg flex flex-col items-center justify-center text-sm`}>
+                                                    <div className="font-bold">#{block.index}</div>
+                                                    <div className="text-xs opacity-75 truncate w-full text-center px-1">
+                                                        {typeof block.data === 'object' ? JSON.stringify(block.data) : block.data}
+                                                    </div>
+                                                </div>
+
+                                                {idx < (selectedPeerData?.blockchain.length ?? 100) - 1 && (
+                                                <div className="">
+                                                    <Link2 className='w-20 h-20' />
+
+                                                </div>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                    <div className='space-y-4 max-h-96 overflow-y-auto'>
+                                        {selectedPeerData.blockchain.slice().reverse().map((block, index) =>(
+                                            <div key={block.index} className={`${selectedPeerData?.color} bg-opacity-5 border border-gray-500 border-opcity-20 rounded-lg p-4`}>
+                                                <div>
+                                                    <div className="font-semibold text-gray-700">Block #{block.index}</div>
+                                                    <div className="text-gray-600">{block.data}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-gray-700">Hash</div>
+                                                    <div className="text-gray-600 font-mono text-xs">{block.hash.substring(0, 12)}...</div>
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-gray-700">Previous Hash</div>
+                                                    <div className="text-gray-600 font-mono text-xs">{block.previousHash.substring(0, 12)}...</div>
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-gray-700">Timestamp</div>
+                                                    <div className="text-gray-600 text-xs">{new Date(block.timestamp).toLocaleString()}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+
+
+
+
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+
 
                     </div>
 
+                ) : (
+                    <div>
+                    </div>
+                )}
 
 
-
-                </div>
 
 
 
