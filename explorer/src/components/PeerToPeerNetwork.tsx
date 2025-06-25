@@ -251,6 +251,46 @@ const PeerToPeerNetwork = () => {
         return peerData;
     };
 
+    const syncPullFromPeer = (receivingPeerId:string, sendingPeerId:string) => {
+
+        if (!receivingPeerId || !sendingPeerId) return;
+
+        let newPeers = [...peers];
+        const receivingPeerData = newPeers.find(p => p.id === receivingPeerId);
+        const senderPeerData = newPeers.find(p => p.id === sendingPeerId);
+
+
+        
+        if (!receivingPeerData || !senderPeerData || !senderPeerData.connected || !receivingPeerData.connected ) {
+            addActivity(`Cannot sync ${receivingPeerData?.name || 'unknown peer'} - peer not found or disconnected`);
+            return;
+        }
+
+
+        // Update the selected peer with the sending peer's blockchain
+        newPeers = newPeers.map(peer => {
+            if (peer.id !== receivingPeerId) return peer;
+            
+            if (peer.id === receivingPeerId && receivingPeerData.connections.includes(sendingPeerId) && (senderPeerData.connections.includes(receivingPeerId))
+                            && (senderPeerData?.blockchain.length > receivingPeerData?.blockchain.length)) {
+                addActivity(`${receivingPeerData?.name} pulled and synced blockchain from ${senderPeerData.name} (${senderPeerData.blockchain.length} blocks)`);
+                return { ...peer, blockchain: [...senderPeerData?.blockchain] };
+            }
+            
+            return peer;
+        });
+        //Check if any syncs occurred
+        const originalReceiver = peers.find(p => p.id === receivingPeerId);
+        const updatedReceiver = newPeers.find(p => p.id === receivingPeerId)
+
+        if (originalReceiver && updatedReceiver && originalReceiver.blockchain.length === updatedReceiver.blockchain.length){
+            addActivity(`${receivingPeerData?.name} attempted to pull and sync from ${senderPeerData?.name}'s blockchain but ${receivingPeerData?.name} already has the longest blockchain.`)
+        }
+
+        // Actually update the state!
+        setPeers(newPeers);
+    }
+
     const syncPeerWithNetwork = (peerId: string) => {
 
         if (!peerId) return;
@@ -560,7 +600,7 @@ const PeerToPeerNetwork = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        syncPeerWithNetwork(connection);
+                                                        syncPullFromPeer(selectedPeer,connection);
                                                     }}
                                                     disabled={!isOnline}
                                                     className={`flex-1 px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
@@ -568,9 +608,9 @@ const PeerToPeerNetwork = () => {
                                                             ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' 
                                                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                                     }`}
-                                                    title={isOnline ? `Sync ${connectedPeer.name} with network` : 'Peer is offline'}
+                                                    title={isOnline ? `Pull and Sync ${connectedPeer.name} with the current selected peer` : 'Peer is offline'}
                                                 >
-                                                    Sync
+                                                    Pull Blockchain from {connectedPeer?.name}
                                                 </button>
                                                 
                                                 <button
