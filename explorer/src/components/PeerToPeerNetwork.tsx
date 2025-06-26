@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
-import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw } from 'lucide-react';
+import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw, UserRound, UserRoundPlus, Cable, Blocks, Unplug } from 'lucide-react';
 import { get, update } from 'lodash';
 
 interface Block {
@@ -61,7 +61,8 @@ const createBlock = (prevBlock: Block |undefined, data: string, difficulty:numbe
 
 const peerColors = [
   'bg-blue-500', 'bg-green-600', 'bg-purple-500', 'bg-red-500', 
-  'bg-yellow-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500'
+  'bg-yellow-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500',
+  'bg-emerald-500', 'bg-fuchsia-500', 'bg-gray-500', 'bg-cyan-500',
 ];
 
 const initialPeers: Peer[] = [
@@ -80,7 +81,7 @@ const initialPeers: Peer[] = [
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
-        connections: ['1', '3'],
+        connections: ['1'],
         color: peerColors[1]
     },
     {
@@ -89,7 +90,7 @@ const initialPeers: Peer[] = [
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
-        connections: ['1','2'],
+        connections: [],
         color: peerColors[2]
     }
 ];
@@ -193,20 +194,12 @@ const PeerToPeerNetwork = () => {
             blockchain: [createGenesisBlock()],
             transactionPool: [],
             connected: true,
-            connections: peers.length > 0 ? [peers[0].id] : [],
+            connections: [],
             color: peerColors[peers.length % peerColors.length]
         };
 
         //Set new Peer
-        setPeers(prev => {
-            const updated = [...peers, newPeer];
-
-            // Connect the first peer to the new peer
-            if (prev.length > 0) {
-                updated[0] = { ...updated[0], connections: [...updated[0].connections, newPeer.id] };
-            }
-            return updated;
-        });
+        setPeers([...peers, newPeer]);
 
         setNewPeerName('');
         setSelectedPeer(newPeer.id);
@@ -246,10 +239,80 @@ const PeerToPeerNetwork = () => {
         setNewBlockData('');
     };
 
+    //Connecting the current peer (selectedPeer source) with the selected peer (destination)
+    const connectWithPeer = (e: React.MouseEvent, connectWithPeerId:string) => {
+        e.stopPropagation();
+
+        //Connecting to data:
+        const connectWithPeerData = peers.find(p => p.id === connectWithPeerId);
+
+        let newPeers = [...peers];
+
+        newPeers = peers.map(peer => {
+
+            if (peer.id === selectedPeer){
+                return {...peer, connections: [...peer.connections, connectWithPeerId]}
+            } else if (peer.id === connectWithPeerId){
+                return {...peer, connections: [...peer.connections, selectedPeer]}
+            } else {
+                return peer
+            }
+        });
+
+
+        //Check if the sync occurred
+        const originalConnections = peers.find(p => p.id === selectedPeerData?.id);
+        const latestConnections = newPeers.find(p => p.id === selectedPeerData?.id);
+
+        // Compare by value
+        const wereDifferent = JSON.stringify(originalConnections?.connections) !== JSON.stringify(latestConnections?.connections);
+
+        if (wereDifferent && connectWithPeerData) {
+            addActivity(`${originalConnections?.name} has connected to ${connectWithPeerData.name}.`);
+        }
+        
+        setPeers(newPeers);
+    }
+
+    //disconnectTargetId: the peer we want to disconnect from.
+    const disconnectFromPeer = (e: React.MouseEvent, disconnectTargetId: string) => {
+
+        //Disconnecting to data:
+        const disconnectedPeerData = peers.find(p => p.id === disconnectTargetId);
+
+        let newPeers = [...peers];
+
+        newPeers = peers.map(peer => {
+
+            if (peer.id === selectedPeer){
+                return {...peer, connections: [...peer.connections.filter(connId=> connId !== disconnectTargetId)]};
+            } else if (peer.id === disconnectTargetId){
+                return {...peer, connections: [...peer.connections.filter(connId => connId !== selectedPeer)]};
+            } else {
+                return peer;
+            }
+        });
+        const originalConnections = peers.find(p => p.id === selectedPeer);
+        const latestConnections = newPeers.find(p => p.id === selectedPeer);
+
+        // Compare by value
+        const wereDifferent = JSON.stringify(originalConnections?.connections) !== JSON.stringify(latestConnections?.connections);
+
+        if (wereDifferent && disconnectedPeerData) {
+            addActivity(`${originalConnections?.name} has disconnected from ${disconnectedPeerData.name}.`);
+        }
+
+        setPeers(newPeers);
+    }
+
+
+
+
     const getPeerFromID = (peerId:string): Peer | undefined => {
         const peerData = peers.find(p => p.id === peerId);
         return peerData;
     };
+
 
     const syncPeerWithNetwork = (peerId: string) => {
 
@@ -431,10 +494,19 @@ const PeerToPeerNetwork = () => {
                                         {peer.connected ? <Wifi className='w-3 h-3 text-white' /> : <WifiOff className='w-3 h-3 text-white'/>}
 
                                     </button>
-                                    {/*Block chain length for peer */}
-                                    <div className='absolute -bottom-1 -right-1 bg-white text-xs font-bold text-gray-700 rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200'>
-                                        {peer.blockchain.length}
-                                    </div>
+
+
+                                    {selectedPeer && selectedPeer !== peer.id && !peer.connections.includes(selectedPeer) &&(
+                                        <div className='absolute -bottom-1 -right-1 bg-white text-xs font-bold text-gray-700 rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200'>
+                                            <button
+                                                title='Connect with peer'
+                                                onClick={(e) => connectWithPeer(e, peer.id )}
+                                                className='flex items-center justify-center'
+                                            >
+                                                <UserRoundPlus className='w-4 h-4'/>
+                                            </button>
+                                        </div>                                        
+                                    )}
                                 </div>
 
                                 <div className="text-center mt-2">
@@ -466,7 +538,10 @@ const PeerToPeerNetwork = () => {
                         </div>
 
                         <div className={`p-8 ${selectedPeerData.color} bg-opacity-20 rounded-lg text-gray-500`}>
-                        <h2 className='text-2xl font-semibold mb-6'>Connections:</h2>
+                        <h2 className='text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-6'>
+                            <Cable size={30} />
+                            Connections:
+                        </h2>
 
                         {selectedPeerData.connections.length === 0 ? (
                             <div className="text-center py-8">
@@ -556,27 +631,11 @@ const PeerToPeerNetwork = () => {
                                             </div>
 
                                             {/* Action Buttons */}
-                                            <div className="flex gap-2 mt-4">
+                                            <div className="flex gap-2 justify-center mt-4">
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        syncPeerWithNetwork(connection);
-                                                    }}
-                                                    disabled={!isOnline}
-                                                    className={`flex-1 px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
-                                                        isOnline 
-                                                            ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' 
-                                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                    }`}
-                                                    title={isOnline ? `Sync ${connectedPeer.name} with network` : 'Peer is offline'}
-                                                >
-                                                    Sync
-                                                </button>
-                                                
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        togglePeerConnection(connection, e);
+                                                        disconnectFromPeer(e, connection);
                                                     }}
                                                     className={`px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
                                                         isOnline 
@@ -585,7 +644,11 @@ const PeerToPeerNetwork = () => {
                                                     }`}
                                                     title={isOnline ? `Disconnect ${connectedPeer.name}` : `Connect ${connectedPeer.name}`}
                                                 >
-                                                    {isOnline ? 'Disconnect' : 'Connect'}
+                                                    <div className='flex items-center gap-2'>
+                                                        <Unplug size={20} />
+                                                        Disconnect
+
+                                                    </div>
                                                 </button>
                                             </div>
 
@@ -601,6 +664,10 @@ const PeerToPeerNetwork = () => {
                         )}
                         </div>
 
+                        <h2 className='text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-6'>
+                            <Blocks size={30} />
+                            BlockChain Visualisation:
+                        </h2>
 
                         <div className='flex items-center gap-6'>
                             <div>
@@ -661,7 +728,7 @@ const PeerToPeerNetwork = () => {
 
                                                 {idx < (selectedPeerData?.blockchain.length ?? 100) - 1 && (
                                                 <div className="">
-                                                    <Link2 className='w-20 h-20' />
+                                                    <Link2 size={30} />
 
                                                 </div>
                                                 )}
