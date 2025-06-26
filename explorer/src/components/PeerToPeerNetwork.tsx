@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
-import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw } from 'lucide-react';
+import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw, UserRound, UserRoundPlus } from 'lucide-react';
 import { get, update } from 'lodash';
 
 interface Block {
@@ -61,7 +61,8 @@ const createBlock = (prevBlock: Block |undefined, data: string, difficulty:numbe
 
 const peerColors = [
   'bg-blue-500', 'bg-green-600', 'bg-purple-500', 'bg-red-500', 
-  'bg-yellow-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500'
+  'bg-yellow-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500',
+  'bg-emerald-500', 'bg-fuchsia-500', 'bg-gray-500', 'bg-cyan-500',
 ];
 
 const initialPeers: Peer[] = [
@@ -80,7 +81,7 @@ const initialPeers: Peer[] = [
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
-        connections: ['1', '3'],
+        connections: ['1'],
         color: peerColors[1]
     },
     {
@@ -89,7 +90,7 @@ const initialPeers: Peer[] = [
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
-        connections: ['1','2'],
+        connections: [],
         color: peerColors[2]
     }
 ];
@@ -193,20 +194,12 @@ const PeerToPeerNetwork = () => {
             blockchain: [createGenesisBlock()],
             transactionPool: [],
             connected: true,
-            connections: peers.length > 0 ? [peers[0].id] : [],
+            connections: [],
             color: peerColors[peers.length % peerColors.length]
         };
 
         //Set new Peer
-        setPeers(prev => {
-            const updated = [...peers, newPeer];
-
-            // Connect the first peer to the new peer
-            if (prev.length > 0) {
-                updated[0] = { ...updated[0], connections: [...updated[0].connections, newPeer.id] };
-            }
-            return updated;
-        });
+        setPeers([...peers, newPeer]);
 
         setNewPeerName('');
         setSelectedPeer(newPeer.id);
@@ -246,10 +239,47 @@ const PeerToPeerNetwork = () => {
         setNewBlockData('');
     };
 
+    //Connecting the current peer (selectedPeer source) with the selected peer (destination)
+    const connectWithPeer = (e: React.MouseEvent, connectWithPeerId:string) => {
+        e.stopPropagation();
+
+        //Connecting to data:
+        const connectWithPeerData = peers.find(p => p.id === connectWithPeerId);
+
+        let newPeers = [...peers];
+
+        newPeers = peers.map(peer => {
+
+            if (peer.id === selectedPeer){
+                return {...peer, connections: [...peer.connections, connectWithPeerId]}
+            } else if (peer.id === connectWithPeerId){
+                return {...peer, connections: [...peer.connections, selectedPeer]}
+            } else {
+                return peer
+            }
+
+    
+        });
+
+
+        //Check if the sync occurred
+        const originalConnections = peers.find(p => p.id === selectedPeerData?.id);
+        const latestConnections = newPeers.find(p => p.id === selectedPeerData?.id);
+
+        if (originalConnections && latestConnections && (originalConnections.connections === latestConnections.connections)){
+            addActivity(`${originalConnections.name} has connected with ${connectWithPeerData?.name}.`);
+        };
+
+
+        setPeers(newPeers);
+    }
+
+
     const getPeerFromID = (peerId:string): Peer | undefined => {
         const peerData = peers.find(p => p.id === peerId);
         return peerData;
     };
+
 
     const syncPeerWithNetwork = (peerId: string) => {
 
@@ -431,10 +461,19 @@ const PeerToPeerNetwork = () => {
                                         {peer.connected ? <Wifi className='w-3 h-3 text-white' /> : <WifiOff className='w-3 h-3 text-white'/>}
 
                                     </button>
-                                    {/*Block chain length for peer */}
-                                    <div className='absolute -bottom-1 -right-1 bg-white text-xs font-bold text-gray-700 rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200'>
-                                        {peer.blockchain.length}
-                                    </div>
+
+
+                                    {selectedPeer && selectedPeer !== peer.id && !peer.connections.includes(selectedPeer) &&(
+                                        <div className='absolute -bottom-1 -right-1 bg-white text-xs font-bold text-gray-700 rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200'>
+                                            <button
+                                                title='Connect with peer'
+                                                onClick={(e) => connectWithPeer(e, peer.id )}
+                                                className='flex items-center justify-center'
+                                            >
+                                                <UserRoundPlus className='w-4 h-4'/>
+                                            </button>
+                                        </div>                                        
+                                    )}
                                 </div>
 
                                 <div className="text-center mt-2">
