@@ -684,7 +684,7 @@ const PeerToPeerNetwork = () => {
 
                                                 {idx < (selectedPeerData?.blockchain.length ?? 100) - 1 && (
                                                 <div className="">
-                                                    <Link2 className='w-20 h-20' />
+                                                    <Link2 size={30} />
 
                                                 </div>
                                                 )}
