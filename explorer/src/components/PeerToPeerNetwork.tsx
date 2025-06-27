@@ -607,24 +607,29 @@ const PeerToPeerNetwork = () => {
 
                         ))}
                     </div>
+                    
+                    <div className='flex items-center justify-center'>
+                        <div style={{width: '100%', height: '60vh' }} className='w-full border border-slate-500 rounded-lg'>
+                            <ReactFlow
+                                
+                                nodes={nodes}
+                                edges={edges}
+                                onNodesChange={onNodesChange}
+                                onEdgesChange={onEdgesChange}
+                                onConnect={onConnect}
+                                nodeTypes={nodeTypes}
+                                edgeTypes={edgeTypes}
+                                fitView
+                                fitViewOptions={{ padding: 0.2 }}
+                                proOptions={{hideAttribution:true}}
+                            >
+                                <Background />
+                                <Controls />
 
-                    <div style={{width: '80vw', height: '100vh'}} className='border border-slate-500 rounded-lg'>
-                        <ReactFlow
-                            nodes={nodes}
-                            edges={edges}
-                            onNodesChange={onNodesChange}
-                            onEdgesChange={onEdgesChange}
-                            onConnect={onConnect}
-                            nodeTypes={nodeTypes}
-                            edgeTypes={edgeTypes}
-                            fitView
-                            fitViewOptions={{ padding: 0.2 }}
-                        >
-                            <Background />
-                            <Controls />
-
-                        </ReactFlow>
+                            </ReactFlow>
+                        </div>
                     </div>
+
                 </div>
 
     
