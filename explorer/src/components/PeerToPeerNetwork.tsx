@@ -610,7 +610,7 @@ const PeerToPeerNetwork = () => {
                         ))}
                     </div>
 
-                    <div style={{width: '70vw', height: '100vh'}} className='border border-slate-500 rounded-lg'>
+                    <div style={{width: '80vw', height: '100vh'}} className='border border-slate-500 rounded-lg'>
                         <ReactFlow
                             nodes={nodes}
                             edges={edges}
