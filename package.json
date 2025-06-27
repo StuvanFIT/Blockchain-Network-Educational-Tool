@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@xyflow/react": "^12.7.1",
     "body-parser": "^2.2.0",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "elliptic": "^6.6.1",

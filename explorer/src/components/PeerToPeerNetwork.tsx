@@ -1,7 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
 import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw, UserRound, UserRoundPlus, Cable, Blocks, Unplug } from 'lucide-react';
-import { get, update } from 'lodash';
+
+import { BlockchainNode } from './Network/BlockchainNode';
+import { ReactFlow, Background, Controls, useNodesState, useEdgesState, addEdge, Connection } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import CustomEdge from './Network/BlockchainEdge';
+
 
 interface Block {
   index: number;
@@ -22,6 +27,20 @@ interface Peer {
     connections: string[],
     color: string
 }
+
+type NodeClickHandler = (peerId: string) => void;
+type ToggleConnectionHandler = (peerId: string) => void;
+type MineBlockHandler = (peerId: string) => void;
+
+
+const nodeTypes = {
+    peer: BlockchainNode
+}
+
+const edgeTypes ={
+    'custom-edge': CustomEdge
+}
+
 
 // Utility functions
 const generateHash = (data: string): string => {
@@ -65,6 +84,50 @@ const peerColors = [
   'bg-emerald-500', 'bg-fuchsia-500', 'bg-gray-500', 'bg-cyan-500',
 ];
 
+
+const getNodesFromPeers = (peers: Peer[]): any[] => {
+    return peers.map((peer, index) => ({
+        id:peer.id,
+        type: 'peer',
+        position: {
+            x: 150 + (index % 4) * 200, // Arrange in a grid pattern
+            y: 100 + Math.floor(index / 4) * 150 
+        },
+        data: { 
+            peer: peer, // Pass entire peer object
+            selected: true
+        },
+    }))
+}
+
+const getEdgesFromPeers = (peers: Peer[]): any[] => {
+    const edges: any[] = [];
+
+    peers.forEach(peer => {
+        peer.connections.forEach(connectionId => {
+
+            const edgeId = `${peer.id}->${connectionId}`;
+            const reverseEdgeId = `${connectionId}->${peer.id}`;
+
+            //Check if the reverse edge already exists
+            const existingEdge = edges.find(e => e.id === reverseEdgeId);
+            console.log(existingEdge)
+
+            if (!existingEdge){
+                edges.push({
+                    id: edgeId,
+                    source: peer.id,
+                    target: connectionId,
+                    type: 'custom-edge',
+                    animated:true,
+                    style: {stroke: '#3b82f6', strokeWidth: 5},
+                })
+            }
+        })
+    })
+
+    return edges
+}
 const initialPeers: Peer[] = [
     {
         id: '1',
@@ -94,6 +157,11 @@ const initialPeers: Peer[] = [
         color: peerColors[2]
     }
 ];
+
+const initialNodes = getNodesFromPeers(initialPeers);
+const initialEdges = getEdgesFromPeers(initialPeers);
+
+
 
 const PeerToPeerNetwork = () => {
     //Add activity to network activoty log
@@ -145,18 +213,37 @@ const PeerToPeerNetwork = () => {
     const [showActivityLog, setShowActivityLog] =useState(false);
     const [autoSync, setAutoSync] = useState(false);
 
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const onConnect = useCallback(
+        (connection: Connection) => {
+        const edge = { ...connection, type: 'custom-edge' };
+        setEdges((eds) => addEdge(edge, eds));
+        },
+        [setEdges],
+    );
+ 
+
 
     let selectedPeerData: Peer | undefined = peers.find(p => p.id === selectedPeer);
 
+    useEffect(() => {
+        console.log('Current nodes:', nodes);
+        console.log('Current edges:', edges);
+        console.log('Peers:', peers);
+    }, [nodes, edges, peers]);
 
     useEffect(() =>{
         const newSelectedPeer = peers.find(p => p.id === selectedPeer);
         selectedPeerData = newSelectedPeer;
     }, [selectedPeer])
 
+
     //Peers to localStorage
     useEffect(() => {
         localStorage.setItem('peers', JSON.stringify(peers));
+        setNodes(getNodesFromPeers(peers));
+        setEdges(getEdgesFromPeers(peers));
     }, [peers]);
 
     //SelectedPeer to localStorage
@@ -520,6 +607,29 @@ const PeerToPeerNetwork = () => {
 
                         ))}
                     </div>
+                    
+                    <div className='flex items-center justify-center'>
+                        <div style={{width: '100%', height: '60vh' }} className='w-full border border-slate-500 rounded-lg'>
+                            <ReactFlow
+                                
+                                nodes={nodes}
+                                edges={edges}
+                                onNodesChange={onNodesChange}
+                                onEdgesChange={onEdgesChange}
+                                onConnect={onConnect}
+                                nodeTypes={nodeTypes}
+                                edgeTypes={edgeTypes}
+                                fitView
+                                fitViewOptions={{ padding: 0.2 }}
+                                proOptions={{hideAttribution:true}}
+                            >
+                                <Background />
+                                <Controls />
+
+                            </ReactFlow>
+                        </div>
+                    </div>
+
                 </div>
 
     
@@ -849,3 +959,4 @@ const PeerToPeerNetwork = () => {
 
 
 export {PeerToPeerNetwork}
+export type {Peer}
