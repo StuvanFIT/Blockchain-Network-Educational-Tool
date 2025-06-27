@@ -119,6 +119,8 @@ const getEdgesFromPeers = (peers: Peer[]): any[] => {
                     source: peer.id,
                     target: connectionId,
                     type: 'custom-edge',
+                    animated:true,
+                    style: {stroke: '#64748b', strokeWidth: 2},
                 })
             }
         })
