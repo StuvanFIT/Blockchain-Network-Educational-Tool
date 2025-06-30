@@ -28,10 +28,6 @@ interface Peer {
     color: string
 }
 
-type NodeClickHandler = (peerId: string) => void;
-type ToggleConnectionHandler = (peerId: string) => void;
-type MineBlockHandler = (peerId: string) => void;
-
 
 const nodeTypes = {
     peer: BlockchainNode
@@ -39,6 +35,11 @@ const nodeTypes = {
 
 const edgeTypes ={
     'custom-edge': CustomEdge
+}
+
+const styles = {
+  background: '#f9fafb',
+  borderRadius: '0.5rem',
 }
 
 
@@ -85,49 +86,6 @@ const peerColors = [
 ];
 
 
-const getNodesFromPeers = (peers: Peer[]): any[] => {
-    return peers.map((peer, index) => ({
-        id:peer.id,
-        type: 'peer',
-        position: {
-            x: 150 + (index % 4) * 200, // Arrange in a grid pattern
-            y: 100 + Math.floor(index / 4) * 150 
-        },
-        data: { 
-            peer: peer, // Pass entire peer object
-            selected: true
-        },
-    }))
-}
-
-const getEdgesFromPeers = (peers: Peer[]): any[] => {
-    const edges: any[] = [];
-
-    peers.forEach(peer => {
-        peer.connections.forEach(connectionId => {
-
-            const edgeId = `${peer.id}->${connectionId}`;
-            const reverseEdgeId = `${connectionId}->${peer.id}`;
-
-            //Check if the reverse edge already exists
-            const existingEdge = edges.find(e => e.id === reverseEdgeId);
-            console.log(existingEdge)
-
-            if (!existingEdge){
-                edges.push({
-                    id: edgeId,
-                    source: peer.id,
-                    target: connectionId,
-                    type: 'custom-edge',
-                    animated:true,
-                    style: {stroke: '#3b82f6', strokeWidth: 5},
-                })
-            }
-        })
-    })
-
-    return edges
-}
 const initialPeers: Peer[] = [
     {
         id: '1',
@@ -157,10 +115,6 @@ const initialPeers: Peer[] = [
         color: peerColors[2]
     }
 ];
-
-const initialNodes = getNodesFromPeers(initialPeers);
-const initialEdges = getEdgesFromPeers(initialPeers);
-
 
 
 const PeerToPeerNetwork = () => {
@@ -208,6 +162,56 @@ const PeerToPeerNetwork = () => {
         }
     });
 
+    
+
+    const getNodesFromPeers = (peers: Peer[]): any[] => {
+        return peers.map((peer, index) => ({
+            id:peer.id,
+            type: 'peer',
+            position: {
+                x: 150 + (index % 4) * 200, // Arrange in a grid pattern
+                y: 100 + Math.floor(index / 4) * 150 
+            },
+            data: { 
+                peer: peer, // Pass entire peer object
+                selected: peer.id === selectedPeer,
+            }
+        }))
+    }
+    const getEdgesFromPeers = (peers: Peer[]): any[] => {
+        const edges: any[] = [];
+
+        peers.forEach(peer => {
+            peer.connections.forEach(connectionId => {
+
+                const edgeId = `${peer.id}->${connectionId}`;
+                const reverseEdgeId = `${connectionId}->${peer.id}`;
+
+                //Check if the reverse edge already exists
+                const existingEdge = edges.find(e => e.id === reverseEdgeId);
+                console.log(existingEdge)
+
+                if (!existingEdge){
+                    edges.push({
+                        id: edgeId,
+                        source: peer.id,
+                        target: connectionId,
+                        type: 'custom-edge',
+                        animated:true,
+                        style: {stroke: '#3b82f6', strokeWidth: 5},
+                    })
+                }
+            })
+        })
+
+        return edges
+    }
+
+        
+    const initialNodes = getNodesFromPeers(initialPeers);
+    const initialEdges = getEdgesFromPeers(initialPeers);
+
+
     const [newPeerName, setNewPeerName] = useState(''); // New added peer/node
     const [newBlockData, setNewBlockData] = useState(''); //Mined block Data
     const [showActivityLog, setShowActivityLog] =useState(false);
@@ -230,6 +234,8 @@ const PeerToPeerNetwork = () => {
     useEffect(() =>{
         const newSelectedPeer = peers.find(p => p.id === selectedPeer);
         selectedPeerData = newSelectedPeer;
+        setNodes(getNodesFromPeers(peers));
+        setEdges(getEdgesFromPeers(peers));
     }, [selectedPeer])
 
 
@@ -243,6 +249,7 @@ const PeerToPeerNetwork = () => {
     //SelectedPeer to localStorage
     useEffect(() => {
         localStorage.setItem('selectedPeer', selectedPeer);
+
     }, [selectedPeer]);
 
     //networkActivity to localStorage
@@ -621,6 +628,7 @@ const PeerToPeerNetwork = () => {
                                 fitView
                                 fitViewOptions={{ padding: 0.2 }}
                                 proOptions={{hideAttribution:true}}
+                                style={styles}
                             >
                                 <Background />
                                 <Controls />
