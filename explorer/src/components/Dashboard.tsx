@@ -1,38 +1,81 @@
 
 import React from 'react';
-import { Home } from 'lucide-react';
+import { Home, Zap } from 'lucide-react';
 
 // Dashboard Page
 export const Dashboard = () => {
+
+  const isVisible:boolean = true;
+
   return (
-    <div className="p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-white">
-              <Home className="w-8 h-8" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800">Dashboard</h1>
-              <p className="text-slate-500 mt-1">Welcome to your blockchain dashboard</p>
-            </div>
+
+    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden'>
+
+      {/*Navigation Bar: relative enables any dropdown menus */}
+      <nav className='relative z-10 flex items-center justify-between p-6 backdrop-blur-sm bg-white/5 border-b border-white/10'>
+
+      {/*Icon */}
+        <div className='flex items-center space-x-2'>
+          <div className=' flex items-center justify-center w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg'>
+            <Zap className='w-6 h-6 text-white' />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl">
-              <h3 className="font-semibold text-blue-800">Total Blocks</h3>
-              <p className="text-2xl font-bold text-blue-900 mt-2">1,234</p>
-            </div>
-            <div className="p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl">
-              <h3 className="font-semibold text-green-800">Transactions</h3>
-              <p className="text-2xl font-bold text-green-900 mt-2">56,789</p>
-            </div>
-            <div className="p-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl">
-              <h3 className="font-semibold text-purple-800">Active Users</h3>
-              <p className="text-2xl font-bold text-purple-900 mt-2">2,456</p>
-            </div>
+          <span className='text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent '>BlockScopeEdu</span>
+        </div>
+      {/* Features/Tabs */}
+        <div className='hidden md:flex space-x-8'>
+          <a href='#' className='hover:text-cyan-500 transition-colors text-white font-bold'>Cryptocurrencies</a>
+          <a href='#' className='hover:text-cyan-500 transition-colors text-white font-bold'>Blockchain</a>
+          <a href='#' className='hover:text-cyan-500 transition-colors text-white font-bold'>Learning Tools</a>
+        </div>
+      
+      <button className='bg-gradient-to-r from-cyan-500 to-purple-500 px-6 py-2 text-white font-bold rounded-full hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105'>
+        Get Started
+      </button>
+      </nav>
+
+
+      {/*Hero Section: prominent visual section */}
+
+      <section className='relative z-10 px-6 py-20'>
+        <div className='max-w-6xl mx-auto text-center'>
+          <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              Master{' '}
+              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
+                Cryptocurrency
+              </span>
+              <br />
+              From Zero to Hero
+            </h1>
+
+            <p className='text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto'>
+              Unlock the world of digital currencies with our interactive, beginner-friendly platform. 
+              Learn blockchain, trading, and security through hands-on experiences designed for complete beginners.
+            </p>
+
+
+
           </div>
         </div>
-      </div>
+      </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </div>
-  );
+  )
 };

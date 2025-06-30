@@ -38,7 +38,7 @@ const BlockchainNode: React.FC<BlockchainNodeProps> = ({data}) => {
 
   return (
     <div className="relative group">
-      {/* Mining indicator */}
+      {/* Selected indicator */}
       {selected && (
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-20">
           <div className="bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 animate-bounce">
@@ -99,7 +99,7 @@ const BlockchainNode: React.FC<BlockchainNodeProps> = ({data}) => {
           </div>
           {selected && (
             <div className="text-xs text-yellow-400">
-              ⚡ Current Selected Node
+            Current Selected Node
             </div>
           )}
         </div>

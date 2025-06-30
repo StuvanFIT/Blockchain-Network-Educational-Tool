@@ -413,8 +413,6 @@ const PeerToPeerNetwork = () => {
 
         let newPeers = [...peers];
         const peerData = newPeers.find(p => p.id === peerId);
-
-        alert(peerData?.name)
         
         if (!peerData || !peerData.connected) {
             addActivity(`Cannot sync ${peerData?.name || 'unknown peer'} - peer not found or disconnected`);
