@@ -140,7 +140,7 @@ const initialPeers: Peer[] = [
     },
     {
         id: '2',
-        name: 'Jason',
+        name: 'Lebron',
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
@@ -149,7 +149,7 @@ const initialPeers: Peer[] = [
     },
     {
         id: '3',
-        name: 'Mike',
+        name: 'Durant',
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
@@ -227,12 +227,6 @@ const PeerToPeerNetwork = () => {
 
     let selectedPeerData: Peer | undefined = peers.find(p => p.id === selectedPeer);
 
-    useEffect(() => {
-        console.log('Current nodes:', nodes);
-        console.log('Current edges:', edges);
-        console.log('Peers:', peers);
-    }, [nodes, edges, peers]);
-
     useEffect(() =>{
         const newSelectedPeer = peers.find(p => p.id === selectedPeer);
         selectedPeerData = newSelectedPeer;
@@ -295,14 +289,19 @@ const PeerToPeerNetwork = () => {
 
     const togglePeerConnection = (peerId: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        setPeers(prev => prev.map(peer => {
-        if (peer.id === peerId) {
-            const newStatus = !peer.connected;
-            addActivity(`${peer.name} ${newStatus ? 'connected to' : 'disconnected from'} the network`);
-            return { ...peer, connected: newStatus };
-        }
-        return peer;
-        }));
+
+        const updatePeers = peers.map(peer => {
+            if (peer.id === peerId){
+                const newStatus = !peer.connected;
+                addActivity(`${peer.name} ${newStatus ? 'connected to' : 'disconnected from'} the network`);
+                return {...peer, connected: newStatus};
+            };
+
+            return peer;
+        });
+
+
+        setPeers(updatePeers);
     };
 
     const mineNewBlock = () => {
