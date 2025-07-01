@@ -1,12 +1,19 @@
 
 import React from 'react';
-import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp } from 'lucide-react';
+import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp, CirclePlay } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 // Dashboard Page
 export const Dashboard = () => {
 
+  const navigate = useNavigate();
+
   const isVisible:boolean = true;
 
+
+  const handleNavigationClick = (route:string) => {
+    navigate(route);
+  };
 
 
   const interactiveSimulators = [
@@ -15,21 +22,24 @@ export const Dashboard = () => {
       title: "Block Mining Simulator",
       description:"Watch blocks being mined in real-time. Adjust difficulty, see hash calculations, and understand proof-of-work.",
       color: "from-orange-500 to-red-500",
-      features: ["Real-Time Hashing", "Difficulty Adjustment", "Nonce Finding"]
+      features: ["Real-Time Hashing", "Difficulty Adjustment", "Nonce Finding"],
+      route: "/simulators/hash"
     },
     {
       icon: <Network className="w-8 h-8" />,
       title: "Node Network Builder",
       description: "Create and manage a peer-to-peer network. See how nodes communicate and reach consensus.",
       color: "from-cyan-500 to-sky-600",
-      features: ["P2P networking", "Consensus mechanisms", "Message propagation"]
+      features: ["P2P networking", "Consensus mechanisms", "Message propagation"],
+      route: "/simulators/peertopeer"
     },
     {
       icon: <Hash className="w-8 h-8" />,
       title: "Transaction Creator",
       description: "Build transactions from scratch using wallet accounts. Understand inputs, outputs, digital signatures, and fees.",
       color: "from-green-500 to-emerald-600",
-      features: ["UTXO model", "Digital signatures", "Fee calculation"]
+      features: ["UTXO model", "Digital signatures", "Fee calculation"],
+      route: "/simulators/createTransactions",
     },
     {
       icon: <Link className="w-8 h-8" />,
@@ -37,7 +47,8 @@ export const Dashboard = () => {
       description: "Construct your own blockchain link by link. See how blocks connect and form an immutable chain.",
       difficulty: "Intermediate",
       color: "from-blue-500 to-indigo-600",
-      features: ["Block linking", "Merkle trees", "Chain validation"]
+      features: ["Block linking", "Merkle trees", "Chain validation"],
+      route: "/simulators/explorer"
     }
   ]
 
@@ -133,7 +144,7 @@ export const Dashboard = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
           {interactiveSimulators.map((simulator, index) => (
 
-            <div key={index} className='group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8  transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
+            <div key={index} onClick={() => handleNavigationClick(simulator.route)} className='group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8  transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
               <div className={`flex items-center justify-center mb-6 w-16 h-16 bg-gradient-to-r ${simulator.color} rounded-xl group-hover:shadow-xl transition-all duration-300`}>
                 {simulator.icon}
               </div>
@@ -149,11 +160,11 @@ export const Dashboard = () => {
                 ))}
               </div>
 
-              <div className='flex items-center justify-between'>
-                <button className='text-white-400 font-semibold hover:text-cyan-300 transition-colors'>
+              <div className='flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity text-white font-semibold'>
+                <div>
                   Launch Simulator
-                </button>
-                <ChevronRight className="w-5 h-5 text-white-400 group-hover:translate-x-1 group-hover:text-cyan-300 transition-transform" />
+                </div>
+                <CirclePlay className="w-5 h-5 text-white-400 group-hover:translate-x-1 group-hover:text-cyan-300 transition-transform" />
               </div>
             </div>
           ))}

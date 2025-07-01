@@ -22,11 +22,11 @@ function App() {
                 <Route index element={<Dashboard/>}/>
 
                 {/*Other pages */}
-                <Route path="explorer" element={<BlockExplorer/>}/>
-                <Route path="createTransactions" element={<Transactions/>}/>
-                <Route path="createWallets" element={<Wallet/>}/>
-                <Route path="hash" element={<HashDemo/>}/>
-                <Route path="peertopeer" element={<PeerToPeerNetwork/>}/>
+                <Route path="/simulators/explorer" element={<BlockExplorer/>}/>
+                <Route path="/simulators/createTransactions" element={<Transactions/>}/>
+                <Route path="/simulators/createWallets" element={<Wallet/>}/>
+                <Route path="/simulators/hash" element={<HashDemo/>}/>
+                <Route path="/simulators/peertopeer" element={<PeerToPeerNetwork/>}/>
 
                 {/*Not found page */}
                 <Route path="*" element={<NotFound />} />
