@@ -31,7 +31,7 @@ const BlockExplorer = () => {
   const formatAddress = (address: string) => `${address.slice(0, 18)}...${address.slice(-6)}`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden ">
       <div className="flex h-screen">
         {/* Sidebar */}
         <div className="w-96 bg-white shadow-lg border-r border-gray-200 flex flex-col">
@@ -182,8 +182,8 @@ const BlockExplorer = () => {
               {/* Transactions Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <Coins className="w-7 h-7 text-blue-600" />
-                  <h3 className="text-2xl font-bold text-gray-800">Transactions</h3>
+                  <Coins className="w-7 h-7 text-sky-300" />
+                  <h3 className="text-2xl font-bold text-white">Transactions</h3>
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
                     {selectedBlock.data.length}
                   </span>
