@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight } from 'lucide-react';
+import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp } from 'lucide-react';
 
 // Dashboard Page
 export const Dashboard = () => {
@@ -39,8 +39,39 @@ export const Dashboard = () => {
       color: "from-blue-500 to-indigo-600",
       features: ["Block linking", "Merkle trees", "Chain validation"]
     }
-
   ]
+
+
+  const conceptModules = [
+    {
+      icon: <Code className="w-6 h-6" />,
+      title: "What is Blockchain?",
+      description: "Interactive explanation of distributed ledgers and their properties",
+      visual: "🔗"
+    },
+    {
+      icon: <Activity className="w-6 h-6" />,
+      title: "How Bitcoin Works",
+      description: "Deep dive into Bitcoin's architecture and transaction flow",
+      visual: "₿"
+    },
+    {
+      icon: <Shield className="w-6 h-6" />,
+      title: "Ethereum & Smart Contracts",
+      description: "Explore programmable money and decentralized applications",
+      visual: "⧫"
+    },
+    {
+      icon: <TrendingUp className="w-6 h-6" />,
+      title: "Consensus Mechanisms",
+      description: "Compare Proof of Work, Proof of Stake, and other algorithms",
+      visual: "⚖️"
+    }
+  ]
+
+
+
+
 
   return (
 
@@ -76,10 +107,11 @@ export const Dashboard = () => {
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Learn Blockchain by {' '}
+              Learn{' '}
               <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
-                Building it
+                Blockchain {' '}
               </span>
+              By Building It
               <br />
 
             </h1>
@@ -101,44 +133,71 @@ export const Dashboard = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
           {interactiveSimulators.map((simulator, index) => (
 
-            <div key={index} className='group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8  hover:border-purple-400/30 transition-all duration-300 cursor-pointer hover:transform hover:scale-110"'>
-              <div className={`flex items-center justify-center mb-6 w-16 h-16 bg-gradient-to-r ${simulator.color} rounded-xl group-hover:shadow-lg transition-all duration-300`}>
+            <div key={index} className='group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8  transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
+              <div className={`flex items-center justify-center mb-6 w-16 h-16 bg-gradient-to-r ${simulator.color} rounded-xl group-hover:shadow-xl transition-all duration-300`}>
                 {simulator.icon}
               </div>
 
-              <h3 className='text-xl font-semibold mb-3 group-hover:text-purple-400 transition-colors'>{simulator.title}</h3>
-              <p className='text-gray-300 mb-4'>{simulator.description}</p>
+              <h3 className='text-xl font-semibold mb-3 transition-colors'>{simulator.title}</h3>
+              <p className='text-gray-300 mb-4 leading-relaxed'>{simulator.description}</p>
 
               <div className='space-y-2 mb-6'>
                 {simulator.features.map((feature, index) =>(
-                  <div key={index} className='flex items-center space-x-2 text-sm text-white-400 border border-gray-500 rounded-lg bg-gradient-to-r from-cyan-500 to-pink-400 font-semibold p-4'>
+                  <div key={index} className='flex items-center space-x-2 text-sm text-white-400 border border-gray-500 rounded-lg bg-gradient-to-r from-cyan-500 to-pink-400 font-semibold font-mono p-4'>
                     <span>{feature}</span>
                   </div>
                 ))}
               </div>
 
               <div className='flex items-center justify-between'>
-                <button className='text-cyan-400 font-semibold gover: text-cyan-300 transition-colors'>
+                <button className='text-white-400 font-semibold hover:text-cyan-300 transition-colors'>
                   Launch Simulator
                 </button>
-                <ChevronRight className="w-5 h-5 text-purple-400 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 text-white-400 group-hover:translate-x-1 group-hover:text-cyan-300 transition-transform" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      </section>
+
+
+      {/*Concept Modules */}
+
+      <section id="concepts" className='relative z-10 px-6 py-20'>
+        <div className='max-w-7xl mx-auto'>
+          <div className='text-center mb-16'>
+            <h2 className='text-5xl font-bold mb-4'>Core Concepts</h2>
+            <p>Understand the fundamentalswith visual explanationsand real examples</p>
+          </div>
+
+
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+            {conceptModules.map((concept, index) => (
+              <div key={index} className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
+
+                <div className='flex items-center gap-4  mb-6'>
+                  <div className='w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center'> {concept.icon} </div>
+                  <h3 className='font-semibold'> {concept.title} </h3>
+                </div>
+
+                <div className='text-gray-400 text-smleading-relaxed'>
+                  {concept.description}
+
+                </div>
+
               </div>
 
 
 
-            </div>
+            ))}
 
+          </div>
 
-          ))}
 
 
 
         </div>
-
-
-      </div>
-
-
 
 
       </section>
