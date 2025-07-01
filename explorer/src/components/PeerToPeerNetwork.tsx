@@ -28,10 +28,6 @@ interface Peer {
     color: string
 }
 
-type NodeClickHandler = (peerId: string) => void;
-type ToggleConnectionHandler = (peerId: string) => void;
-type MineBlockHandler = (peerId: string) => void;
-
 
 const nodeTypes = {
     peer: BlockchainNode
@@ -39,6 +35,11 @@ const nodeTypes = {
 
 const edgeTypes ={
     'custom-edge': CustomEdge
+}
+
+const styles = {
+  background: '#f9fafb',
+  borderRadius: '0.5rem',
 }
 
 
@@ -85,49 +86,6 @@ const peerColors = [
 ];
 
 
-const getNodesFromPeers = (peers: Peer[]): any[] => {
-    return peers.map((peer, index) => ({
-        id:peer.id,
-        type: 'peer',
-        position: {
-            x: 150 + (index % 4) * 200, // Arrange in a grid pattern
-            y: 100 + Math.floor(index / 4) * 150 
-        },
-        data: { 
-            peer: peer, // Pass entire peer object
-            selected: true
-        },
-    }))
-}
-
-const getEdgesFromPeers = (peers: Peer[]): any[] => {
-    const edges: any[] = [];
-
-    peers.forEach(peer => {
-        peer.connections.forEach(connectionId => {
-
-            const edgeId = `${peer.id}->${connectionId}`;
-            const reverseEdgeId = `${connectionId}->${peer.id}`;
-
-            //Check if the reverse edge already exists
-            const existingEdge = edges.find(e => e.id === reverseEdgeId);
-            console.log(existingEdge)
-
-            if (!existingEdge){
-                edges.push({
-                    id: edgeId,
-                    source: peer.id,
-                    target: connectionId,
-                    type: 'custom-edge',
-                    animated:true,
-                    style: {stroke: '#3b82f6', strokeWidth: 5},
-                })
-            }
-        })
-    })
-
-    return edges
-}
 const initialPeers: Peer[] = [
     {
         id: '1',
@@ -140,7 +98,7 @@ const initialPeers: Peer[] = [
     },
     {
         id: '2',
-        name: 'Jason',
+        name: 'Lebron',
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
@@ -149,7 +107,7 @@ const initialPeers: Peer[] = [
     },
     {
         id: '3',
-        name: 'Mike',
+        name: 'Durant',
         blockchain: [createGenesisBlock()],
         transactionPool: [],
         connected: true,
@@ -157,10 +115,6 @@ const initialPeers: Peer[] = [
         color: peerColors[2]
     }
 ];
-
-const initialNodes = getNodesFromPeers(initialPeers);
-const initialEdges = getEdgesFromPeers(initialPeers);
-
 
 
 const PeerToPeerNetwork = () => {
@@ -208,6 +162,56 @@ const PeerToPeerNetwork = () => {
         }
     });
 
+    
+
+    const getNodesFromPeers = (peers: Peer[]): any[] => {
+        return peers.map((peer, index) => ({
+            id:peer.id,
+            type: 'peer',
+            position: {
+                x: 150 + (index % 4) * 200, // Arrange in a grid pattern
+                y: 100 + Math.floor(index / 4) * 150 
+            },
+            data: { 
+                peer: peer, // Pass entire peer object
+                selected: peer.id === selectedPeer,
+            }
+        }))
+    }
+    const getEdgesFromPeers = (peers: Peer[]): any[] => {
+        const edges: any[] = [];
+
+        peers.forEach(peer => {
+            peer.connections.forEach(connectionId => {
+
+                const edgeId = `${peer.id}->${connectionId}`;
+                const reverseEdgeId = `${connectionId}->${peer.id}`;
+
+                //Check if the reverse edge already exists
+                const existingEdge = edges.find(e => e.id === reverseEdgeId);
+                console.log(existingEdge)
+
+                if (!existingEdge){
+                    edges.push({
+                        id: edgeId,
+                        source: peer.id,
+                        target: connectionId,
+                        type: 'custom-edge',
+                        animated:true,
+                        style: {stroke: '#3b82f6', strokeWidth: 5},
+                    })
+                }
+            })
+        })
+
+        return edges
+    }
+
+        
+    const initialNodes = getNodesFromPeers(initialPeers);
+    const initialEdges = getEdgesFromPeers(initialPeers);
+
+
     const [newPeerName, setNewPeerName] = useState(''); // New added peer/node
     const [newBlockData, setNewBlockData] = useState(''); //Mined block Data
     const [showActivityLog, setShowActivityLog] =useState(false);
@@ -227,15 +231,11 @@ const PeerToPeerNetwork = () => {
 
     let selectedPeerData: Peer | undefined = peers.find(p => p.id === selectedPeer);
 
-    useEffect(() => {
-        console.log('Current nodes:', nodes);
-        console.log('Current edges:', edges);
-        console.log('Peers:', peers);
-    }, [nodes, edges, peers]);
-
     useEffect(() =>{
         const newSelectedPeer = peers.find(p => p.id === selectedPeer);
         selectedPeerData = newSelectedPeer;
+        setNodes(getNodesFromPeers(peers));
+        setEdges(getEdgesFromPeers(peers));
     }, [selectedPeer])
 
 
@@ -249,6 +249,7 @@ const PeerToPeerNetwork = () => {
     //SelectedPeer to localStorage
     useEffect(() => {
         localStorage.setItem('selectedPeer', selectedPeer);
+
     }, [selectedPeer]);
 
     //networkActivity to localStorage
@@ -295,14 +296,19 @@ const PeerToPeerNetwork = () => {
 
     const togglePeerConnection = (peerId: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        setPeers(prev => prev.map(peer => {
-        if (peer.id === peerId) {
-            const newStatus = !peer.connected;
-            addActivity(`${peer.name} ${newStatus ? 'connected to' : 'disconnected from'} the network`);
-            return { ...peer, connected: newStatus };
-        }
-        return peer;
-        }));
+
+        const updatePeers = peers.map(peer => {
+            if (peer.id === peerId){
+                const newStatus = !peer.connected;
+                addActivity(`${peer.name} ${newStatus ? 'connected to' : 'disconnected from'} the network`);
+                return {...peer, connected: newStatus};
+            };
+
+            return peer;
+        });
+
+
+        setPeers(updatePeers);
     };
 
     const mineNewBlock = () => {
@@ -407,8 +413,6 @@ const PeerToPeerNetwork = () => {
 
         let newPeers = [...peers];
         const peerData = newPeers.find(p => p.id === peerId);
-
-        alert(peerData?.name)
         
         if (!peerData || !peerData.connected) {
             addActivity(`Cannot sync ${peerData?.name || 'unknown peer'} - peer not found or disconnected`);
@@ -492,7 +496,7 @@ const PeerToPeerNetwork = () => {
 
 
     return (
-        <div className='p-8 bg-gray-50 min-h-screen'>
+        <div className='p-8 min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden'>
             <div className='max-w-7xl mx-auto space-y-8'>
                 <div className='bg-white rounded-2xl shadow-lg p-8 border border-slate-200'>
                     <div className='flex items-center gap-4 mb-6'>
@@ -622,6 +626,7 @@ const PeerToPeerNetwork = () => {
                                 fitView
                                 fitViewOptions={{ padding: 0.2 }}
                                 proOptions={{hideAttribution:true}}
+                                style={styles}
                             >
                                 <Background />
                                 <Controls />

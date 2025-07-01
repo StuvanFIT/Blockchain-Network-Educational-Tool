@@ -97,7 +97,7 @@ const Wallet = () => {
 
 
     return (
-        <div className='p-8 bg-gray-50 min-h-screen'>
+        <div className='p-8 min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden'>
             <div className='max-w-7xl mx-auto space-y-8'>
                 <div className='bg-white rounded-2xl p-8 shadow-lg border border-slate-200'>
                     <div className='flex items-center gap-4 mb-4'>
