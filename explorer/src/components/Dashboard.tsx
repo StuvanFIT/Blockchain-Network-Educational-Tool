@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Zap, BarChart3, Network, Hash, Link } from 'lucide-react';
+import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight } from 'lucide-react';
 
 // Dashboard Page
 export const Dashboard = () => {
@@ -27,7 +27,7 @@ export const Dashboard = () => {
     {
       icon: <Hash className="w-8 h-8" />,
       title: "Transaction Creator",
-      description: "Build transactions from scratch. Understand inputs, outputs, digital signatures, and fees.",
+      description: "Build transactions from scratch using wallet accounts. Understand inputs, outputs, digital signatures, and fees.",
       color: "from-green-500 to-emerald-600",
       features: ["UTXO model", "Digital signatures", "Fee calculation"]
     },
@@ -101,12 +101,30 @@ export const Dashboard = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
           {interactiveSimulators.map((simulator, index) => (
 
-            <div key={index}>
-              <div className='flex items-center justify-between mb-6'>
+            <div key={index} className='group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8  hover:border-purple-400/30 transition-all duration-300 cursor-pointer hover:transform hover:scale-110"'>
+              <div className={`flex items-center justify-center mb-6 w-16 h-16 bg-gradient-to-r ${simulator.color} rounded-xl group-hover:shadow-lg transition-all duration-300`}>
                 {simulator.icon}
               </div>
 
-              <h3>{simulator.title}</h3>
+              <h3 className='text-xl font-semibold mb-3 group-hover:text-purple-400 transition-colors'>{simulator.title}</h3>
+              <p className='text-gray-300 mb-4'>{simulator.description}</p>
+
+              <div className='space-y-2 mb-6'>
+                {simulator.features.map((feature, index) =>(
+                  <div key={index} className='flex items-center space-x-2 text-sm text-white-400 border border-gray-500 rounded-lg bg-gradient-to-r from-cyan-500 to-pink-400 font-semibold p-4'>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className='flex items-center justify-between'>
+                <button className='text-cyan-400 font-semibold gover: text-cyan-300 transition-colors'>
+                  Launch Simulator
+                </button>
+                <ChevronRight className="w-5 h-5 text-purple-400 group-hover:translate-x-1 transition-transform" />
+              </div>
+
+
 
             </div>
 
