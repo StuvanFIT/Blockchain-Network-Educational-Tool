@@ -1,8 +1,6 @@
 import { ec } from 'elliptic';
 import {create} from 'zustand';
-import { persist } from 'zustand/middleware';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { getPublicKey, UnspentTxOut } from '../blockchain/transaction';
+import { UnspentTxOut } from '../blockchain/transaction';
 import { Transaction } from '../blockchain/transaction';
 import { WalletStructure } from '../components/Wallet';
 
