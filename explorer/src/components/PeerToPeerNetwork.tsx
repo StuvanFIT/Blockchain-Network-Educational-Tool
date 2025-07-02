@@ -38,7 +38,7 @@ const edgeTypes ={
 }
 
 const styles = {
-  background: '#f9fafb',
+  background: '#1e1b4b',
   borderRadius: '0.5rem',
 }
 
@@ -498,24 +498,38 @@ const PeerToPeerNetwork = () => {
     return (
         <div className='p-8 min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden'>
             <div className='max-w-7xl mx-auto space-y-8'>
-                <div className='bg-white rounded-2xl shadow-lg p-8 border border-slate-200'>
+                <div className='bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg p-8 border border-slate-200'>
                     <div className='flex items-center gap-4 mb-6'>
                         <div className='bg-gradient-to-r from-cyan-400 to-sky-600 rounded-lg text-white p-3'>
                             <Network className='w-8 h-8'/>
                         </div>
                         <div>
-                            <h1 className='text-3xl font-bold text-slate-800'> P2P Blockchain Network</h1>
-                            <p className="text-slate-500 mt-1">Add and connect to peers!</p>
+                            <h1 className='text-3xl font-bold text-white'> P2P Blockchain Network</h1>
+                            <p className="text-slate-300 mt-1">Add and connect to peers!</p>
                         </div>
                     </div>
-                    <p className='text-slate-600'>Click on any peer node to view its blockchain. Nodes sync with connected peers automatically.</p>
+                    <p className='text-white'>Click on any peer node to view its blockchain. Nodes sync with connected peers automatically.</p>
                 </div>
 
-                <div className='mt-4 space-y-8 bg-white rounded-xl shadow-2xl p-8 border border-slate-200'>
+                <div className='mt-4 space-y-8 bg-slate-800/70 rounded-xl shadow-2xl p-8 border border-slate-200'>
                     {/*Network nodes title */}
-                    <div className='flex items-center gap-2'>
-                        <Users className='w-6 h-6' />
-                        <p className='text-xl font-semibold '>Network Nodes (Peers)</p>
+                    <div className='flex items-center gap-2 justify-between text-white'>
+
+                        <div className='flex items-center gap-2'>
+                            <Users className='w-6 h-6' />
+                            <p className='text-xl font-semibold '>Network Nodes (Peers)</p>
+                        </div>
+
+                        <label className='flex items-center gap-2 text-sm'>
+                            <input 
+                                type="checkbox"
+                                className='rounded w-5 h-5'
+                                checked={autoSync}
+                                onChange={(e)=> setAutoSync(e.target.checked)}
+                            />
+                            <p className='text-base text-white'>Auto Sync Nodes</p>
+                            
+                        </label>
                     </div>
                     {/*Add new peer buttons */}
                     <div className='flex items-center gap-6'>
@@ -531,7 +545,7 @@ const PeerToPeerNetwork = () => {
                         <div>
                             <button
                                 onClick={addPeer}
-                                className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
+                                className='bg-gradient-to-r from-cyan-400 to-sky-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
                             >
                                 <div className='flex items-center gap-2'>
                                     <Plus className='w-4 h-4' />
@@ -542,7 +556,7 @@ const PeerToPeerNetwork = () => {
                         <div>
                             <button
                             onClick={syncAllPeers}
-                                className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
+                                className='bg-gradient-to-r from-cyan-400 to-sky-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
                             >
                                 <div className='flex items-center gap-2'>
                                     <Link className='w-4 h-4' />
@@ -550,16 +564,6 @@ const PeerToPeerNetwork = () => {
                                 </div>
                             </button>
                         </div>
-                        <label className='flex items-center gap-2 text-sm'>
-                            <input 
-                                type="checkbox"
-                                className='rounded w-5 h-5'
-                                checked={autoSync}
-                                onChange={(e)=> setAutoSync(e.target.checked)}
-                            />
-                            <p className='text-base'>Auto Sync Nodes</p>
-                            
-                        </label>
                     </div>
 
                     {/*Peer icons */}
@@ -594,15 +598,15 @@ const PeerToPeerNetwork = () => {
                                                 onClick={(e) => connectWithPeer(e, peer.id )}
                                                 className='flex items-center justify-center'
                                             >
-                                                <UserRoundPlus className='w-4 h-4'/>
+                                                <UserRoundPlus className='w-5 h-5'/>
                                             </button>
                                         </div>                                        
                                     )}
                                 </div>
 
                                 <div className="text-center mt-2">
-                                    <div className="text-sm font-medium text-gray-800">{peer.name}</div>
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-sm font-medium text-white">{peer.name}</div>
+                                    <div className="text-xs text-white">
                                     {peer.connections.length} connections
                                     </div>
                                 </div>
@@ -639,29 +643,29 @@ const PeerToPeerNetwork = () => {
 
     
                 {selectedPeerData ? (
-                    <div className='mt-4 space-y-12 bg-white rounded-xl shadow-2xl p-8 border border-slate-200'>
+                    <div className='mt-4 space-y-12 bg-slate-800/70 rounded-xl shadow-2xl p-8 border border-slate-200'>
                         <div className='flex items-center justify-between mb-6'>
-                            <h2 className='text-2xl font-semibold text-gray-800 flex items-center gap-3'>
+                            <h2 className='text-2xl font-semibold text-white flex items-center gap-3'>
                                 <div className= {`${selectedPeerData.color} p-4 rounded-full`}>
                                     <Server className='text-white' />
                                 </div>
                                 {selectedPeerData.name}'s Blockchain
-                                <span className='text-sm font-normal text-gray-500'>
+                                <span className='text-sm font-normal text-white'>
                                     {selectedPeerData.blockchain.length > 1  ? `(${selectedPeerData.blockchain.length} blocks)` : `(${selectedPeerData.blockchain.length} block)` }
                                 </span>
                             </h2>
                         </div>
 
                         <div className={`p-8 ${selectedPeerData.color} bg-opacity-20 rounded-lg text-gray-500`}>
-                        <h2 className='text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-6'>
+                        <h2 className='text-2xl font-semibold text-white flex items-center gap-3 mb-6'>
                             <Cable size={30} />
                             Connections:
                         </h2>
 
                         {selectedPeerData.connections.length === 0 ? (
                             <div className="text-center py-8">
-                                <div className="text-gray-400 text-lg">No connections</div>
-                                <div className="text-sm text-gray-500 mt-2">This peer is isolated from the network</div>
+                                <div className="text-white text-lg">No connections</div>
+                                <div className="text-sm text-white mt-2">This peer is isolated from the network</div>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -679,7 +683,7 @@ const PeerToPeerNetwork = () => {
                                             className={`
                                                 relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer
                                                 ${isOnline ? 'border-green-200 hover:border-green-300 hover:shadow-lg' : 'border-red-200 opacity-60'}
-                                                ${hasLongerChain ? 'bg-yellow-50 border-yellow-300' : 'bg-white'}
+                                                ${hasLongerChain ? 'bg-yellow-50 border-yellow-300' : 'bg-slate-800/80 backdrop-blur-sm border border-slate-600/30'}
                                                 hover:scale-105 group
                                             `}
                                             onClick={() => setSelectedPeer(connection)}
@@ -709,14 +713,14 @@ const PeerToPeerNetwork = () => {
 
                                             {/* Peer Info */}
                                             <div className="text-center">
-                                                <div className="text-lg font-semibold text-gray-800 mb-1">
+                                                <div className="text-lg font-semibold text-gray-400 mb-1">
                                                     {connectedPeer.name}
                                                 </div>
                                                 
                                                 {/* Blockchain Info */}
                                                 <div className="flex items-center justify-center gap-2 mb-2">
-                                                    <Database className="w-4 h-4 text-gray-500" />
-                                                    <span className={`text-sm font-medium ${hasLongerChain ? 'text-orange-600' : 'text-gray-600'}`}>
+                                                    <Database className="w-4 h-4 text-white" />
+                                                    <span className={`text-sm font-medium ${hasLongerChain ? 'text-orange-300' : 'text-white'}`}>
                                                         {connectedPeer.blockchain.length} blocks
                                                     </span>
                                                     {hasLongerChain && (
@@ -732,8 +736,8 @@ const PeerToPeerNetwork = () => {
                                                 </div>
 
                                                 {/* Connection Info */}
-                                                <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-                                                    <Link2 className="w-3 h-3" />
+                                                <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+                                                    <Link2 className="w-4 h-4" />
                                                     <span>{connectedPeer.connections.length} connections</span>
                                                 </div>
 
@@ -779,7 +783,7 @@ const PeerToPeerNetwork = () => {
                         )}
                         </div>
 
-                        <h2 className='text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-6'>
+                        <h2 className='text-2xl font-semibold text-white flex items-center gap-3 mb-6'>
                             <Blocks size={30} />
                             BlockChain Visualisation:
                         </h2>
@@ -798,7 +802,7 @@ const PeerToPeerNetwork = () => {
                                 <button
                                     onClick={mineNewBlock}
                                     disabled={!selectedPeerData.connected || !newBlockData.trim()}
-                                    className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
+                                    className='bg-gradient-to-r from-cyan-400 to-sky-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
                                 >
                                     <div className='flex items-center gap-2'>
                                         <Pickaxe className='w-4 h-4' />
@@ -809,7 +813,7 @@ const PeerToPeerNetwork = () => {
                             <div>
                                 <button
                                     onClick={() => syncPeerWithNetwork(selectedPeerData?.id ?? '')}
-                                    className='bg-cyan-500 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
+                                    className='bg-gradient-to-r from-cyan-400 to-sky-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-500 flex items-center gap-1 text-sm'
                                 >
                                     <div className='flex items-center gap-2'>
                                         <RefreshCcw className='w-4 h-4' />
@@ -824,7 +828,7 @@ const PeerToPeerNetwork = () => {
                         {/*block chain visualisation */}
                         <div className='space-y-4'>
                             {!selectedPeerData.blockchain || selectedPeerData.blockchain.length ===0 ? (
-                                <div className='text-center py-12 text-gray-500'>
+                                <div className='text-center py-12 text-white'>
                                     <Database size={48} className="mx-auto mb-4 opacity-50" />
                                     <p>No blocks in blockchain</p>
                                 </div>
@@ -834,7 +838,7 @@ const PeerToPeerNetwork = () => {
                                     <div className='flex items-center gap-2 overflow-x-auto'>
                                         {selectedPeerData && selectedPeerData.blockchain.map((block, idx) => (
                                             <React.Fragment key={block.index}>
-                                                <div className={`flex-shrink-0 w-24 h-20 ${selectedPeerData?.color} bg-opacity-20 border-2 border-current rounded-lg flex flex-col items-center justify-center text-sm`}>
+                                                <div className={`flex-shrink-0 w-24 h-20 ${selectedPeerData?.color} bg-opacity-70 border-2 border-current rounded-lg flex flex-col items-center justify-center text-sm`}>
                                                     <div className="font-bold">#{block.index}</div>
                                                     <div className="text-xs opacity-75 truncate w-full text-center px-1">
                                                         {typeof block.data === 'object' ? JSON.stringify(block.data) : block.data}
@@ -842,7 +846,7 @@ const PeerToPeerNetwork = () => {
                                                 </div>
 
                                                 {idx < (selectedPeerData?.blockchain.length ?? 100) - 1 && (
-                                                <div className="">
+                                                <div className="text-white">
                                                     <Link2 size={30} />
 
                                                 </div>
@@ -854,20 +858,20 @@ const PeerToPeerNetwork = () => {
                                         {selectedPeerData.blockchain.slice().reverse().map((block, index) =>(
                                             <div key={block.index} className={`${selectedPeerData?.color} bg-opacity-5 border border-gray-500 border-opcity-20 rounded-lg p-4`}>
                                                 <div>
-                                                    <div className="font-semibold text-gray-700">Block #{block.index}</div>
-                                                    <div className="text-gray-600">{block.data}</div>
+                                                    <div className="font-semibold text-white">Block #{block.index}</div>
+                                                    <div className="text-gray-400">{block.data}</div>
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-gray-700">Hash</div>
-                                                    <div className="text-gray-600 font-mono text-xs">{block.hash.substring(0, 12)}...</div>
+                                                    <div className="font-semibold text-white">Hash</div>
+                                                    <div className="text-gray-400 font-mono text-xs">{block.hash.substring(0, 12)}...</div>
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-gray-700">Previous Hash</div>
-                                                    <div className="text-gray-600 font-mono text-xs">{block.previousHash.substring(0, 12)}...</div>
+                                                    <div className="font-semibold text-white">Previous Hash</div>
+                                                    <div className="text-gray-400 font-mono text-xs">{block.previousHash.substring(0, 12)}...</div>
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-gray-700">Timestamp</div>
-                                                    <div className="text-gray-600 text-xs">{new Date(block.timestamp).toLocaleString()}</div>
+                                                    <div className="font-semibold text-white">Timestamp</div>
+                                                    <div className="text-gray-400 text-xs">{new Date(block.timestamp).toLocaleString()}</div>
                                                 </div>
                                             </div>
                                         ))}

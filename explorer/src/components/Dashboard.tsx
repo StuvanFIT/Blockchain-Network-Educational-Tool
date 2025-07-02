@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp, CirclePlay } from 'lucide-react';
+import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp, CirclePlay, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 // Dashboard Page
@@ -45,10 +45,17 @@ export const Dashboard = () => {
       icon: <Link className="w-8 h-8" />,
       title: "Blockchain Explorer",
       description: "Construct your own blockchain link by link. See how blocks connect and form an immutable chain.",
-      difficulty: "Intermediate",
       color: "from-blue-500 to-indigo-600",
       features: ["Block linking", "Merkle trees", "Chain validation"],
       route: "/simulators/explorer"
+    },
+      {
+      icon: <Wallet className="w-8 h-8" />,
+      title: "Create Wallet Accounts",
+      description: "Create Wallet Accounts with Public Key and Private Key.",
+      color: "from-fuchsia-600 to-pink-500",
+      features: ["Public Address", "Private Keys"],
+      route: "/simulators/createWallets"
     }
   ]
 
