@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef }  from 'react';
 import { BarChart3, Loader2, Pickaxe, Square, Wrench,ChartColumnIncreasing,
-  Target, Hourglass, ChartNoAxesCombined, Trophy, Ban, Info } from "lucide-react";
+  Target, Hourglass, ChartNoAxesCombined, Trophy, Ban, Info, 
+  TrendingUp,
+  Activity} from "lucide-react";
 import CryptoJS from 'crypto-js';
 
 import { hexToBinary } from '../blockchain/utils';
@@ -165,355 +167,344 @@ export const HashDemo = () => {
   };
 
 
-
   return (
-    <div className="p-8 bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-white">
-              <BarChart3 className="w-8 h-8" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800">Block Mining Simulator</h1>
-              <p className="text-slate-500 mt-1">Experience proof-of-work mining and see how computational difficulty affects blockchain security</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
+     
+      <div className="p-8 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Card */}
+          <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-white shadow-lg">
+                <BarChart3 className="w-8 h-8" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white">Block Mining Simulator</h1>
+                <p className="text-slate-300 mt-1">Experience proof-of-work mining and see how computational difficulty affects blockchain security</p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="mt-6 max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-
-          {/* Header Section */}
-          <div className="flex items-center justify-between mb-6">
-            <label htmlFor="hash-output" className="text-base font-semibold text-slate-900">
-              Hash Output (Hexadecimal)
-            </label>
-            <div className="flex items-center gap-3">
-              {miningSuccess && (
-                <div className="flex items-center text-emerald-600 gap-2">
-                  <Trophy className="w-4 h-4" />
-                  <span className="text-sm font-medium">Valid Block!</span>
-                </div>
-              )}
-              <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
+          {/* Hash Output Card */}
+          <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-6">
+            <div className="flex items-center justify-between mb-6">
+              <label htmlFor="hash-output" className="text-base font-semibold text-white">
+                Hash Output (Hexadecimal)
+              </label>
+              <div className="flex items-center gap-3">
+                {miningSuccess && (
+                  <div className="flex items-center text-emerald-400 gap-2">
+                    <Trophy className="w-4 h-4" />
+                    <span className="text-sm font-medium">Valid Block!</span>
+                  </div>
+                )}
+                <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                  miningSuccess 
+                    ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30' 
+                    : 'bg-red-500/20 text-red-400 ring-1 ring-red-500/30'
+                }`}>
+                  {miningSuccess ? 'Valid' : 'Invalid'}
+                </span>
+              </div>
+            </div>
+            
+            <textarea 
+              id="hash-output" 
+              className={`w-full h-24 p-4 border rounded-xl resize-none font-mono text-sm transition-colors ${
                 miningSuccess 
-                  ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200' 
-                  : 'bg-red-100 text-red-700 ring-1 ring-red-200'
-              }`}>
-                {miningSuccess ? 'Valid' : 'Invalid'}
-              </span>
+                  ? 'bg-emerald-900/20 border-emerald-500/30 text-emerald-300' 
+                  : 'bg-amber-900/20 border-amber-500/30 text-amber-300'
+              }`} 
+              value={hash} 
+              spellCheck={false} 
+              readOnly 
+            />
+
+            <label htmlFor="hash-binary" className="block mt-6 mb-3 text-base font-semibold text-white">
+              Hash Binary (Binary)
+            </label>
+            <textarea 
+              id="hash-binary" 
+              className={`w-full h-24 p-4 border rounded-xl resize-none font-mono text-sm transition-colors ${
+                miningSuccess 
+                  ? 'bg-emerald-900/20 border-emerald-500/30 text-emerald-300' 
+                  : 'bg-amber-900/20 border-amber-500/30 text-amber-300'
+              }`} 
+              value={hashBinary} 
+              spellCheck={false} 
+              readOnly 
+            />
+
+            <div className="mt-4 p-4 bg-slate-700/50 rounded-xl border border-slate-500/50">
+              <div className="text-base text-slate-300">
+                <span className="font-semibold text-white">Target:</span> Hash must start with{' '}
+                <span className="font-mono font-semibold text-orange-400">{difficulty}</span> zeros in binary →{' '}
+                <span className="font-mono text-slate-400">{Number(difficulty) > 150 ? "0".repeat(150) : "0".repeat(Number(difficulty))}...</span>
+              </div>
             </div>
           </div>
-          {/* Hash Output */}
-          <textarea 
-            id="hash-output" 
-            className={`w-full h-24 p-4 border rounded-xl resize-none font-mono text-sm transition-colors ${
-              miningSuccess 
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
-                : 'bg-amber-50 border-amber-200 text-amber-900'
-            }`} 
-            value={hash} 
-            spellCheck={false} 
-            readOnly 
-          />
+          
+          {/* Mining Controls and Stats */}
+          <div className='bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-8'>
+            <div className='flex flex-col lg:flex-row gap-8'>
+              <div className='flex-1'>
+                <h3 className='text-lg font-semibold text-white mb-5 flex items-center gap-2'>
+                  <Wrench className='w-4 h-4' />
+                  Mining Controls
+                </h3>
 
-          {/* Binary Section */}
-          <label htmlFor="hash-binary" className="block mt-6 mb-3 text-base font-semibold text-slate-900">
-            Hash Binary (Binary)
-          </label>
-          <textarea 
-            id="hash-binary" 
-            className={`w-full h-24 p-4 border rounded-xl resize-none font-mono text-sm transition-colors ${
-              miningSuccess 
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
-                : 'bg-amber-50 border-amber-200 text-amber-900'
-            }`} 
-            value={hashBinary} 
-            spellCheck={false} 
-            readOnly 
-          />
-
-          {/* Target Info */}
-          <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="text-base text-slate-700">
-              <span className="font-semibold text-slate-900">Target:</span> Hash must start with{' '}
-              <span className="font-mono font-semibold text-slate-900">{difficulty}</span> zeros in binary →{' '}
-              <span className="font-mono text-slate-600">{Number(difficulty) >150 ? "0".repeat(150) : "0".repeat(Number(difficulty))}...</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className='flex-1 bg-white rounded-2xl shadow-lg p-8 border border-slate-200 mt-8 mb-8'>
-          <div className='flex flex-col lg:flex-row gap-8'>
-            <div className='flex-1'>
-              <h3 className='text-lg font-semibold text-gray-800 mb-5 flex items-center gap-2'>
-                < Wrench className='w-4 h-4' />
-                Mining Controls
-              </h3>
-
-              <div className='flex gap-4'>
-                <button 
-                onClick={mineBlock}
-                disabled={isMiningRef.current}
-                className={`flex items-center gap-2 px-6 py-6 rounded-lg font-medium ${
-                  isMiningRef.current
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-700 hover:to-red-700 shadow-lg hover:shadow-xl'}`}>
-
+                <div className='flex gap-4'>
+                  <button 
+                    onClick={mineBlock}
+                    disabled={isMiningRef.current}
+                    className={`flex items-center gap-2 px-6 py-6 rounded-lg font-medium transition-all ${
+                      isMiningRef.current
+                        ? 'bg-slate-600/50 text-slate-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transform hover:scale-105'
+                    }`}>
                     {(isMiningRef.current || isMining) ? (
                       <>
                         <Loader2 className='w-4 h-4 animate-spin' />
                         Mining...
                       </>
-                    ): (
+                    ) : (
                       <>
                         <Pickaxe className='w-4 h-4' />
                         Mine Block
                       </>
-
-
                     )}
-                </button>
-
-                {(isMiningRef.current || isMining) && (
-                  <button
-                  onClick={stopMining}
-                  className='flex items-center gap-2 px-6 py-6 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
-
-                    <Square className='w-4 h-4'/>
-                    Stop
-
                   </button>
-                )}
-            </div>
-        </div>
 
-        {/*Mining Statistics */}
-        {(isMiningRef.current || miningStatus.attempts >0) && (
-          <div className='flex-1'> 
-            <h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
-              <ChartColumnIncreasing className='w-4 h-4'/>
-              Mining Statistics
-            </h3>
-
-            <div className='grid grid-cols-2 gap-4'>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-blue-700 mb-1">
-                    <Target className="w-4 h-4" />
-                    <span className="text-sm font-medium">Attempts</span>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-800">
-                    {formatNumber(miningStatus.attempts)}
-                  </div>
+                  {(isMiningRef.current || isMining) && (
+                    <button
+                      onClick={stopMining}
+                      className='flex items-center gap-2 px-6 py-6 rounded-lg font-medium bg-red-500 text-white hover:bg-red-600 transition-all transform hover:scale-105'>
+                      <Square className='w-4 h-4'/>
+                      Stop
+                    </button>
+                  )}
                 </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-green-700 mb-1">
-                    <Hourglass className="w-4 h-4" />
-                    <span className="text-sm font-medium">Time Elapsed</span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-800">
-                    {formatTime(miningTime)}
-                  </div>
-                </div>
-                <div className="bg-pink-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-pink-700 mb-1">
-                    <ChartNoAxesCombined className="w-4 h-4" />
-                    <span className="text-sm font-medium">Hash Rate</span>
-                  </div>
-                  <div className="text-2xl font-bold text-pink-800">
-                    {formatNumber(miningHashRate)} H/s
-                  </div>
-                </div>
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-orange-700 mb-1">
-                    <ChartNoAxesCombined className="w-4 h-4" />
-                    <span className="text-sm font-medium">Nonces</span>
-                  </div>
-                  <div className="text-2xl font-bold text-orange-800">
-                    {formatNumber(nonce)}
-                  </div>
-                </div>
-                {/* Progress Bar */}
-                {isMiningRef.current && estimatedTime > 0 && (
-                  <div className="mt-4">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>Estimated Progress</span>
-                      <span>{progress.toFixed(1)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Est. total time: {formatTime(estimatedTime)} (based on difficulty {difficulty})
-                    </div>
-                  </div>
-                )}
-            </div>
-            {/*Success Message: valid block */}
-            {miningSuccess && (
-
-              <div className='mt-4 p-4 border border-green-300 rounded-lg bg-emerald-50'>
-                <div className='flex items-center gap-2 font-medium'>
-                  <Trophy className='w-8 h-8 text-yellow-500'/>
-                  <span className='text-green-700'>Block Mined Successfully!</span> 
-                </div>
-
-                <div className='text-sm text-green-700 font-medium'>
-                  Found valid hash in {formatNumber(miningStatus.attempts)} attempts and  {formatTime(miningTime)}
-                </div>
-              
               </div>
-            )}
 
-            {/*Unsuccessful Message: Too many attempts */}
-            {(!miningSuccess && miningStatus.attempts >1000000)&&(
+              {/* Mining Statistics */}
+              {(isMiningRef.current || miningStatus.attempts > 0) && (
+                <div className='flex-1'> 
+                  <h3 className='text-lg font-semibold text-white mb-4 flex items-center gap-2'>
+                    <TrendingUp className='w-4 h-4'/>
+                    Mining Statistics
+                  </h3>
 
-              <div className='mt-4 p-4 border border-red-300 rounded-lg bg-red-100'>
-                <div className='flex items-center gap-2 font-medium'>
-                  <Trophy className='w-8 h-8 text-yellow-500'/>
-                  <span className='text-red-700'>Block Mined Unsuccessfully..</span> 
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div className="bg-blue-500/20 p-4 rounded-lg border border-blue-500/30">
+                      <div className="flex items-center gap-2 text-blue-300 mb-1">
+                        <Target className="w-4 h-4" />
+                        <span className="text-sm font-medium">Attempts</span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-200">
+                        {formatNumber(miningStatus.attempts)}
+                      </div>
+                    </div>
+                    <div className="bg-green-500/20 p-4 rounded-lg border border-green-500/30">
+                      <div className="flex items-center gap-2 text-green-300 mb-1">
+                        <Hourglass className="w-4 h-4" />
+                        <span className="text-sm font-medium">Time Elapsed</span>
+                      </div>
+                      <div className="text-2xl font-bold text-green-200">
+                        {formatTime(miningTime)}
+                      </div>
+                    </div>
+                    <div className="bg-pink-500/20 p-4 rounded-lg border border-pink-500/30">
+                      <div className="flex items-center gap-2 text-pink-300 mb-1">
+                        <Activity className="w-4 h-4" />
+                        <span className="text-sm font-medium">Hash Rate</span>
+                      </div>
+                      <div className="text-2xl font-bold text-pink-200">
+                        {formatNumber(miningHashRate)} H/s
+                      </div>
+                    </div>
+                    <div className="bg-orange-500/20 p-4 rounded-lg border border-orange-500/30">
+                      <div className="flex items-center gap-2 text-orange-300 mb-1">
+                        <Activity className="w-4 h-4" />
+                        <span className="text-sm font-medium">Nonces</span>
+                      </div>
+                      <div className="text-2xl font-bold text-orange-200">
+                        {formatNumber(nonce)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  {isMiningRef.current && estimatedTime > 0 && (
+                    <div className="mt-4">
+                      <div className="flex justify-between text-sm text-slate-300 mb-2">
+                        <span>Estimated Progress</span>
+                        <span>{progress.toFixed(1)}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1">
+                        Est. total time: {formatTime(estimatedTime)} (based on difficulty {difficulty})
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success Message */}
+                  {miningSuccess && (
+                    <div className='mt-4 p-4 border border-green-500/30 rounded-lg bg-green-500/20'>
+                      <div className='flex items-center gap-2 font-medium'>
+                        <Trophy className='w-8 h-8 text-yellow-400'/>
+                        <span className='text-green-300'>Block Mined Successfully!</span> 
+                      </div>
+                      <div className='text-sm text-green-300 font-medium'>
+                        Found valid hash in {formatNumber(miningStatus.attempts)} attempts and {formatTime(miningTime)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Unsuccessful Message */}
+                  {(!miningSuccess && miningStatus.attempts > 1000000) && (
+                    <div className='mt-4 p-4 border border-red-500/30 rounded-lg bg-red-500/20'>
+                      <div className='flex items-center gap-2 font-medium'>
+                        <Trophy className='w-8 h-8 text-yellow-400'/>
+                        <span className='text-red-300'>Block Mining Unsuccessful..</span> 
+                      </div>
+                      <div className='text-sm text-red-300 font-medium'>
+                        Mining has halted after 1,000,000 attempts. Maybe try reducing the difficulty.
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                <div className='text-sm text-red-700 font-medium'>
-                  Mining has halted after 1,000,000 attempts. Maybe try reducing the difficulty.
-                </div>
-              
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    </div>
 
-        <div className="bg-white rounded-2xl mt-6 shadow-lg p-8 border border-slate-200">
-          <div className="flex items-center gap-4 mb-6">
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 w-full'>
-
-              <div className='flex flex-col'>
-
-                <div className="flex items-center gap-2">
-                  <label htmlFor="data-message" className="mb-2 text-base font-semibold text-slate-900">
-                    Input Data
-                  </label>
-                  <InfoTooltip 
-                    content={tooltipContent['data-tool-tip']} 
-                    id="data-tool-tip" 
-                  />
+          {/* Input Fields Card */}
+          <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-500/50">
+            <div className="flex items-center gap-4 mb-6">
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6 w-full'>
+                <div className='flex flex-col'>
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="data-message" className="mb-2 text-base font-semibold text-white">
+                      Input Data
+                    </label>
+                    <InfoTooltip 
+                      content={tooltipContent['data-tool-tip']} 
+                      id="data-tool-tip" 
+                    />
+                  </div>
+                  <textarea
+                    id="data-message"
+                    className="w-full bg-slate-700/50 h-24 p-4 text-left border border-slate-600 rounded-md resize-none text-slate-200 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
+                    onChange={handleChange(setData)}
+                    value={data}
+                    spellCheck={false}
+                    placeholder="Enter input block data..."
+                  ></textarea>
                 </div>
 
-                <textarea
-                  id="data-message"
-                  className="w-full bg-amber-50 h-24 p-4 text-left border border-gray-500 rounded-md resize-none"
-                  onChange={handleChange(setData)}
-                  value={data}
-                  spellCheck={false}
-                  placeholder="Enter input block data..."
-                ></textarea>
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="index" className="mb-2 text-base font-semibold text-slate-900">
-                    Index
-                  </label>
-                  <InfoTooltip 
-                    content={tooltipContent['index-tool-tip']} 
-                    id="index-tool-tip" 
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="index" className="mb-2 text-base font-semibold text-white">
+                      Index
+                    </label>
+                    <InfoTooltip 
+                      content={tooltipContent['index-tool-tip']} 
+                      id="index-tool-tip" 
+                    />
+                  </div>
+                  <textarea
+                    id="index"
+                    className="w-full bg-slate-700/50 h-24 p-4 border border-slate-600 rounded-md resize-none text-slate-200 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
+                    onChange={handleChange(setIndex)}
+                    value={index.toString()}
+                    spellCheck={false}
+                    placeholder="Enter index..."
+                  ></textarea>
                 </div>
-                <textarea
-                  id="index"
-                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
-                  onChange={handleChange(setIndex)}
-                  value={index.toString()}
-                  spellCheck={false}
-                  placeholder="Enter index..."
-                ></textarea>
-              </div>
 
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="previous-hash" className="mb-2 text-base font-semibold text-slate-900">
-                    Previous Hash
-                  </label>
-                  <InfoTooltip 
-                    content={tooltipContent['prev-hash-tool-tip']} 
-                    id="prev-hash-tool-tip" 
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="previous-hash" className="mb-2 text-base font-semibold text-white">
+                      Previous Hash
+                    </label>
+                    <InfoTooltip 
+                      content={tooltipContent['prev-hash-tool-tip']} 
+                      id="prev-hash-tool-tip" 
+                    />
+                  </div>
+                  <textarea
+                    id="previous-hash"
+                    className="w-full bg-slate-700/50 h-24 p-4 border border-slate-600 rounded-md resize-none text-slate-200 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
+                    onChange={handleChange(setPreviousHash)}
+                    value={previousHash.toString()}
+                    spellCheck={false}
+                    placeholder="Enter Previous Hash..."
+                  ></textarea>
                 </div>
-                <textarea
-                  id="previous-hash"
-                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
-                  onChange={handleChange(setPreviousHash)}
-                  value={previousHash.toString()}
-                  spellCheck={false}
-                  placeholder="Enter Previous Hash..."
-                ></textarea>
-              </div>
 
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="timestamp" className="mb-2 text-base font-semibold text-slate-900">
-                    Timestamp
-                  </label>
-                  <InfoTooltip 
-                    content={tooltipContent['timestamp-tool-tip']} 
-                    id="timestamp-tool-tip" 
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="timestamp" className="mb-2 text-base font-semibold text-white">
+                      Timestamp
+                    </label>
+                    <InfoTooltip 
+                      content={tooltipContent['timestamp-tool-tip']} 
+                      id="timestamp-tool-tip" 
+                    />
+                  </div>
+                  <textarea
+                    id="timestamp"
+                    className="w-full bg-slate-700/50 h-24 p-4 border border-slate-600 rounded-md resize-none text-slate-200 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
+                    onChange={handleChange(setTimeStamp)}
+                    value={timestamp.toString()}
+                    spellCheck={false}
+                    placeholder="Timestamp..."
+                  ></textarea>
                 </div>
-                <textarea
-                  id="timestamp"
-                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
-                  onChange={handleChange(setTimeStamp)}
-                  value={timestamp.toString()}
-                  spellCheck={false}
-                  placeholder="Timestamp..."
-                ></textarea>
-              </div>
 
-              <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <label htmlFor="difficulty" className="mb-2 text-base font-semibold text-slate-900">
-                  Difficulty
-                </label>
-                <InfoTooltip 
-                  content={tooltipContent['difficulty-tool-tip']} 
-                  id="difficulty-tool-tip" 
-                />
-              </div>
-                <textarea
-                  id="difficulty"
-                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
-                  onChange={handleChange(setDifficulty)}
-                  value={difficulty.toString()}
-                  spellCheck={false}
-                  placeholder="Enter difficulty level..."
-                ></textarea>
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="nonce" className="mb-2 text-base font-semibold text-slate-900">
-                    Nonce
-                  </label>
-                  <InfoTooltip 
-                    content={tooltipContent['nonce-tool-tip']} 
-                    id="nonce-tool-tip" 
-                  />
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="difficulty" className="mb-2 text-base font-semibold text-white">
+                      Difficulty
+                    </label>
+                    <InfoTooltip 
+                      content={tooltipContent['difficulty-tool-tip']} 
+                      id="difficulty-tool-tip" 
+                    />
+                  </div>
+                  <textarea
+                    id="difficulty"
+                    className="w-full bg-slate-700/50 h-24 p-4 border border-slate-600 rounded-md resize-none text-slate-200 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
+                    onChange={handleChange(setDifficulty)}
+                    value={difficulty.toString()}
+                    spellCheck={false}
+                    placeholder="Enter difficulty level..."
+                  ></textarea>
                 </div>
-                <textarea
-                  id="nonce"
-                  className="w-full bg-amber-50 h-24 p-4 border border-gray-500 rounded-md resize-none"
-                  onChange={handleChange(setNonce)}
-                  value={nonce.toString()}
-                  spellCheck={false}
-                  placeholder="Enter nonce..."
-                ></textarea>
+
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="nonce" className="mb-2 text-base font-semibold text-white">
+                      Nonce
+                    </label>
+                    <InfoTooltip 
+                      content={tooltipContent['nonce-tool-tip']} 
+                      id="nonce-tool-tip" 
+                    />
+                  </div>
+                  <textarea
+                    id="nonce"
+                    className="w-full bg-slate-700/50 h-24 p-4 border border-slate-600 rounded-md resize-none text-slate-200 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
+                    onChange={handleChange(setNonce)}
+                    value={nonce.toString()}
+                    spellCheck={false}
+                    placeholder="Enter nonce..."
+                  ></textarea>
+                </div>
               </div>
             </div>
           </div>
