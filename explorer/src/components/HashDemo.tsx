@@ -173,7 +173,7 @@ export const HashDemo = () => {
       <div className="p-8 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {/* Header Card */}
-          <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-6">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-white shadow-lg">
                 <BarChart3 className="w-8 h-8" />

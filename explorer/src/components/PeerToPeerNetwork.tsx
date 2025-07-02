@@ -498,7 +498,7 @@ const PeerToPeerNetwork = () => {
     return (
         <div className='p-8 min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden'>
             <div className='max-w-7xl mx-auto space-y-8'>
-                <div className='bg-slate-800/70 rounded-2xl shadow-lg p-8 border border-slate-200'>
+                <div className='bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg p-8 border border-slate-200'>
                     <div className='flex items-center gap-4 mb-6'>
                         <div className='bg-gradient-to-r from-cyan-400 to-sky-600 rounded-lg text-white p-3'>
                             <Network className='w-8 h-8'/>

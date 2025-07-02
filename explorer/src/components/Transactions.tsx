@@ -274,7 +274,7 @@ const Transactions = () => {
   return (
     <div className="p-8 min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden">
       <div className="max-w-7x1 mx-auto space-y-8">
-        <div className="bg-slate-800/70 rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-6">
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-slate-500/50 mb-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-white">
               <FileText className="w-8 h-8" />
