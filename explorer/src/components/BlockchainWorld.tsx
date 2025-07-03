@@ -1,4 +1,4 @@
-import { Database, ChevronLeft, ChevronRight} from 'lucide-react';
+import { Database, ChevronLeft, ChevronRight, Zap, Network, Star, CheckCircle} from 'lucide-react';
 import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typewriter } from '../utils/Typewriter';
@@ -189,6 +189,196 @@ const BlockchainWorld = () => {
         }
     };
 
+    const renderInteractiveContent = (interactive:any) => {
+        if (!interactive) return null;
+
+        switch (interactive.type) {
+        case 'comparison':
+            return (
+            <div className="grid grid-cols-2 gap-6 mt-6">
+                <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                <h4 className="font-bold text-red-800 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🏛️</span>
+                    Centralized Systems
+                </h4>
+                <ul className="space-y-2">
+                    {interactive.data.centralized.map((item:any, idx:number) => (
+                    <li key={idx} className="text-red-700 text-sm flex items-start gap-2">
+                        <span className="text-red-500 mt-1">•</span>
+                        {item}
+                    </li>
+                    ))}
+                </ul>
+                </div>
+                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🌐</span>
+                    Decentralized Systems
+                </h4>
+                <ul className="space-y-2">
+                    {interactive.data.decentralized.map((item:any, idx:number) => (
+                    <li key={idx} className="text-green-700 text-sm flex items-start gap-2">
+                        <span className="text-green-500 mt-1">•</span>
+                        {item}
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            </div>
+            );
+
+        case 'block_builder':
+            return (
+            <div className="mt-6">
+                <h4 className="font-bold text-gray-800 mb-4">Interactive Blockchain</h4>
+                <div className="flex gap-4 overflow-x-auto pb-4">
+                {interactive.data.blocks.map((block:any, idx:number) => (
+                    <div key={block.id} className="bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-64">
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="font-bold text-blue-800">Block #{block.id}</span>
+                        <span className="text-xs bg-blue-100 px-2 py-1 rounded text-blue-700">
+                        Hash: {block.hash}
+                        </span>
+                    </div>
+                    <div className="space-y-2">
+                        {block.transactions.map((tx:any, txIdx:number) => (
+                        <div key={txIdx} className="text-sm bg-white p-2 rounded border text-gray-700">
+                            {tx}
+                        </div>
+                        ))}
+                    </div>
+                    {idx < interactive.data.blocks.length - 1 && (
+                        <div className="flex justify-center mt-4">
+                        <ChevronRight className="w-6 h-6 text-blue-500" />
+                        </div>
+                    )}
+                    </div>
+                ))}
+                </div>
+            </div>
+            );
+
+        case 'hash_demo':
+            return (
+            <div className="mt-6 bg-purple-50 p-6 rounded-xl border border-purple-200">
+                <h4 className="font-bold text-purple-800 mb-4">Hash Demonstration</h4>
+                <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-purple-700 mb-2">Original Data:</label>
+                    <div className="bg-white p-3 rounded border text-gray-800 font-mono text-sm">
+                    {interactive.data.originalText}
+                    </div>
+                </div>
+                <div className="flex items-center justify-center">
+                    <div className="bg-purple-100 p-2 rounded-full">
+                    <Zap className="w-5 h-5 text-purple-600" />
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-purple-700 mb-2">Hash Output:</label>
+                    <div className="bg-white p-3 rounded border text-purple-800 font-mono text-sm">
+                    {interactive.data.hash}
+                    </div>
+                </div>
+                <p className="text-sm text-purple-600 italic">
+                    Try changing even one character above and watch the hash change completely!
+                </p>
+                </div>
+            </div>
+            );
+
+        case 'mining_game':
+            return (
+            <div className="mt-6 bg-yellow-50 p-6 rounded-xl border border-yellow-200">
+                <h4 className="font-bold text-yellow-800 mb-4">Mining Simulation</h4>
+                <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded border">
+                    <div className="text-sm font-medium text-yellow-700 mb-2">Difficulty Level</div>
+                    <div className="text-2xl font-bold text-yellow-800">{interactive.data.difficulty}</div>
+                </div>
+                <div className="bg-white p-4 rounded border">
+                    <div className="text-sm font-medium text-yellow-700 mb-2">Block Reward</div>
+                    <div className="text-2xl font-bold text-yellow-800">{interactive.data.reward} BTC</div>
+                </div>
+                </div>
+                <div className="mt-4 bg-yellow-100 p-4 rounded">
+                <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-5 h-5 text-yellow-600" />
+                    <span className="font-medium text-yellow-800">Mining in Progress...</span>
+                </div>
+                <div className="w-full bg-yellow-200 rounded-full h-2">
+                    <div className="bg-yellow-500 h-2 rounded-full animate-pulse" style={{width: '67%'}}></div>
+                </div>
+                </div>
+            </div>
+            );
+
+        case 'network_visualization':
+            return (
+            <div className="mt-6 bg-teal-50 p-6 rounded-xl border border-teal-200">
+                <h4 className="font-bold text-teal-800 mb-4">Decentralized Network</h4>
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                {[...Array(12)].map((_, idx) => (
+                    <div key={idx} className="bg-teal-100 p-3 rounded-lg text-center">
+                    <div className="w-8 h-8 bg-teal-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-sm">
+                        {idx + 1}
+                    </div>
+                    <div className="text-xs text-teal-700">Node {idx + 1}</div>
+                    </div>
+                ))}
+                </div>
+                <div className="text-center text-sm text-teal-600">
+                <Network className="w-5 h-5 inline mr-2" />
+                {interactive.data.nodes} nodes with {interactive.data.connections} connections
+                </div>
+            </div>
+            );
+
+        case 'application_explorer':
+            return (
+            <div className="mt-6 grid grid-cols-2 gap-4">
+                {interactive.data.applications.map((app:any, idx:number) => (
+                <div key={idx} className="bg-indigo-50 p-4 rounded-xl border border-indigo-200 hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3">
+                    <span className="text-2xl">{app.icon}</span>
+                    <div>
+                        <h5 className="font-bold text-indigo-800">{app.name}</h5>
+                        <p className="text-sm text-indigo-600 mt-1">{app.description}</p>
+                    </div>
+                    </div>
+                </div>
+                ))}
+            </div>
+            );
+
+        case 'certificate':
+            return (
+            <div className="mt-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
+                <div className="text-center mb-6">
+                <Star className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                <h4 className="text-2xl font-bold text-yellow-800 mb-2">Blockchain Master Certificate</h4>
+                <p className="text-yellow-700">You have successfully completed the Blockchain Adventure!</p>
+                </div>
+                <div className="space-y-2">
+                <h5 className="font-bold text-yellow-800">Achievements Unlocked:</h5>
+                {interactive.data.achievements.map((achievement:any, idx:number) => (
+                    <div key={idx} className="flex items-center gap-2 text-yellow-700">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-sm">{achievement}</span>
+                    </div>
+                ))}
+                </div>
+            </div>
+            );
+
+        default:
+            return null;
+        }
+    };
+
+
+
+
 
     const currentStageData = stages[currentStage];
 
@@ -243,6 +433,8 @@ const BlockchainWorld = () => {
                     </div>
 
                     {/* Interactive Content */}
+
+                    {renderInteractiveContent(currentStageData.interactive)}
 
                     
                 </div>
