@@ -5,6 +5,7 @@ import { Typewriter } from '../utils/Typewriter';
 
 
 const BlockchainWorld = () => {
+    const navigate = useNavigate();
 
     const [gameStarted, setGameStarted] = useState(false);
     const [currentStage, setCurrentStage] = useState(0);
@@ -24,39 +25,65 @@ const BlockchainWorld = () => {
             color: 'from-blue-500 to-purple-600'
         },
         {
-            id:'history',
-            title: 'The Evolution of Blockchain',
-            character: '🤖',
-            characterName: 'BlockBot',
-            story: "Blockchain technology began with the introduction of Bitcoin, cryptocurrencyand and blockchain concepts in 2008, developed by an anonymous figure or group" +
-            " known as Satoshi Nakamoto."+
-            " Nakamoto's design presented the concept of a chain of blocks, making it possible to add blocks without requiring them to be signed by a trusted third party.",
-            concept: 'Evolution of Blockchain',
-            interactive: null,
-            color: 'from-fuchsia-500 to-pink-600'
-            
-            
-        }
-        ,
-        {
             id: 'problem',
-            title: 'The Trust Problem',
+            title: 'The Trust Problem - Part 1',
             character: '🤖',
             characterName: 'BlockBot',
-            story: "For centuries, people have relied on trusted institutions like banks to handle their money. But what if I told you there's a way to create trust without needing a central authority?" + 
-            " Satoshi Nakamoto's initial purpose for blockchain was to create a secure, transparent and decentralised public ledger to support Bitcoin which eliminated the need for intermediaries like banks in financial transactions." +
-            " It gives ordinary people like you a chance to take part in a decentralised financial system!" +
-            " Let's explore the problems with traditional systems...",
+            story: "For centuries and even today, people have trusted banks. If you needed to keep your money safe, borrow or send it to someone far away, the bank was your go-to." +
+            " You didn't question it - they were the gatekeepers of money.\nHowever, there were costs:\n-Banks charged fees for everything\n-They could freeze your account, decline your loan, or even block transactions.\n"
+            +"-And worst of all, if the bank made a mistake or collapsed, your money could vanish.\n\n"
+            +"But what if I told you there's a way to create trust without needing a central authority?\n\n"
+            +"One day, a mysterious figure named Satoshi Nakamoto gave birth to something revolutionary: Bitcoin, and behind it — the power of blockchain.\n"
+            +"Satoshi Nakamoto's initial purpose for blockchain was to create a secure, transparent and decentralised public ledger to support Bitcoin which eliminated the need for intermediaries like banks in financial transactions. It gives ordinary people like you a chance to take part in a decentralised financial system!\n"
+            +"This was a new world where:\n"
+            +"-You could be your own bank\n-Money could move peer-to-peer, without middlemen.\n-No one could change your records, because everything was locked in a global, public ledger.",
 
-            concept: 'Traditional centralized systems have single points of failure and require trust in institutions.',
+            concept: 'Traditional centralised systems have single points of failure and require trust in institutions.',
             interactive: {
                 type: 'comparison',
                 data: {
-                centralized: ['Single point of failure', 'Requires trust in institutions', 'Can be censored or shut down', 'Intermediaries take fees'],
-                decentralized: ['No single point of failure', 'Trustless system', 'Censorship resistant', 'Peer-to-peer transactions']
+                centralised: ['Single point of failure', 'Requires trust in institutions', 'Can be censored or shut down', 'Intermediaries take fees'],
+                decentralised: ['No single point of failure', 'Trustless system', 'Censorship resistant', 'Peer-to-peer transactions']
                 }
             },
             color: 'from-red-500 to-orange-600'
+        },
+        {
+            id: 'problem',
+            title: 'The Trust Problem - Part 2',
+            character: '🤖',
+            characterName: 'BlockBot',
+            story: "But not everyone was pleased...You see, crypto wasn't just a new tool for banks - it was new rival.\n\n"
+            +"To them, crypto looked unregulated, dangerous, and sometimes even like dirty money — because it didn’t come from the usual, trusted systems. And in many cases, people weren’t paying taxes like they do on stocks. Crypto gains happened quietly, outside of view\n"
+            +"Why are banks against Bitcoin?\n"
+            +"One of the biggest reasons banks are against Bitcoin is that it grants individuals exclusive sovereignty over their funds, making it impossible for banks and governments to control individuals' funds and earn from it.\n"
+            +"With Bitcoin being blockchain-based and decentralised, they can’t earn from people’s bank deposits, and they lose control of the economic system and people's funds",
+            concept: 'Banks started to worry',
+            interactive: null,
+            color: 'from-red-500 to-orange-600'
+        },
+        {
+            id: 'problem',
+            title: 'The Trust Problem - Part 3',
+            character: '🤖',
+            characterName: 'BlockBot',
+            story: "Some believe these two worlds will eventually merge — banks adopting blockchain, and governments regulating crypto. Others believe crypto will remain a rebel system, for those who want freedom and control over their own money.\n"+
+            "And you — dear listener — are now stepping into the middle of this revolution.\n"
+            +"Welcome to the blockchain journey!\n",
+
+            concept: 'Potential merging between the 2 worlds - coexistence',
+            interactive: null,
+            color: 'from-red-500 to-orange-600'
+        },
+        {
+            id: 'problem',
+            title: 'Case Study: 2008 Financial Crisis',
+            character: '🤖',
+            characterName: 'BlockBot',
+            story: "If you want to understand some of the inherent problems of the current traditional financial system, the 2008 Financial Crisis is a good case study! I'll note some quick details about the financial crisis down below!",
+            concept: null,
+            interactive: null,
+            color: 'from-yellow-500 to-lime-600'
         },
         {
             id: 'solution',
@@ -149,7 +176,7 @@ const BlockchainWorld = () => {
             title: 'Congratulations, Blockchain Master!',
             character: '🤖',
             characterName: 'BlockBot',
-            story: "You've completed your journey through the blockchain universe! You now understand how this revolutionary technology creates trust without intermediaries, secures data with cryptography, and enables a new era of decentralized applications. The future is in your hands!",
+            story: "You've completed your journey through the blockchain universe! You now understand how this revolutionary technology creates trust without intermediaries, secures data with cryptography, and enables a new era of decentralised applications. The future is in your hands!",
             concept: 'You are now equipped with fundamental blockchain knowledge!',
             interactive: {
                 type: 'certificate',
@@ -199,10 +226,10 @@ const BlockchainWorld = () => {
                 <div className="bg-red-50 p-6 rounded-xl border border-red-200">
                 <h4 className="font-bold text-red-800 mb-4 flex items-center gap-2">
                     <span className="text-2xl">🏛️</span>
-                    Centralized Systems
+                    Centralised Systems
                 </h4>
                 <ul className="space-y-2">
-                    {interactive.data.centralized.map((item:any, idx:number) => (
+                    {interactive.data.centralised.map((item:any, idx:number) => (
                     <li key={idx} className="text-red-700 text-sm flex items-start gap-2">
                         <span className="text-red-500 mt-1">•</span>
                         {item}
@@ -213,10 +240,10 @@ const BlockchainWorld = () => {
                 <div className="bg-green-50 p-6 rounded-xl border border-green-200">
                 <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
                     <span className="text-2xl">🌐</span>
-                    Decentralized Systems
+                    Decentralised Systems
                 </h4>
                 <ul className="space-y-2">
-                    {interactive.data.decentralized.map((item:any, idx:number) => (
+                    {interactive.data.decentralised.map((item:any, idx:number) => (
                     <li key={idx} className="text-green-700 text-sm flex items-start gap-2">
                         <span className="text-green-500 mt-1">•</span>
                         {item}
@@ -233,26 +260,29 @@ const BlockchainWorld = () => {
                 <h4 className="font-bold text-gray-800 mb-4">Interactive Blockchain</h4>
                 <div className="flex gap-4 overflow-x-auto pb-4">
                 {interactive.data.blocks.map((block:any, idx:number) => (
-                    <div key={block.id} className="bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-64">
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="font-bold text-blue-800">Block #{block.id}</span>
-                        <span className="text-xs bg-blue-100 px-2 py-1 rounded text-blue-700">
-                        Hash: {block.hash}
-                        </span>
-                    </div>
-                    <div className="space-y-2">
-                        {block.transactions.map((tx:any, txIdx:number) => (
-                        <div key={txIdx} className="text-sm bg-white p-2 rounded border text-gray-700">
-                            {tx}
+                    <div className='flex items-center gap-2'>
+                        <div key={block.id} className="bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-64">
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="font-bold text-blue-800">Block #{block.id}</span>
+                                <span className="text-xs bg-blue-100 px-2 py-1 rounded text-blue-700">
+                                Hash: {block.hash}
+                                </span>
+                            </div>
+                            <div className="space-y-2">
+                                {block.transactions.map((tx:any, txIdx:number) => (
+                                <div key={txIdx} className="text-sm bg-white p-2 rounded border text-gray-700">
+                                    {tx}
+                                </div>
+                                ))}
+                            </div>
                         </div>
-                        ))}
+                        {idx < interactive.data.blocks.length - 1 && (
+                            <div className="flex justify-center mt-4">
+                                <ChevronRight className="w-6 h-6 text-blue-500" />
+                            </div>
+                        )}
                     </div>
-                    {idx < interactive.data.blocks.length - 1 && (
-                        <div className="flex justify-center mt-4">
-                        <ChevronRight className="w-6 h-6 text-blue-500" />
-                        </div>
-                    )}
-                    </div>
+
                 ))}
                 </div>
             </div>
@@ -263,26 +293,21 @@ const BlockchainWorld = () => {
             <div className="mt-6 bg-purple-50 p-6 rounded-xl border border-purple-200">
                 <h4 className="font-bold text-purple-800 mb-4">Hash Demonstration</h4>
                 <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-purple-700 mb-2">Original Data:</label>
-                    <div className="bg-white p-3 rounded border text-gray-800 font-mono text-sm">
-                    {interactive.data.originalText}
+                    <div>
+                        <label className="block text-sm font-medium text-purple-700 mb-2">Original Data:</label>
+                        <div className="bg-white p-3 rounded border text-gray-800 font-mono text-sm">
+                        {interactive.data.originalText}
+                        </div>
                     </div>
-                </div>
-                <div className="flex items-center justify-center">
-                    <div className="bg-purple-100 p-2 rounded-full">
-                    <Zap className="w-5 h-5 text-purple-600" />
+                    <div>
+                        <label className="block text-sm font-medium text-purple-700 mb-2">Hash Output:</label>
+                        <div className="bg-white p-3 rounded border text-purple-800 font-mono text-sm">
+                        {interactive.data.hash}
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-purple-700 mb-2">Hash Output:</label>
-                    <div className="bg-white p-3 rounded border text-purple-800 font-mono text-sm">
-                    {interactive.data.hash}
-                    </div>
-                </div>
-                <p className="text-sm text-purple-600 italic">
-                    Try changing even one character above and watch the hash change completely!
-                </p>
+                    <p className="text-sm text-purple-600 italic">
+                        Try changing even one character above and watch the hash change completely!
+                    </p>
                 </div>
             </div>
             );
@@ -316,7 +341,7 @@ const BlockchainWorld = () => {
         case 'network_visualization':
             return (
             <div className="mt-6 bg-teal-50 p-6 rounded-xl border border-teal-200">
-                <h4 className="font-bold text-teal-800 mb-4">Decentralized Network</h4>
+                <h4 className="font-bold text-teal-800 mb-4">Decentralised Network</h4>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                 {[...Array(12)].map((_, idx) => (
                     <div key={idx} className="bg-teal-100 p-3 rounded-lg text-center">
@@ -420,17 +445,19 @@ const BlockchainWorld = () => {
                     </div>
 
                     {/* Concept Box */}
-                    <div className="bg-blue-50 rounded-xl p-6 border border-blue-200 mb-6">
-                    <div className="flex items-start gap-3">
-                        <div className="bg-blue-100 rounded-full p-2">
-                        <Database className="w-5 h-5 text-blue-600" />
+                    {currentStageData.concept && (
+                        <div className="bg-blue-50 rounded-xl p-6 border border-blue-200 mb-6">
+                            <div className="flex items-start gap-3">
+                                <div className="bg-blue-100 rounded-full p-2">
+                                <Database className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                <h3 className="font-bold text-blue-800 mb-2">Key Concept</h3>
+                                <p className="text-blue-700">{currentStageData.concept}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                        <h3 className="font-bold text-blue-800 mb-2">Key Concept</h3>
-                        <p className="text-blue-700">{currentStageData.concept}</p>
-                        </div>
-                    </div>
-                    </div>
+                    )}
 
                     {/* Interactive Content */}
 
@@ -442,34 +469,50 @@ const BlockchainWorld = () => {
                 {/* Navigation */}
                 <div className="bg-black/20 p-6 flex justify-between items-center">
                     <button
-                    onClick={prevStage}
-                    disabled={currentStage === 0}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                        currentStage === 0 
-                        ? 'text-white/50 cursor-not-allowed' 
-                        : 'text-white hover:bg-white/20'
-                    }`}
+                        onClick={prevStage}
+                        disabled={currentStage === 0}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                            currentStage === 0 
+                            ? 'text-white/50 cursor-not-allowed' 
+                            : 'text-white hover:bg-white/20'
+                        }`}
                     >
-                    <ChevronLeft className="w-5 h-5" />
-                    Previous
+                        <ChevronLeft className="w-5 h-5" />
+                        Previous
                     </button>
 
                     <div className="text-white/80 text-sm">
-                    {currentStage + 1} / {stages.length}
+                        {currentStage + 1} / {stages.length}
                     </div>
 
-                    <button
-                    onClick={nextStage}
-                    disabled={currentStage === stages.length - 1}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                        currentStage === stages.length - 1 
-                        ? 'text-white/50 cursor-not-allowed' 
-                        : 'text-white hover:bg-white/20'
-                    }`}
-                    >
-                    Next
-                    <ChevronRight className="w-5 h-5" />
-                    </button>
+
+                        {currentStage !== stages.length -1 ? (
+                            <button
+                                onClick={nextStage}
+                                disabled={currentStage === stages.length - 1}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                                    currentStage === stages.length - 1 
+                                    ? 'text-white/50 cursor-not-allowed' 
+                                    : 'text-white hover:bg-white/20'
+                                }`}
+                            >
+                                Next
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        ): (
+
+                            <button
+                                onClick={() => navigate("/")}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold text-white hover:bg-white/20`}
+                            >
+                                Finish
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+
+
+                        )}
+
+
                 </div>
                 </div>
             </div>
