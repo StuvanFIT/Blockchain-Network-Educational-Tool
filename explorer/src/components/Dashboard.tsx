@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp, CirclePlay, Wallet } from 'lucide-react';
+import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp, CirclePlay, Wallet, Play } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { BlockchainWorld } from './BlockchainWorld';
 
 // Dashboard Page
 export const Dashboard = () => {
@@ -166,7 +167,6 @@ export const Dashboard = () => {
             <p>Understand the fundamentalswith visual explanationsand real examples</p>
           </div>
 
-
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
             {conceptModules.map((concept, index) => (
               <div key={index} className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
@@ -182,20 +182,36 @@ export const Dashboard = () => {
                 </div>
 
               </div>
-
-
-
             ))}
-
           </div>
-
-
-
-
         </div>
-
-
       </section>
+
+
+      <section id="game" className='relative z-10 px-6 py-20 bg-gradient-to-r from-transparent via-white/5 to-transparent'>
+        <div className='text-center max-w-2xl mx-auto'>
+            <div className='mb-4'>
+                <div className="text-8xl mb-4 animate-bounce">⛓️</div>
+                    <h1 className="text-5xl font-bold text-white mb-4">
+                    Blockchain Adventure
+                    </h1>
+                    <p className="text-xl text-blue-100 mb-8">
+                    Join an epic journey to discover the secrets of blockchain technology!
+                    Learn through interactive stories, games, and animated characters.
+                    </p>
+            </div>
+
+            <button
+                onClick={() => navigate("/tutorial/blockchainworld")}
+                className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center gap-3 mx-auto"
+            >
+                <Play className='w-6 h-6' />
+                Start Your Adventure
+            </button>
+        </div>
+      </section>
+
+
 
 
 

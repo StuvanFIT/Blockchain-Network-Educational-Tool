@@ -86,7 +86,21 @@ export const useWalletStore = create<WalletStore>()(((set, get) => ({
     transactionPool: [],
     balance: 300,
 
-    exampleWallets: [initialWallet, secondaryWallet],
+    exampleWallets: (() => {
+      const storedWallets = localStorage.getItem('exampleWallets');
+
+      if (storedWallets) {
+        try {
+          return JSON.parse(storedWallets);
+        } catch (err) {
+          console.error("Failed to parse exampleWallets from localStorage", err);
+        }
+      }
+
+      return [initialWallet, secondaryWallet];
+    })(),
+
+
 
     updateWallets: (exampleWallets: WalletStructure[]) =>{
       set({exampleWallets});

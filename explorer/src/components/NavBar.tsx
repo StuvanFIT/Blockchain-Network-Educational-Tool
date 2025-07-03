@@ -33,7 +33,7 @@ const NavBar = () =>{
 
     return (
 
-        <nav className="relative sticky top-0 z-50 flex items-center justify-between p-6 bg-slate-800/95 backdrop-blur-sm border-b border-slate-700/50 shadow-2xl">
+        <nav className="relative sticky top-0 z-50 flex items-center justify-between p-2 bg-slate-800/95 backdrop-blur-sm border-b border-slate-700/50 shadow-2xl">
             {/*Icon */}
             <div onClick={() => handleNavigationClick("/")} className='flex items-center space-x-2 cursor-pointer'>
                 <div className=' flex items-center justify-center w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg'>
@@ -42,7 +42,7 @@ const NavBar = () =>{
                 <span className='text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent '>BlockScopeEdu</span>
             </div>
             {/* Features/Tabs */}
-            <div className='hidden md:flex space-x-8 text-2xl'>
+            <div className='hidden md:flex space-x-8 text-xl'>
                 <a href='#' className='hover:text-cyan-400 transition-colors text-slate-300 font-bold'>Cryptocurrencies</a>
                 <a href='#' className='hover:text-cyan-400 transition-colors text-slate-300 font-bold'>Blockchain</a>
                 <a href='#' className='hover:text-cyan-400 transition-colors text-slate-300 font-bold'>Learning Tools</a>

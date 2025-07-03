@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {ec as EC} from 'elliptic';
 import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check, Lock} from 'lucide-react';
 import { arrayToHex, sha256 } from '../blockchain/utils';
@@ -53,10 +53,17 @@ const Wallet = () => {
         } catch (error:any){
             console.error('Error generating wallet', error.message);
         }
-
-
-
     };
+
+    //Example Wallets to localStorage
+    useEffect(() => {
+        localStorage.setItem('exampleWallets', JSON.stringify(exampleWallets));
+    }, [exampleWallets]);
+
+
+
+
+
 
     const clearAllWallets = () =>{
         resetWallets();

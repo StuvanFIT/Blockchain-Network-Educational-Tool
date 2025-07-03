@@ -10,6 +10,7 @@ import {Transactions} from './components/Transactions';
 import NotFound from './components/NotFound';
 import { Wallet } from './components/Wallet';
 import { PeerToPeerNetwork } from './components/PeerToPeerNetwork';
+import { BlockchainWorld } from './components/BlockchainWorld';
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/simulators/createWallets" element={<Wallet/>}/>
                 <Route path="/simulators/hash" element={<HashDemo/>}/>
                 <Route path="/simulators/peertopeer" element={<PeerToPeerNetwork/>}/>
+                <Route path="/tutorial/blockchainworld" element={<BlockchainWorld/>}/>
 
                 {/*Not found page */}
                 <Route path="*" element={<NotFound />} />
