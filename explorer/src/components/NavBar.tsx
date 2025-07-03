@@ -1,6 +1,6 @@
 import React from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
-import { Hash, Home, FileText, BarChart3, Wallet, Network, Zap, Settings } from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
+import { Zap, Settings } from 'lucide-react';
 
 const NavBar = () =>{
 
