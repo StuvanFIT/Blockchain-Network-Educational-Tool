@@ -1,34 +1,15 @@
 import React from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
-import { Hash, Home, FileText, BarChart3, Wallet, Network, Zap, Settings } from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
+import { Zap, Settings } from 'lucide-react';
 
 const NavBar = () =>{
 
-    const location = useLocation();
     const navigate = useNavigate();
 
 
     const handleNavigationClick = (route:string) => {
         navigate(route);
     };
-
-
-    const navItems = [
-        { path: '/', icon: Home, label: 'Dashboard' },
-        { path: '/explorer', icon: BarChart3, label: 'Block Explorer' },
-        { path: '/createTransactions', icon: FileText, label: 'Create Transactions' },
-        { path: '/createWallets', icon: Wallet, label: 'Create Wallet Accounts'},
-        { path: '/peertopeer', icon: Network, label: 'P2P Network'},
-        { path: '/hash', icon: Hash, label: 'Block Mining Simulator' },
-
-    ];
-
-    const isActiveItem = (path:string) => location.pathname ===path;
-
-    const reset = () =>{
-        localStorage.clear();
-    }
-
 
 
     return (

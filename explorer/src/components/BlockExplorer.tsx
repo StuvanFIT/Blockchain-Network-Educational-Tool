@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Hash, Clock, ArrowRight, Coins, FileText, Database } from 'lucide-react';
-import { useBlockchainStore, testChain } from '../stores/BlockChainStore';
-import test from 'node:test';
+import { Hash, Clock, Coins, FileText, Database } from 'lucide-react';
+import { useBlockchainStore } from '../stores/BlockChainStore';
 
 
 type TxIn = { txOutId: string; txOutIndex: number; signature: string };
@@ -25,10 +24,9 @@ const BlockExplorer = () => {
     const currBlockChain = [...blockchain].reverse();
     setBlocks(currBlockChain);
     setSelectedBlock(currBlockChain[0]);
-  }, []);
+  }, [blockchain]);
 
   const formatHash = (hash: string, length = 8) => `${hash.slice(0, length)}...${hash.slice(-4)}`;
-  const formatAddress = (address: string) => `${address.slice(0, 18)}...${address.slice(-6)}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 overflow-hidden ">

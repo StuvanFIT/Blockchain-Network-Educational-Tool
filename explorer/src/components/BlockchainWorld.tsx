@@ -1,13 +1,12 @@
 import { Database, ChevronLeft, ChevronRight, Zap, Network, Star, CheckCircle} from 'lucide-react';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typewriter } from '../utils/Typewriter';
 
 
 const BlockchainWorld = () => {
     const navigate = useNavigate();
-
-    const [gameStarted, setGameStarted] = useState(false);
+    
     const [currentStage, setCurrentStage] = useState(0);
     const [isCharacterTalking, setIsCharacterTalking] = useState(false);
     const [animationKey, setAnimationKey] = useState(0);
@@ -187,12 +186,6 @@ const BlockchainWorld = () => {
             color: 'from-gradient-to-r from-yellow-400 via-red-500 to-pink-500'
         }
     ];
-
-    const startGame = () => {
-        setGameStarted(true);
-        setCurrentStage(0);
-        startCharacterAnimation();
-    };
 
     const startCharacterAnimation = () => {
             setAnimationKey(prev => prev + 1);

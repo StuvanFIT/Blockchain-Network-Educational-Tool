@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import { Transaction } from '../blockchain/transaction';
-import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw, UserRound, UserRoundPlus, Cable, Blocks, Unplug } from 'lucide-react';
+import { Network, Users, Plus, Link, Server, Wifi, WifiOff, Pickaxe, Database, Link2, MessageCircle, Activity, X, RefreshCcw, UserRoundPlus, Cable, Blocks, Unplug } from 'lucide-react';
 
 import { BlockchainNode } from './Network/BlockchainNode';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, addEdge, Connection } from '@xyflow/react';
