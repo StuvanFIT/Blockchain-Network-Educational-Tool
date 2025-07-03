@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef }  from 'react';
-import { BarChart3, Loader2, Pickaxe, Square, Wrench,ChartColumnIncreasing,
-  Target, Hourglass, ChartNoAxesCombined, Trophy, Ban, Info, 
+import { BarChart3, Loader2, Pickaxe, Square, Wrench,
+  Target, Hourglass, Trophy, 
   TrendingUp,
   Activity} from "lucide-react";
 import CryptoJS from 'crypto-js';

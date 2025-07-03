@@ -1,5 +1,5 @@
 import React from 'react';
-import  ReactFlow, {Handle, Position, NodeProps, XYPosition} from '@xyflow/react';
+import {Handle, Position} from '@xyflow/react';
 
 
 import { Peer } from '../PeerToPeerNetwork';

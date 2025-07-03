@@ -30,7 +30,6 @@ const Transactions = () => {
 
   //use the blockchain store
   const {
-    blockchain,
     addNewBlock,
     getLatestBlock,
     getBlockchain,
@@ -40,16 +39,9 @@ const Transactions = () => {
   } = useBlockchainStore();
  
 
- 
-
-  const HEX_CHARS = '0123456789abcdef';
-  const ADDRESS_PREFIX = '04';
-  const ADDRESS_BODY_LENGTH = 128;
-  const MAX_GENERATION_ATTEMPTS = 10;
 
   const [activeTab, setActiveTab] = useState(''); //send or mine
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [randomAddress, setRandomAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const poolRef = useRef<Transaction[]>([]);
@@ -62,7 +54,6 @@ const Transactions = () => {
   const hashRef = useRef('');
   const [difficulty, setDifficulty] = useState(5);
   const timestampRef = useRef(0);
-  const [isGeneratingRandAddress, setIsGeneratingRandAddress] = useState(false);
   const [copied, setCopied] = useState(false);
 
 

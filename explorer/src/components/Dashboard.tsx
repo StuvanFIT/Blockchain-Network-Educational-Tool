@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Home, Zap, BarChart3, Network, Hash, Link, ChevronRight, Code, Activity, Shield, TrendingUp, CirclePlay, Wallet, Play } from 'lucide-react';
+import { BarChart3, Network, Hash, Link, Code, Activity, Shield, TrendingUp, CirclePlay, Wallet, Play } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { BlockchainWorld } from './BlockchainWorld';
+
 
 // Dashboard Page
 export const Dashboard = () => {
