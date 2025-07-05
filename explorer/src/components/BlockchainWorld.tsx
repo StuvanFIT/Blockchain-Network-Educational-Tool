@@ -1,4 +1,4 @@
-import { Database, ChevronLeft, ChevronRight, Zap, Network, Star, CheckCircle} from 'lucide-react';
+import { Database, ChevronLeft, ChevronRight, Zap, Network, Star, CheckCircle, Calendar} from 'lucide-react';
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typewriter } from '../utils/Typewriter';
@@ -75,13 +75,64 @@ const BlockchainWorld = () => {
             color: 'from-red-500 to-orange-600'
         },
         {
-            id: 'problem',
+            id: 'financial-crisis',
             title: 'Case Study: 2008 Financial Crisis',
             character: '🤖',
             characterName: 'BlockBot',
             story: "If you want to understand some of the inherent problems of the current traditional financial system, the 2008 Financial Crisis is a good case study! I'll note some quick details about the financial crisis down below!",
             concept: null,
-            interactive: null,
+            interactive: {
+                type: 'financial-crisis',
+                data: {
+                    timeline: [
+                        { 
+                            date: "Sep 2008",
+                            title: "Lehman Brothers Collapse",
+                            description: "The investment bank's bankruptcy exposed the dangerous interconnectedness of global financial institutions."
+                            + "When one major player failed, it triggered a domino effect across the entire system, exposing how traditional finance lacked proper risk distribution and transparency mechanisms", 
+                            impact: ""
+                        },
+                        {
+                            date: "Oct 2008",
+                            title: "Government Bailsout Begin",
+                            description: "The U.S. government's $700 billion TARP program and similar bailouts worldwide demonstrated the too big to fail problem. This centralized rescue highlighted how the financial system depended on government intervention rather than market mechanisms, undermining trust in free-market principles.",
+                            impact: ""
+                        },
+                        {
+                            date: "Jan 2009",
+                            title: "Quantitative Easing Launches",
+                            description: "Central banks began printing massive amounts of money to stimulate economies, devaluing currencies and creating concerns about inflation.",
+                            impact: ""
+                        },
+                        {
+                            date: "Jan 2009",
+                            title: "Bitcoin Genesis Block",
+                            description: "Satoshi Nakamoto mined the first Bitcoin block, embedding the headline Chancellor on brink of second bailout for banks. This directly referenced the ongoing financial crisis and positioned Bitcoin as an alternative to the failing traditional system, offering decentralized, transparent, and mathematically-governed money.",
+                            impact: ""
+                        },
+                        
+                    ],
+                    problems: [
+                        { icon: "🏦", title: "Centralisation", description: "Excessive centralisation leading to single points of failure" },
+                        { icon: "🏦", title: "Transparency", description: "Lack of transparency in complex financial instruments" },
+                        { icon: "🏦", title: "Morals", description: "Moral hazard from government bailouts" },
+                        { icon: "🏦", title: "Inflationary monetary policy", description: "Inflationary monetary policy undermining currency stability" },
+                    ],
+                    bitcoinSolutions: [
+                        { icon: "🔗", title: "Decentralisation", description: "Decentralised networks with no single point of failure" },
+                        { icon: "🔗", title: "Clear Transparency", description: "Transparent, immutable ledgers for all transactions" },
+                        { icon: "🔗", title: "Avoids Manipulation", description: "Algorithmic governance removing human manipulation" },
+                        { icon: "🔗", title: "Inflation", description: "Fixed supply currencies protecting against inflation" },
+                       
+                    ],
+                    statistics: [
+                        { value: "$700B", label: "TARP Bailout" },
+                        { value: "8.8 million", label: "Jobs Lost"},
+                        { value: "S&P 500", label:"Declined by 38.5%"}
+                        
+                    ],
+                }
+            },
             color: 'from-yellow-500 to-lime-600'
         },
         {
@@ -113,7 +164,10 @@ const BlockchainWorld = () => {
                 type: 'hash_demo',
                 data: {
                 originalText: 'Alice sends 5 coins to Bob',
-                hash: 'a1b2c3d4e5f6'
+                hash: '7cd39e5f2f31932b2e7525c5f3702686028b35b9ada923f7eeaac4d2d272b813',
+                changeText: 'Alice sends 5 coins to Bo',
+                changeHash: 'a1f6b901a8ab135c19864afdad4352ec697c754f68ba7a57d45e6378ba41c78d'
+
                 }
             },
             color: 'from-purple-500 to-pink-600'
@@ -213,184 +267,296 @@ const BlockchainWorld = () => {
         if (!interactive) return null;
 
         switch (interactive.type) {
-        case 'comparison':
-            return (
-            <div className="grid grid-cols-2 gap-6 mt-6">
-                <div className="bg-red-50 p-6 rounded-xl border border-red-200">
-                <h4 className="font-bold text-red-800 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">🏛️</span>
-                    Centralised Systems
-                </h4>
-                <ul className="space-y-2">
-                    {interactive.data.centralised.map((item:any, idx:number) => (
-                    <li key={idx} className="text-red-700 text-sm flex items-start gap-2">
-                        <span className="text-red-500 mt-1">•</span>
-                        {item}
-                    </li>
-                    ))}
-                </ul>
-                </div>
-                <div className="bg-green-50 p-6 rounded-xl border border-green-200">
-                <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">🌐</span>
-                    Decentralised Systems
-                </h4>
-                <ul className="space-y-2">
-                    {interactive.data.decentralised.map((item:any, idx:number) => (
-                    <li key={idx} className="text-green-700 text-sm flex items-start gap-2">
-                        <span className="text-green-500 mt-1">•</span>
-                        {item}
-                    </li>
-                    ))}
-                </ul>
-                </div>
-            </div>
-            );
 
-        case 'block_builder':
-            return (
-            <div className="mt-6">
-                <h4 className="font-bold text-gray-800 mb-4">Interactive Blockchain</h4>
-                <div className="flex gap-4 overflow-x-auto pb-4">
-                {interactive.data.blocks.map((block:any, idx:number) => (
-                    <div className='flex items-center gap-2'>
-                        <div key={block.id} className="bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-64">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="font-bold text-blue-800">Block #{block.id}</span>
-                                <span className="text-xs bg-blue-100 px-2 py-1 rounded text-blue-700">
-                                Hash: {block.hash}
-                                </span>
-                            </div>
-                            <div className="space-y-2">
-                                {block.transactions.map((tx:any, txIdx:number) => (
-                                <div key={txIdx} className="text-sm bg-white p-2 rounded border text-gray-700">
-                                    {tx}
-                                </div>
+            case 'financial-crisis':
+                return (
+                    <div className="mt-6 space-y-6">
+                        {/* Timeline Section */}
+                        <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                            <h4 className="font-bold text-red-800 mb-4 flex items-center gap-2">
+                                <span className="text-2xl">📉</span>
+                                2008 Financial Crisis Timeline
+                            </h4>
+                            <div className="space-y-4">
+                                {interactive.data.timeline.map((event:any, idx:number) => (
+                                    <div key={idx} className="flex items-start gap-4 p-4 bg-white rounded-lg border border-red-100">
+                                        <div className="bg-red-100 rounded-full px-3 py-1 text-sm font-bold text-red-700 flex-shrink-0">
+                                            {event.date}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h5 className="font-semibold text-red-800 mb-1">{event.title}</h5>
+                                            <p className="text-red-700 text-sm">{event.description}</p>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
-                        {idx < interactive.data.blocks.length - 1 && (
-                            <div className="flex justify-center mt-4">
-                                <ChevronRight className="w-6 h-6 text-blue-500" />
+
+                        {/* Problems Exposed */}
+                        <div className="bg-orange-50 p-6 rounded-xl border border-orange-200">
+                            <h4 className="font-bold text-orange-800 mb-4 flex items-center gap-2">
+                                <span className="text-2xl">⚠️</span>
+                                System Flaws Exposed
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {interactive.data.problems.map((problem:any, idx:number) => (
+                                    <div key={idx} className="bg-white p-4 rounded-lg border border-orange-100">
+                                        <div className="flex items-start gap-3">
+                                            <span className="text-2xl">{problem.icon}</span>
+                                            <div>
+                                                <h5 className="font-semibold text-orange-800 mb-1">{problem.title}</h5>
+                                                <p className="text-orange-700 text-sm">{problem.description}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        )}
-                    </div>
+                        </div>
 
-                ))}
-                </div>
-            </div>
-            );
+                        {/* Bitcoin's Response */}
+                        <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                            <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
+                                <span className="text-2xl">₿</span>
+                                Bitcoin's Revolutionary Response
+                            </h4>
+                            <div className="space-y-4">
+                                <div className="bg-white p-4 rounded-lg border border-green-100">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Calendar className="w-5 h-5 text-green-600" />
+                                        <span className="font-semibold text-green-800">January 3, 2009</span>
+                                    </div>
+                                    <div className="bg-gray-100 p-3 rounded font-mono text-sm text-gray-700 mb-3">
+                                        "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
+                                    </div>
+                                    <p className="text-green-700 text-sm">
+                                        This message, embedded in Bitcoin's Genesis Block, directly referenced the ongoing financial crisis and positioned Bitcoin as an alternative to the failing traditional system.
+                                    </p>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {interactive.data.bitcoinSolutions.map((solution:any, idx:number) => (
+                                        <div key={idx} className="bg-white p-4 rounded-lg border border-green-100">
+                                            <div className="flex items-start gap-3">
+                                                <span className="text-xl">{solution.icon}</span>
+                                                <div>
+                                                    <h5 className="font-semibold text-green-800 mb-1">{solution.title}</h5>
+                                                    <p className="text-green-700 text-sm">{solution.description}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
 
-        case 'hash_demo':
-            return (
-            <div className="mt-6 bg-purple-50 p-6 rounded-xl border border-purple-200">
-                <h4 className="font-bold text-purple-800 mb-4">Hash Demonstration</h4>
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">Original Data:</label>
-                        <div className="bg-white p-3 rounded border text-gray-800 font-mono text-sm">
-                        {interactive.data.originalText}
+                        {/* Interactive Statistics */}
+                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                            <h4 className="font-bold text-blue-800 mb-4 flex items-center gap-2">
+                                <span className="text-2xl">📊</span>
+                                Crisis by the Numbers
+                            </h4>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {interactive.data.statistics.map((stat:any, idx:number) => (
+                                    <div key={idx} className="bg-white p-4 rounded-lg border border-blue-100 text-center">
+                                        <div className="text-3xl font-bold text-blue-800 mb-1">{stat.value}</div>
+                                        <div className="text-sm text-blue-600">{stat.label}</div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">Hash Output:</label>
-                        <div className="bg-white p-3 rounded border text-purple-800 font-mono text-sm">
-                        {interactive.data.hash}
+                );
+
+            case 'comparison':
+                return (
+                <div className="grid grid-cols-2 gap-6 mt-6">
+                    <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+                    <h4 className="font-bold text-red-800 mb-4 flex items-center gap-2">
+                        <span className="text-2xl">🏛️</span>
+                        Centralised Systems
+                    </h4>
+                    <ul className="space-y-2">
+                        {interactive.data.centralised.map((item:any, idx:number) => (
+                        <li key={idx} className="text-red-700 text-sm flex items-start gap-2">
+                            <span className="text-red-500 mt-1">•</span>
+                            {item}
+                        </li>
+                        ))}
+                    </ul>
+                    </div>
+                    <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                    <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
+                        <span className="text-2xl">🌐</span>
+                        Decentralised Systems
+                    </h4>
+                    <ul className="space-y-2">
+                        {interactive.data.decentralised.map((item:any, idx:number) => (
+                        <li key={idx} className="text-green-700 text-sm flex items-start gap-2">
+                            <span className="text-green-500 mt-1">•</span>
+                            {item}
+                        </li>
+                        ))}
+                    </ul>
+                    </div>
+                </div>
+                );
+
+            case 'block_builder':
+                return (
+                <div className="mt-6">
+                    <h4 className="font-bold text-gray-800 mb-4">Interactive Blockchain</h4>
+                    <div className="flex gap-4 overflow-x-auto pb-4">
+                    {interactive.data.blocks.map((block:any, idx:number) => (
+                        <div className='flex items-center gap-2'>
+                            <div key={block.id} className="bg-blue-50 p-4 rounded-xl border border-blue-200 min-w-64">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="font-bold text-blue-800">Block #{block.id}</span>
+                                    <span className="text-xs bg-blue-100 px-2 py-1 rounded text-blue-700">
+                                    Hash: {block.hash}
+                                    </span>
+                                </div>
+                                <div className="space-y-2">
+                                    {block.transactions.map((tx:any, txIdx:number) => (
+                                    <div key={txIdx} className="text-sm bg-white p-2 rounded border text-gray-700">
+                                        {tx}
+                                    </div>
+                                    ))}
+                                </div>
+                            </div>
+                            {idx < interactive.data.blocks.length - 1 && (
+                                <div className="flex justify-center mt-4">
+                                    <ChevronRight className="w-6 h-6 text-blue-500" />
+                                </div>
+                            )}
+                        </div>
+
+                    ))}
+                    </div>
+                </div>
+                );
+
+            case 'hash_demo':
+                return (
+                <div className="mt-6 bg-purple-50 p-6 rounded-xl border border-purple-200">
+                    <h4 className="font-bold text-purple-800 mb-4">Hash Demonstration</h4>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-purple-700 mb-2">Example Data 1:</label>
+                            <div className="bg-white p-3 rounded border text-gray-800 font-mono text-sm">
+                                {interactive.data.originalText}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-purple-700 mb-2">Example Hash Output 1:</label>
+                            <div className="bg-white p-3 rounded border text-purple-800 font-mono text-sm">
+                                {interactive.data.hash}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-purple-700 mb-2">Example Data 2:</label>
+                            <div className="bg-white p-3 rounded border text-gray-800 font-mono text-sm">
+                                {interactive.data.changeText}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-purple-700 mb-2">Example Hash Output 2:</label>
+                            <div className="bg-white p-3 rounded border text-purple-800 font-mono text-sm">
+                                {interactive.data.changeHash}
+                            </div>
+                        </div>
+                        <p className="text-sm text-purple-600 italic">
+                            Changing even one character changes the hash completely!
+                        </p>
+                    </div>
+                </div>
+                );
+
+            case 'mining_game':
+                return (
+                <div className="mt-6 bg-yellow-50 p-6 rounded-xl border border-yellow-200">
+                    <h4 className="font-bold text-yellow-800 mb-4">Mining Simulation</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded border">
+                        <div className="text-sm font-medium text-yellow-700 mb-2">Difficulty Level</div>
+                        <div className="text-2xl font-bold text-yellow-800">{interactive.data.difficulty}</div>
+                    </div>
+                    <div className="bg-white p-4 rounded border">
+                        <div className="text-sm font-medium text-yellow-700 mb-2">Block Reward</div>
+                        <div className="text-2xl font-bold text-yellow-800">{interactive.data.reward} BTC</div>
+                    </div>
+                    </div>
+                    <div className="mt-4 bg-yellow-100 p-4 rounded">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Zap className="w-5 h-5 text-yellow-600" />
+                        <span className="font-medium text-yellow-800">Mining in Progress...</span>
+                    </div>
+                    <div className="w-full bg-yellow-200 rounded-full h-2">
+                        <div className="bg-yellow-500 h-2 rounded-full animate-pulse" style={{width: '67%'}}></div>
+                    </div>
+                    </div>
+                </div>
+                );
+
+            case 'network_visualization':
+                return (
+                <div className="mt-6 bg-teal-50 p-6 rounded-xl border border-teal-200">
+                    <h4 className="font-bold text-teal-800 mb-4">Decentralised Network</h4>
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    {[...Array(12)].map((_, idx) => (
+                        <div key={idx} className="bg-teal-100 p-3 rounded-lg text-center">
+                        <div className="w-8 h-8 bg-teal-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-sm">
+                            {idx + 1}
+                        </div>
+                        <div className="text-xs text-teal-700">Node {idx + 1}</div>
+                        </div>
+                    ))}
+                    </div>
+                    <div className="text-center text-sm text-teal-600">
+                    <Network className="w-5 h-5 inline mr-2" />
+                    {interactive.data.nodes} nodes with {interactive.data.connections} connections
+                    </div>
+                </div>
+                );
+
+            case 'application_explorer':
+                return (
+                <div className="mt-6 grid grid-cols-2 gap-4">
+                    {interactive.data.applications.map((app:any, idx:number) => (
+                    <div key={idx} className="bg-indigo-50 p-4 rounded-xl border border-indigo-200 hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-3">
+                        <span className="text-2xl">{app.icon}</span>
+                        <div>
+                            <h5 className="font-bold text-indigo-800">{app.name}</h5>
+                            <p className="text-sm text-indigo-600 mt-1">{app.description}</p>
+                        </div>
                         </div>
                     </div>
-                    <p className="text-sm text-purple-600 italic">
-                        Try changing even one character above and watch the hash change completely!
-                    </p>
+                    ))}
                 </div>
-            </div>
-            );
+                );
 
-        case 'mining_game':
-            return (
-            <div className="mt-6 bg-yellow-50 p-6 rounded-xl border border-yellow-200">
-                <h4 className="font-bold text-yellow-800 mb-4">Mining Simulation</h4>
-                <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded border">
-                    <div className="text-sm font-medium text-yellow-700 mb-2">Difficulty Level</div>
-                    <div className="text-2xl font-bold text-yellow-800">{interactive.data.difficulty}</div>
-                </div>
-                <div className="bg-white p-4 rounded border">
-                    <div className="text-sm font-medium text-yellow-700 mb-2">Block Reward</div>
-                    <div className="text-2xl font-bold text-yellow-800">{interactive.data.reward} BTC</div>
-                </div>
-                </div>
-                <div className="mt-4 bg-yellow-100 p-4 rounded">
-                <div className="flex items-center gap-2 mb-2">
-                    <Zap className="w-5 h-5 text-yellow-600" />
-                    <span className="font-medium text-yellow-800">Mining in Progress...</span>
-                </div>
-                <div className="w-full bg-yellow-200 rounded-full h-2">
-                    <div className="bg-yellow-500 h-2 rounded-full animate-pulse" style={{width: '67%'}}></div>
-                </div>
-                </div>
-            </div>
-            );
-
-        case 'network_visualization':
-            return (
-            <div className="mt-6 bg-teal-50 p-6 rounded-xl border border-teal-200">
-                <h4 className="font-bold text-teal-800 mb-4">Decentralised Network</h4>
-                <div className="grid grid-cols-4 gap-4 mb-4">
-                {[...Array(12)].map((_, idx) => (
-                    <div key={idx} className="bg-teal-100 p-3 rounded-lg text-center">
-                    <div className="w-8 h-8 bg-teal-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-sm">
-                        {idx + 1}
+            case 'certificate':
+                return (
+                <div className="mt-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
+                    <div className="text-center mb-6">
+                        <Star className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                        <h4 className="text-2xl font-bold text-yellow-800 mb-2">Blockchain Master Certificate</h4>
+                        <p className="text-yellow-700">You have successfully completed the Blockchain Adventure!</p>
                     </div>
-                    <div className="text-xs text-teal-700">Node {idx + 1}</div>
-                    </div>
-                ))}
-                </div>
-                <div className="text-center text-sm text-teal-600">
-                <Network className="w-5 h-5 inline mr-2" />
-                {interactive.data.nodes} nodes with {interactive.data.connections} connections
-                </div>
-            </div>
-            );
-
-        case 'application_explorer':
-            return (
-            <div className="mt-6 grid grid-cols-2 gap-4">
-                {interactive.data.applications.map((app:any, idx:number) => (
-                <div key={idx} className="bg-indigo-50 p-4 rounded-xl border border-indigo-200 hover:shadow-md transition-shadow">
-                    <div className="flex items-start gap-3">
-                    <span className="text-2xl">{app.icon}</span>
-                    <div>
-                        <h5 className="font-bold text-indigo-800">{app.name}</h5>
-                        <p className="text-sm text-indigo-600 mt-1">{app.description}</p>
-                    </div>
+                    <div className="space-y-2">
+                        <h5 className="font-bold text-yellow-800">Achievements Unlocked:</h5>
+                            {interactive.data.achievements.map((achievement:any, idx:number) => (
+                                <div key={idx} className="flex items-center gap-2 text-yellow-700">
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                                <span className="text-sm">{achievement}</span>
+                                </div>
+                            ))}
                     </div>
                 </div>
-                ))}
-            </div>
-            );
+                );
 
-        case 'certificate':
-            return (
-            <div className="mt-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
-                <div className="text-center mb-6">
-                <Star className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-                <h4 className="text-2xl font-bold text-yellow-800 mb-2">Blockchain Master Certificate</h4>
-                <p className="text-yellow-700">You have successfully completed the Blockchain Adventure!</p>
-                </div>
-                <div className="space-y-2">
-                <h5 className="font-bold text-yellow-800">Achievements Unlocked:</h5>
-                {interactive.data.achievements.map((achievement:any, idx:number) => (
-                    <div key={idx} className="flex items-center gap-2 text-yellow-700">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span className="text-sm">{achievement}</span>
-                    </div>
-                ))}
-                </div>
-            </div>
-            );
-
-        default:
-            return null;
+            default:
+                return null;
         }
     };
 

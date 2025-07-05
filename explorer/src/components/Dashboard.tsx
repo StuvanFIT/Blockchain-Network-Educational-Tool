@@ -211,24 +211,6 @@ export const Dashboard = () => {
         </div>
       </section>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     </div>
   )
 };
