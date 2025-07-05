@@ -66,25 +66,29 @@ export const Dashboard = () => {
       icon: <Code className="w-6 h-6" />,
       title: "What is Blockchain?",
       description: "Interactive explanation of distributed ledgers and their properties",
-      visual: "🔗"
+      visual: "🔗",
+      route: "/concepts/blockchain"
     },
     {
       icon: <Activity className="w-6 h-6" />,
       title: "How Bitcoin Works",
       description: "Deep dive into Bitcoin's architecture and transaction flow",
-      visual: "₿"
+      visual: "₿",
+      route: "/concepts/blockchain"
     },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "Ethereum & Smart Contracts",
       description: "Explore programmable money and decentralized applications",
-      visual: "⧫"
+      visual: "⧫",
+      route: "/concepts/blockchain"
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
       title: "Consensus Mechanisms",
       description: "Compare Proof of Work, Proof of Stake, and other algorithms",
-      visual: "⚖️"
+      visual: "⚖️", 
+      route: "/concepts/blockchain"
     }
   ]
 
@@ -169,7 +173,7 @@ export const Dashboard = () => {
 
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
             {conceptModules.map((concept, index) => (
-              <div key={index} className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
+              <div key={index} onClick={()=> handleNavigationClick(concept.route)} className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:ring-1 ring-cyan-400/50 hover:shadow-2xl ease-in-out'>
 
                 <div className='flex items-center gap-4  mb-6'>
                   <div className='w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center'> {concept.icon} </div>

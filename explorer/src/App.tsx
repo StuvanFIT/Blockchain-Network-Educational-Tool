@@ -11,6 +11,9 @@ import NotFound from './components/NotFound';
 import { Wallet } from './components/Wallet';
 import { PeerToPeerNetwork } from './components/PeerToPeerNetwork';
 import { BlockchainWorld } from './components/BlockchainWorld';
+import BlockChainConcept from './components/Concepts/BlockchainConcept';
+import BitcoinProcess from './components/Concepts/BitcoinProcess';
+import CryptoCurrencyInvestment from './components/Concepts/CryptocurrencyInvestment';
 
 function App() {
 
@@ -29,6 +32,9 @@ function App() {
                 <Route path="/simulators/hash" element={<HashDemo/>}/>
                 <Route path="/simulators/peertopeer" element={<PeerToPeerNetwork/>}/>
                 <Route path="/tutorial/blockchainworld" element={<BlockchainWorld/>}/>
+                <Route path="/concepts/blockchain" element={<BlockChainConcept/>}/>
+                <Route path="/concepts/How-Bitcoin-Works" element={<BitcoinProcess/>}/>
+                <Route path="/concepts/Cryptocurrency-as-an-investment" element={<CryptoCurrencyInvestment/>}/>
 
                 {/*Not found page */}
                 <Route path="*" element={<NotFound />} />
