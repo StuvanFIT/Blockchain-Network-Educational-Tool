@@ -17,7 +17,7 @@ export default function CryptoCurrencyInvestment() {
     useEffect(() => {
         const handleScroll = () => {
             const scrollPosition = window.scrollY || 0;
-            const offset = 150;
+            const offset = 500;
 
             for (const section of sections) {
                 const element = sectionRefs.current[section.id];
