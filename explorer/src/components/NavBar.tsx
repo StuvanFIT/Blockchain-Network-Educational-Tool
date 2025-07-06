@@ -49,7 +49,7 @@ const NavBar = () => {
     ];
 
     return (
-        <nav className="relative sticky top-0 z-50 flex items-center justify-between p-2 bg-slate-800/95 backdrop-blur-sm border-b border-slate-700/50 shadow-2xl">
+        <nav className="relative sticky top-0 z-50 h-20 flex items-center justify-between p-2 bg-slate-800/95 backdrop-blur-sm border-b border-slate-700/50 shadow-2xl">
             {/* Icon */}
             <div 
                 onClick={() => handleNavigationClick("/")} 
