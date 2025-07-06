@@ -124,6 +124,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **React Team**: For providing an excellent framework
 - **Tailwind CSS**: For the utility-first CSS framework
 - **Open Source Contributors**: For making quality education accessible
+- **https://lhartikk.github.io/**: This project idea was inspired by the build your own project link.
 
 ## 📞 Support
 
