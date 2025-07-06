@@ -71,15 +71,15 @@ export const Dashboard = () => {
     },
     {
       icon: <Activity className="w-6 h-6" />,
-      title: "How Bitcoin Works",
-      description: "Deep dive into Bitcoin's architecture and transaction flow",
+      title: "How are Blockchain and Cryptocurrency related?",
+      description: "Deep dive into the relationships between crytocurrency and blockchain.",
       visual: "₿",
-      route: "/concepts/blockchain"
+      route: "/concepts/Cryptocurrency-as-an-investment"
     },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "Ethereum & Smart Contracts",
-      description: "Explore programmable money and decentralized applications",
+      description: "Explore programmable money and decentralised applications",
       visual: "⧫",
       route: "/concepts/blockchain"
     },
@@ -127,7 +127,7 @@ export const Dashboard = () => {
       <div className='max-w-7xl mx-auto'>
         <div className='text-center mb-16'>
           <h2 className='text-5xl font-bold mb-4'>Interactive Simulators</h2>
-          <p className='text-gray-300 text-lg max-w-3xl mx-auto'>Get hands on experience with blockchain technology through our interactive simulations</p>
+          <p className='text-xl text-blue-100 max-w-3xl mx-auto'>Get hands on experience with blockchain technology through our interactive simulations</p>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
@@ -168,7 +168,7 @@ export const Dashboard = () => {
         <div className='max-w-7xl mx-auto'>
           <div className='text-center mb-16'>
             <h2 className='text-5xl font-bold mb-4'>Core Concepts</h2>
-            <p>Understand the fundamentalswith visual explanationsand real examples</p>
+            <p className='text-xl text-blue-100'>Understand the fundamentals and important aspects of the Blockchain.</p>
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
