@@ -1,5 +1,9 @@
 # BlockchainEdu 🔗📚
 
+**CURRENT VERSION OF BLOCKCHAINEDU SITE:** **[BlockchainEdu](https://wondrous-longma-0c345d.netlify.app/)**
+
+
+
 **An Interactive Educational Tool for Understanding Blockchain Technology and Cryptocurrency**
 
 BlockchainEdu is a comprehensive, interactive web application designed to help users learn about blockchain technology and cryptocurrency through engaging, easy-to-understand content. Whether you're a complete beginner or looking to deepen your knowledge, BlockchainEdu provides a structured learning experience with modern, responsive design.
