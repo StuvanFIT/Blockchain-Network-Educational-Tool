@@ -15,7 +15,7 @@ import BlockChainConcept from './components/Concepts/BlockchainConcept';
 import BitcoinProcess from './components/Concepts/BitcoinProcess';
 import CryptoCurrencyInvestment from './components/Concepts/CryptocurrencyInvestment';
 import ScrollToTop from './utils/ScrollTop';
-import { Scroll } from 'lucide-react';
+
 
 function App() {
 
@@ -38,10 +38,10 @@ function App() {
                     <Route path="/concepts/blockchain" element={<BlockChainConcept/>}/>
                     <Route path="/concepts/How-Bitcoin-Works" element={<BitcoinProcess/>}/>
                     <Route path="/concepts/Cryptocurrency-as-an-investment" element={<CryptoCurrencyInvestment/>}/>
-
-                    {/*Not found page */}
-                    <Route path="*" element={<NotFound />} />
                 </Route>
+                
+                {/*Not found page */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </div>
 

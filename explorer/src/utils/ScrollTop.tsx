@@ -9,7 +9,6 @@ const ScrollToTop = () => {
 
     useEffect(() => {
         const element = document.documentElement || document.body;
-        console.log(element)
         element.scrollTop = 0;
     }, [location]);
 
