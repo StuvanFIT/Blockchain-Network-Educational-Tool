@@ -66,15 +66,11 @@ const NavBar = () => {
             {/* Features/Tabs */}
             <div className='hidden md:flex space-x-8 text-xl'>
                 <a href='#' className='hover:text-cyan-400 transition-colors text-slate-300 font-bold relative group'>
-                    Cryptocurrencies
+                    Concepts
                     <span className='absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300'></span>
                 </a>
                 <a href='#' className='hover:text-cyan-400 transition-colors text-slate-300 font-bold relative group'>
-                    Blockchain
-                    <span className='absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300'></span>
-                </a>
-                <a href='#' className='hover:text-cyan-400 transition-colors text-slate-300 font-bold relative group'>
-                    Learning Tools
+                    Learning Resources
                     <span className='absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300'></span>
                 </a>
             </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Hash, Clock, Coins, FileText, Database } from 'lucide-react';
 import { useBlockchainStore } from '../stores/BlockChainStore';
+import { Link } from 'react-router';
 
 
 type TxIn = { txOutId: string; txOutIndex: number; signature: string };
@@ -44,13 +45,17 @@ const BlockExplorer = () => {
                 <p className="text-blue-100 text-sm opacity-90">{blocks.length} blocks mined</p>
               </div>
             </div>
-            <p className="text-blue-100 text-sm leading-relaxed opacity-90">
-              Head to the 'Create Transactions' page and send money! You should see your new block down below!
-            </p>
+
+            <div className='text-blue-100 text-sm leading-relaxed opacity-90'>
+              Head to the {' '}
+              <Link to={"/simulators/createTransactions"} className='font-bold underline'>Create Transaction</Link>
+              {' '}page and send money! You should see your new block down below!
+            </div>
             <br/>
             <p className="text-blue-100 text-sm leading-relaxed opacity-90">
               Explore blocks and transactions on the blockchain. Click any block to view its details.
             </p>
+
           </div>
           
           {/* Block List */}
