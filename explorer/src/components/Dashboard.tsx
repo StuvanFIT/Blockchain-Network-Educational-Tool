@@ -74,21 +74,21 @@ export const Dashboard = () => {
       title: "How are Blockchain and Cryptocurrency related?",
       description: "Deep dive into the relationships between crytocurrency and blockchain.",
       visual: "₿",
-      route: "/concepts/Cryptocurrency-as-an-investment"
+      route: "/concepts/Blockchain-and-cryptocurrency"
     },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "Ethereum & Smart Contracts",
       description: "Explore programmable money and decentralised applications",
       visual: "⧫",
-      route: "/concepts/blockchain"
+      route: "/concepts/smart-contracts"
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
-      title: "Consensus Mechanisms",
-      description: "Compare Proof of Work, Proof of Stake, and other algorithms",
+      title: "Should You Invest into Cryptocurrency?",
+      description: "Be knowledgable about what you are investing into!",
       visual: "⚖️", 
-      route: "/concepts/blockchain"
+      route: "/concepts/Cryptocurrency-as-an-investment"
     }
   ]
 

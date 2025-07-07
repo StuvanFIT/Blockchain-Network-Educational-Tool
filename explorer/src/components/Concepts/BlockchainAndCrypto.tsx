@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-export default function CryptoCurrencyInvestment() {
+export default function BlockchainAndCrypto() {
     const [activeSection, setActiveSection] = useState('introduction');
     const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
