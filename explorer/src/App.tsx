@@ -15,6 +15,7 @@ import BlockChainConcept from './components/Concepts/BlockchainConcept';
 import BlockchainAndCrypto from './components/Concepts/BlockchainAndCrypto';
 import CryptoAsInvestment from './components/Concepts/CryptoAsInvestment';
 import ScrollToTop from './utils/ScrollTop';
+import SmartContracts from './components/Concepts/SmartContracts';
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
                     <Route path="/simulators/peertopeer" element={<PeerToPeerNetwork/>}/>
                     <Route path="/tutorial/blockchainworld" element={<BlockchainWorld/>}/>
                     <Route path="/concepts/blockchain" element={<BlockChainConcept/>}/>
+                    <Route path="/concepts/smart-contracts" element={<SmartContracts/>}/>
                     <Route path="/concepts/Cryptocurrency-as-an-investment" element={<CryptoAsInvestment/>}/>
                     <Route path="/concepts/Blockchain-and-cryptocurrency" element={<BlockchainAndCrypto/>}/>
                 </Route>
