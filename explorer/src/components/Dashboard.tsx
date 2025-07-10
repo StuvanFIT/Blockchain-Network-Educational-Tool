@@ -188,6 +188,11 @@ export const Dashboard = () => {
               </div>
             ))}
           </div>
+
+          <div className='text-center mt-12'>
+            <button onClick={() => handleNavigationClick("/concepts/Concepts")} className='text-xl font-bold p-4 bg-gradient-to-r from-cyan-500 to-purple-500 px-6 py-2 text-white text-xl font-bold rounded-full hover:shadow-lg hover:shadow-purple-500/25 transition-all'>View More...</button>
+
+          </div>
         </div>
       </section>
 
