@@ -1,6 +1,6 @@
 # BlockchainEdu 🔗📚
 
-**CURRENT VERSION OF BLOCKCHAINEDU SITE:** **[BlockchainEdu](https://blockchaineducation.netlify.app/)**
+**CURRENT VERSION OF BLOCKCHAINEDU SITE:** **[BlockchainEdu](https://networkblockchaineducation.netlify.app/)**
 
 
 
