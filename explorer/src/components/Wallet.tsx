@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {ec as EC} from 'elliptic';
-import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, EyeClosed, Eye, Check, Lock} from 'lucide-react';
-import { arrayToHex, sha256 } from '../blockchain/utils';
+import { WalletCards, Plus, RefreshCcw, Copy, EyeOff, Eye, Check, Lock} from 'lucide-react';
 
 import { useWalletStore } from '../stores/WalletStore';
 

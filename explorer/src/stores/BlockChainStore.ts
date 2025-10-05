@@ -1,10 +1,8 @@
-import React from  'react';
 import { create } from 'zustand';
 import _ from 'lodash';
 import CryptoJS from 'crypto-js';
 import { UnspentTxOut, Transaction, TxIn, TxOut, getTransactionId, signTxIn} from '../blockchain/transaction';
 import { hexToBinary } from '../blockchain/utils';
-import { useWalletStore } from './WalletStore';
 
 
 

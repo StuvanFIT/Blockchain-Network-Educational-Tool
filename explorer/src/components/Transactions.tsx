@@ -1,12 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary, LocationEdit, Check} from 'lucide-react';
-import { UnspentTxOut, validateTransaction, getCoinbaseTransaction, Transaction, COINBASE_AMOUNT, updateUnspentTxOuts } from '../blockchain/transaction';
-import { getTransactionPool, addToTransactionPool, clearTransactionPool, updateTransactionPool } from '../blockchain/transactionPool';
+import {FileText, Wallet, Copy, RefreshCw, Send, Pickaxe, AlertCircle, CheckCircle, Zap, Clock, Blocks, SquareLibrary} from 'lucide-react';
+import {getCoinbaseTransaction, Transaction, COINBASE_AMOUNT } from '../blockchain/transaction';
+import { addToTransactionPool} from '../blockchain/transactionPool';
 
 //Import Subscription
 import { useWalletStore } from '../stores/WalletStore';
 import { useBlockchainStore, Block, createTransaction } from '../stores/BlockChainStore';
-import { generatePrivateKey } from '../stores/WalletStore';
+
 
 
 // Transactions Page
